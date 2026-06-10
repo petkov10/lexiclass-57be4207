@@ -338,3 +338,67 @@ function ResourceForm({ themeId, existing, orderHint, onDone }: { themeId: strin
     </div>
   );
 }
+
+function inferType(name: string): ResourceType {
+  const n = name.toLowerCase();
+  if (/\.(pptx?|key|odp)$/.test(n)) return "presentation";
+  if (/\.(docx?|odt|rtf|txt|md|pdf)$/.test(n)) return "document";
+  if (/\.(jpg|jpeg|png|gif|webp|svg|bmp)$/.test(n)) return "image";
+  if (/\.(mp4|mov|webm|avi|mkv)$/.test(n)) return "video";
+  if (/\.(cs|html|css|sql|js|ts|tsx|jsx|py|cpp|java|json|sh)$/.test(n)) return "code";
+  return "other";
+}
+
+function BulkUploader({ themeId, baseOrder, onDone }: { themeId: string; baseOrder: number; onDone: () => void }) {
+  const [dragOver, setDragOver] = useState(false);
+  const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const upload = async (files: FileList | File[]) => {
+    const arr = Array.from(files);
+    if (arr.length === 0) return;
+    setProgress({ done: 0, total: arr.length });
+    let i = 0;
+    for (const file of arr) {
+      const type = inferType(file.name);
+      try {
+        const path = `${themeId}/${Date.now()}_${i}_${sanitizeFileName(file.name)}`;
+        const { error: upErr } = await supabase.storage.from("resources").upload(path, file);
+        if (upErr) throw upErr;
+        await supabase.from("resources").insert({
+          theme_id: themeId, type, title: file.name.replace(/\.[^.]+$/, ""),
+          file_path: path, order_index: baseOrder + i + 1,
+        });
+      } catch (e: any) {
+        toast.error(`${file.name}: ${e.message}`);
+      }
+      i++;
+      setProgress({ done: i, total: arr.length });
+    }
+    setProgress(null);
+    toast.success(`Качени ${arr.length} файла`);
+    onDone();
+  };
+
+  return (
+    <div
+      onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+      onDragLeave={() => setDragOver(false)}
+      onDrop={(e) => { e.preventDefault(); setDragOver(false); upload(e.dataTransfer.files); }}
+      onClick={() => inputRef.current?.click()}
+      className={`rounded-lg border-2 border-dashed p-6 text-center cursor-pointer transition-colors ${dragOver ? "border-primary bg-primary/5" : "border-muted-foreground/25 hover:border-primary/50"}`}
+    >
+      <input ref={inputRef} type="file" multiple className="hidden" onChange={(e) => e.target.files && upload(e.target.files)} />
+      <Upload className="h-6 w-6 mx-auto text-muted-foreground mb-2" />
+      {progress ? (
+        <div className="text-sm">Качване... <strong>{progress.done}/{progress.total}</strong></div>
+      ) : (
+        <>
+          <div className="font-medium text-sm">Влачи и пусни файлове тук</div>
+          <div className="text-xs text-muted-foreground mt-1">или кликни — типът се разпознава автоматично</div>
+        </>
+      )}
+    </div>
+  );
+}
+
