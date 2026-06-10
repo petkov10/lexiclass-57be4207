@@ -15,6 +15,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ThemeThemeIdRouteImport } from './routes/theme.$themeId'
 import { Route as ClassClassIdRouteImport } from './routes/class.$classId'
 import { Route as ApiAiTestRouteImport } from './routes/api/ai-test'
+import { Route as ApiAiLessonPlanRouteImport } from './routes/api/ai-lesson-plan'
 import { Route as ApiAiFlashcardsRouteImport } from './routes/api/ai-flashcards'
 import { Route as ApiAiRouteImport } from './routes/api/ai'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
@@ -57,6 +58,11 @@ const ClassClassIdRoute = ClassClassIdRouteImport.update({
 const ApiAiTestRoute = ApiAiTestRouteImport.update({
   id: '/api/ai-test',
   path: '/api/ai-test',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAiLessonPlanRoute = ApiAiLessonPlanRouteImport.update({
+  id: '/api/ai-lesson-plan',
+  path: '/api/ai-lesson-plan',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAiFlashcardsRoute = ApiAiFlashcardsRouteImport.update({
@@ -144,6 +150,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/api/ai': typeof ApiAiRoute
   '/api/ai-flashcards': typeof ApiAiFlashcardsRoute
+  '/api/ai-lesson-plan': typeof ApiAiLessonPlanRoute
   '/api/ai-test': typeof ApiAiTestRoute
   '/class/$classId': typeof ClassClassIdRouteWithChildren
   '/theme/$themeId': typeof ThemeThemeIdRoute
@@ -164,6 +171,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/api/ai': typeof ApiAiRoute
   '/api/ai-flashcards': typeof ApiAiFlashcardsRoute
+  '/api/ai-lesson-plan': typeof ApiAiLessonPlanRoute
   '/api/ai-test': typeof ApiAiTestRoute
   '/class/$classId': typeof ClassClassIdRouteWithChildren
   '/theme/$themeId': typeof ThemeThemeIdRoute
@@ -187,6 +195,7 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/api/ai': typeof ApiAiRoute
   '/api/ai-flashcards': typeof ApiAiFlashcardsRoute
+  '/api/ai-lesson-plan': typeof ApiAiLessonPlanRoute
   '/api/ai-test': typeof ApiAiTestRoute
   '/class/$classId': typeof ClassClassIdRouteWithChildren
   '/theme/$themeId': typeof ThemeThemeIdRoute
@@ -210,6 +219,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/api/ai'
     | '/api/ai-flashcards'
+    | '/api/ai-lesson-plan'
     | '/api/ai-test'
     | '/class/$classId'
     | '/theme/$themeId'
@@ -230,6 +240,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/api/ai'
     | '/api/ai-flashcards'
+    | '/api/ai-lesson-plan'
     | '/api/ai-test'
     | '/class/$classId'
     | '/theme/$themeId'
@@ -252,6 +263,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/api/ai'
     | '/api/ai-flashcards'
+    | '/api/ai-lesson-plan'
     | '/api/ai-test'
     | '/class/$classId'
     | '/theme/$themeId'
@@ -274,6 +286,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   ApiAiRoute: typeof ApiAiRoute
   ApiAiFlashcardsRoute: typeof ApiAiFlashcardsRoute
+  ApiAiLessonPlanRoute: typeof ApiAiLessonPlanRoute
   ApiAiTestRoute: typeof ApiAiTestRoute
   ClassClassIdRoute: typeof ClassClassIdRouteWithChildren
   ThemeThemeIdRoute: typeof ThemeThemeIdRoute
@@ -321,6 +334,13 @@ declare module '@tanstack/react-router' {
       path: '/api/ai-test'
       fullPath: '/api/ai-test'
       preLoaderRoute: typeof ApiAiTestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/ai-lesson-plan': {
+      id: '/api/ai-lesson-plan'
+      path: '/api/ai-lesson-plan'
+      fullPath: '/api/ai-lesson-plan'
+      preLoaderRoute: typeof ApiAiLessonPlanRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/ai-flashcards': {
@@ -482,6 +502,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   ApiAiRoute: ApiAiRoute,
   ApiAiFlashcardsRoute: ApiAiFlashcardsRoute,
+  ApiAiLessonPlanRoute: ApiAiLessonPlanRoute,
   ApiAiTestRoute: ApiAiTestRoute,
   ClassClassIdRoute: ClassClassIdRouteWithChildren,
   ThemeThemeIdRoute: ThemeThemeIdRoute,
