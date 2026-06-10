@@ -13,10 +13,7 @@ export const settingsQuery = queryOptions({
 export const classesQuery = queryOptions({
   queryKey: ["classes"],
   queryFn: async () => {
-    const { data, error } = await supabase
-      .from("classes")
-      .select("*")
-      .order("order_index");
+    const { data, error } = await supabase.from("classes").select("*").order("order_index");
     if (error) throw error;
     return data ?? [];
   },
@@ -25,10 +22,7 @@ export const classesQuery = queryOptions({
 export const subjectsQuery = queryOptions({
   queryKey: ["subjects"],
   queryFn: async () => {
-    const { data, error } = await supabase
-      .from("subjects")
-      .select("*")
-      .order("order_index");
+    const { data, error } = await supabase.from("subjects").select("*").order("order_index");
     if (error) throw error;
     return data ?? [];
   },
@@ -94,6 +88,48 @@ export const themeByIdQuery = (themeId: string) =>
       return data;
     },
   });
+
+export const homeworkForThemeQuery = (themeId: string) =>
+  queryOptions({
+    queryKey: ["homework", themeId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("homework")
+        .select("*")
+        .eq("theme_id", themeId)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+export const mySchedulesQuery = (userId: string | undefined) =>
+  queryOptions({
+    queryKey: ["schedules", userId],
+    enabled: !!userId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("schedules")
+        .select("*, class:classes(id,name), subject:subjects(id,name), theme:themes(id,name)")
+        .eq("owner_id", userId!)
+        .order("day_of_week")
+        .order("start_time");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+export const usersWithRolesQuery = queryOptions({
+  queryKey: ["users-roles"],
+  queryFn: async () => {
+    const [{ data: profiles }, { data: roles }, { data: invites }] = await Promise.all([
+      supabase.from("profiles").select("*"),
+      supabase.from("user_roles").select("*"),
+      supabase.from("pending_invites").select("*").order("created_at", { ascending: false }),
+    ]);
+    return { profiles: profiles ?? [], roles: roles ?? [], invites: invites ?? [] };
+  },
+});
 
 export const fileUrl = (path: string | null) => {
   if (!path) return null;

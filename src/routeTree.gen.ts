@@ -14,13 +14,18 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ThemeThemeIdRouteImport } from './routes/theme.$themeId'
 import { Route as ClassClassIdRouteImport } from './routes/class.$classId'
+import { Route as ApiAiTestRouteImport } from './routes/api/ai-test'
+import { Route as ApiAiLessonPlanRouteImport } from './routes/api/ai-lesson-plan'
 import { Route as ApiAiFlashcardsRouteImport } from './routes/api/ai-flashcards'
+import { Route as ApiAiCodeExerciseRouteImport } from './routes/api/ai-code-exercise'
 import { Route as ApiAiRouteImport } from './routes/api/ai'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
 import { Route as AuthenticatedAdminThemesRouteImport } from './routes/_authenticated/admin.themes'
 import { Route as AuthenticatedAdminSubjectsRouteImport } from './routes/_authenticated/admin.subjects'
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin.settings'
+import { Route as AuthenticatedAdminScheduleRouteImport } from './routes/_authenticated/admin.schedule'
 import { Route as AuthenticatedAdminResourcesRouteImport } from './routes/_authenticated/admin.resources'
 import { Route as AuthenticatedAdminClassesRouteImport } from './routes/_authenticated/admin.classes'
 import { Route as AuthenticatedAdminBackupRouteImport } from './routes/_authenticated/admin.backup'
@@ -51,9 +56,24 @@ const ClassClassIdRoute = ClassClassIdRouteImport.update({
   path: '/class/$classId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAiTestRoute = ApiAiTestRouteImport.update({
+  id: '/api/ai-test',
+  path: '/api/ai-test',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAiLessonPlanRoute = ApiAiLessonPlanRouteImport.update({
+  id: '/api/ai-lesson-plan',
+  path: '/api/ai-lesson-plan',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAiFlashcardsRoute = ApiAiFlashcardsRouteImport.update({
   id: '/api/ai-flashcards',
   path: '/api/ai-flashcards',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAiCodeExerciseRoute = ApiAiCodeExerciseRouteImport.update({
+  id: '/api/ai-code-exercise',
+  path: '/api/ai-code-exercise',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAiRoute = ApiAiRouteImport.update({
@@ -69,6 +89,11 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
 const AuthenticatedAdminThemesRoute =
@@ -87,6 +112,12 @@ const AuthenticatedAdminSettingsRoute =
   AuthenticatedAdminSettingsRouteImport.update({
     id: '/settings',
     path: '/settings',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminScheduleRoute =
+  AuthenticatedAdminScheduleRouteImport.update({
+    id: '/schedule',
+    path: '/schedule',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const AuthenticatedAdminResourcesRoute =
@@ -124,16 +155,21 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/api/ai': typeof ApiAiRoute
+  '/api/ai-code-exercise': typeof ApiAiCodeExerciseRoute
   '/api/ai-flashcards': typeof ApiAiFlashcardsRoute
+  '/api/ai-lesson-plan': typeof ApiAiLessonPlanRoute
+  '/api/ai-test': typeof ApiAiTestRoute
   '/class/$classId': typeof ClassClassIdRouteWithChildren
   '/theme/$themeId': typeof ThemeThemeIdRoute
   '/admin/ai': typeof AuthenticatedAdminAiRoute
   '/admin/backup': typeof AuthenticatedAdminBackupRoute
   '/admin/classes': typeof AuthenticatedAdminClassesRoute
   '/admin/resources': typeof AuthenticatedAdminResourcesRoute
+  '/admin/schedule': typeof AuthenticatedAdminScheduleRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/subjects': typeof AuthenticatedAdminSubjectsRoute
   '/admin/themes': typeof AuthenticatedAdminThemesRoute
+  '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/class/$classId/subject/$subjectId': typeof ClassClassIdSubjectSubjectIdRoute
 }
@@ -141,16 +177,21 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/api/ai': typeof ApiAiRoute
+  '/api/ai-code-exercise': typeof ApiAiCodeExerciseRoute
   '/api/ai-flashcards': typeof ApiAiFlashcardsRoute
+  '/api/ai-lesson-plan': typeof ApiAiLessonPlanRoute
+  '/api/ai-test': typeof ApiAiTestRoute
   '/class/$classId': typeof ClassClassIdRouteWithChildren
   '/theme/$themeId': typeof ThemeThemeIdRoute
   '/admin/ai': typeof AuthenticatedAdminAiRoute
   '/admin/backup': typeof AuthenticatedAdminBackupRoute
   '/admin/classes': typeof AuthenticatedAdminClassesRoute
   '/admin/resources': typeof AuthenticatedAdminResourcesRoute
+  '/admin/schedule': typeof AuthenticatedAdminScheduleRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/subjects': typeof AuthenticatedAdminSubjectsRoute
   '/admin/themes': typeof AuthenticatedAdminThemesRoute
+  '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/class/$classId/subject/$subjectId': typeof ClassClassIdSubjectSubjectIdRoute
 }
@@ -161,16 +202,21 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/api/ai': typeof ApiAiRoute
+  '/api/ai-code-exercise': typeof ApiAiCodeExerciseRoute
   '/api/ai-flashcards': typeof ApiAiFlashcardsRoute
+  '/api/ai-lesson-plan': typeof ApiAiLessonPlanRoute
+  '/api/ai-test': typeof ApiAiTestRoute
   '/class/$classId': typeof ClassClassIdRouteWithChildren
   '/theme/$themeId': typeof ThemeThemeIdRoute
   '/_authenticated/admin/ai': typeof AuthenticatedAdminAiRoute
   '/_authenticated/admin/backup': typeof AuthenticatedAdminBackupRoute
   '/_authenticated/admin/classes': typeof AuthenticatedAdminClassesRoute
   '/_authenticated/admin/resources': typeof AuthenticatedAdminResourcesRoute
+  '/_authenticated/admin/schedule': typeof AuthenticatedAdminScheduleRoute
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/subjects': typeof AuthenticatedAdminSubjectsRoute
   '/_authenticated/admin/themes': typeof AuthenticatedAdminThemesRoute
+  '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/class/$classId/subject/$subjectId': typeof ClassClassIdSubjectSubjectIdRoute
 }
@@ -181,16 +227,21 @@ export interface FileRouteTypes {
     | '/auth'
     | '/admin'
     | '/api/ai'
+    | '/api/ai-code-exercise'
     | '/api/ai-flashcards'
+    | '/api/ai-lesson-plan'
+    | '/api/ai-test'
     | '/class/$classId'
     | '/theme/$themeId'
     | '/admin/ai'
     | '/admin/backup'
     | '/admin/classes'
     | '/admin/resources'
+    | '/admin/schedule'
     | '/admin/settings'
     | '/admin/subjects'
     | '/admin/themes'
+    | '/admin/users'
     | '/admin/'
     | '/class/$classId/subject/$subjectId'
   fileRoutesByTo: FileRoutesByTo
@@ -198,16 +249,21 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/api/ai'
+    | '/api/ai-code-exercise'
     | '/api/ai-flashcards'
+    | '/api/ai-lesson-plan'
+    | '/api/ai-test'
     | '/class/$classId'
     | '/theme/$themeId'
     | '/admin/ai'
     | '/admin/backup'
     | '/admin/classes'
     | '/admin/resources'
+    | '/admin/schedule'
     | '/admin/settings'
     | '/admin/subjects'
     | '/admin/themes'
+    | '/admin/users'
     | '/admin'
     | '/class/$classId/subject/$subjectId'
   id:
@@ -217,16 +273,21 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/admin'
     | '/api/ai'
+    | '/api/ai-code-exercise'
     | '/api/ai-flashcards'
+    | '/api/ai-lesson-plan'
+    | '/api/ai-test'
     | '/class/$classId'
     | '/theme/$themeId'
     | '/_authenticated/admin/ai'
     | '/_authenticated/admin/backup'
     | '/_authenticated/admin/classes'
     | '/_authenticated/admin/resources'
+    | '/_authenticated/admin/schedule'
     | '/_authenticated/admin/settings'
     | '/_authenticated/admin/subjects'
     | '/_authenticated/admin/themes'
+    | '/_authenticated/admin/users'
     | '/_authenticated/admin/'
     | '/class/$classId/subject/$subjectId'
   fileRoutesById: FileRoutesById
@@ -236,7 +297,10 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   ApiAiRoute: typeof ApiAiRoute
+  ApiAiCodeExerciseRoute: typeof ApiAiCodeExerciseRoute
   ApiAiFlashcardsRoute: typeof ApiAiFlashcardsRoute
+  ApiAiLessonPlanRoute: typeof ApiAiLessonPlanRoute
+  ApiAiTestRoute: typeof ApiAiTestRoute
   ClassClassIdRoute: typeof ClassClassIdRouteWithChildren
   ThemeThemeIdRoute: typeof ThemeThemeIdRoute
 }
@@ -278,11 +342,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ClassClassIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/ai-test': {
+      id: '/api/ai-test'
+      path: '/api/ai-test'
+      fullPath: '/api/ai-test'
+      preLoaderRoute: typeof ApiAiTestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/ai-lesson-plan': {
+      id: '/api/ai-lesson-plan'
+      path: '/api/ai-lesson-plan'
+      fullPath: '/api/ai-lesson-plan'
+      preLoaderRoute: typeof ApiAiLessonPlanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/ai-flashcards': {
       id: '/api/ai-flashcards'
       path: '/api/ai-flashcards'
       fullPath: '/api/ai-flashcards'
       preLoaderRoute: typeof ApiAiFlashcardsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/ai-code-exercise': {
+      id: '/api/ai-code-exercise'
+      path: '/api/ai-code-exercise'
+      fullPath: '/api/ai-code-exercise'
+      preLoaderRoute: typeof ApiAiCodeExerciseRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/ai': {
@@ -306,6 +391,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/users': {
+      id: '/_authenticated/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/themes': {
       id: '/_authenticated/admin/themes'
       path: '/themes'
@@ -325,6 +417,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/admin/settings'
       preLoaderRoute: typeof AuthenticatedAdminSettingsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/schedule': {
+      id: '/_authenticated/admin/schedule'
+      path: '/schedule'
+      fullPath: '/admin/schedule'
+      preLoaderRoute: typeof AuthenticatedAdminScheduleRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/resources': {
@@ -370,9 +469,11 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminBackupRoute: typeof AuthenticatedAdminBackupRoute
   AuthenticatedAdminClassesRoute: typeof AuthenticatedAdminClassesRoute
   AuthenticatedAdminResourcesRoute: typeof AuthenticatedAdminResourcesRoute
+  AuthenticatedAdminScheduleRoute: typeof AuthenticatedAdminScheduleRoute
   AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
   AuthenticatedAdminSubjectsRoute: typeof AuthenticatedAdminSubjectsRoute
   AuthenticatedAdminThemesRoute: typeof AuthenticatedAdminThemesRoute
+  AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
@@ -381,9 +482,11 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminBackupRoute: AuthenticatedAdminBackupRoute,
   AuthenticatedAdminClassesRoute: AuthenticatedAdminClassesRoute,
   AuthenticatedAdminResourcesRoute: AuthenticatedAdminResourcesRoute,
+  AuthenticatedAdminScheduleRoute: AuthenticatedAdminScheduleRoute,
   AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
   AuthenticatedAdminSubjectsRoute: AuthenticatedAdminSubjectsRoute,
   AuthenticatedAdminThemesRoute: AuthenticatedAdminThemesRoute,
+  AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
 
@@ -418,7 +521,10 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   ApiAiRoute: ApiAiRoute,
+  ApiAiCodeExerciseRoute: ApiAiCodeExerciseRoute,
   ApiAiFlashcardsRoute: ApiAiFlashcardsRoute,
+  ApiAiLessonPlanRoute: ApiAiLessonPlanRoute,
+  ApiAiTestRoute: ApiAiTestRoute,
   ClassClassIdRoute: ClassClassIdRouteWithChildren,
   ThemeThemeIdRoute: ThemeThemeIdRoute,
 }

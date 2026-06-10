@@ -41,6 +41,8 @@ export type ResourceType =
   | "note"
   | "notebooklm"
   | "flashcards"
+  | "lesson_plan"
+  | "code_exercise"
   | "other";
 
 export type Flashcard = { front: string; back: string };
