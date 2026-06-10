@@ -223,7 +223,13 @@ function ResourceForm({ themeId, existing, orderHint, onDone }: { themeId: strin
             <div><Label>Примерен изход</Label><Textarea rows={3} value={content.sample_output || ""} onChange={(e) => setC("sample_output", e.target.value)} /></div>
           </div>
           <div className="grid grid-cols-[1fr_3fr] gap-3">
-            <div><Label>Език</Label><Input value={content.language || ""} onChange={(e) => setC("language", e.target.value)} placeholder="python, c++..." /></div>
+            <div>
+              <Label>Език</Label>
+              <Select value={content.language || "csharp"} onValueChange={(v) => setC("language", v)}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>{CODE_LANGUAGES.map((l) => <SelectItem key={l} value={l}>{l}</SelectItem>)}</SelectContent>
+              </Select>
+            </div>
             <div><Label>Решение</Label><Textarea rows={6} className="font-mono text-xs" value={content.solution || ""} onChange={(e) => setC("solution", e.target.value)} /></div>
           </div>
         </div>
