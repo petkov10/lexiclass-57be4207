@@ -92,6 +92,7 @@ function ResourcesAdmin() {
 
       {themeId && (
         <>
+          <BulkUploader themeId={themeId} baseOrder={resources?.length ?? 0} onDone={refresh} />
           <div className="flex justify-end">
             <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) setEditing(null); }}>
               <DialogTrigger asChild><Button><Plus /> Нов ресурс</Button></DialogTrigger>
