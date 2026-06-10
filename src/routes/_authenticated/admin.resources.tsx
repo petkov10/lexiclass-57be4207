@@ -12,8 +12,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Plus, Trash2, Edit, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
-import type { ResourceRow, ResourceType } from "@/lib/types";
+import type { ResourceRow, ResourceType, Flashcard } from "@/lib/types";
 import { sanitizeFileName } from "@/lib/storage";
+import { Sparkles, BookOpen, Layers as LayersIcon, X } from "lucide-react";
 
 const CODE_LANGUAGES = ["csharp", "html", "css", "sql", "javascript", "typescript", "python", "cpp", "java", "json", "bash"];
 
