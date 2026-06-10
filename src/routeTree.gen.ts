@@ -17,6 +17,7 @@ import { Route as ClassClassIdRouteImport } from './routes/class.$classId'
 import { Route as ApiAiTestRouteImport } from './routes/api/ai-test'
 import { Route as ApiAiLessonPlanRouteImport } from './routes/api/ai-lesson-plan'
 import { Route as ApiAiFlashcardsRouteImport } from './routes/api/ai-flashcards'
+import { Route as ApiAiCodeExerciseRouteImport } from './routes/api/ai-code-exercise'
 import { Route as ApiAiRouteImport } from './routes/api/ai'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
@@ -68,6 +69,11 @@ const ApiAiLessonPlanRoute = ApiAiLessonPlanRouteImport.update({
 const ApiAiFlashcardsRoute = ApiAiFlashcardsRouteImport.update({
   id: '/api/ai-flashcards',
   path: '/api/ai-flashcards',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAiCodeExerciseRoute = ApiAiCodeExerciseRouteImport.update({
+  id: '/api/ai-code-exercise',
+  path: '/api/ai-code-exercise',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAiRoute = ApiAiRouteImport.update({
@@ -149,6 +155,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/api/ai': typeof ApiAiRoute
+  '/api/ai-code-exercise': typeof ApiAiCodeExerciseRoute
   '/api/ai-flashcards': typeof ApiAiFlashcardsRoute
   '/api/ai-lesson-plan': typeof ApiAiLessonPlanRoute
   '/api/ai-test': typeof ApiAiTestRoute
@@ -170,6 +177,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/api/ai': typeof ApiAiRoute
+  '/api/ai-code-exercise': typeof ApiAiCodeExerciseRoute
   '/api/ai-flashcards': typeof ApiAiFlashcardsRoute
   '/api/ai-lesson-plan': typeof ApiAiLessonPlanRoute
   '/api/ai-test': typeof ApiAiTestRoute
@@ -194,6 +202,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/api/ai': typeof ApiAiRoute
+  '/api/ai-code-exercise': typeof ApiAiCodeExerciseRoute
   '/api/ai-flashcards': typeof ApiAiFlashcardsRoute
   '/api/ai-lesson-plan': typeof ApiAiLessonPlanRoute
   '/api/ai-test': typeof ApiAiTestRoute
@@ -218,6 +227,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/admin'
     | '/api/ai'
+    | '/api/ai-code-exercise'
     | '/api/ai-flashcards'
     | '/api/ai-lesson-plan'
     | '/api/ai-test'
@@ -239,6 +249,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/api/ai'
+    | '/api/ai-code-exercise'
     | '/api/ai-flashcards'
     | '/api/ai-lesson-plan'
     | '/api/ai-test'
@@ -262,6 +273,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/admin'
     | '/api/ai'
+    | '/api/ai-code-exercise'
     | '/api/ai-flashcards'
     | '/api/ai-lesson-plan'
     | '/api/ai-test'
@@ -285,6 +297,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   ApiAiRoute: typeof ApiAiRoute
+  ApiAiCodeExerciseRoute: typeof ApiAiCodeExerciseRoute
   ApiAiFlashcardsRoute: typeof ApiAiFlashcardsRoute
   ApiAiLessonPlanRoute: typeof ApiAiLessonPlanRoute
   ApiAiTestRoute: typeof ApiAiTestRoute
@@ -348,6 +361,13 @@ declare module '@tanstack/react-router' {
       path: '/api/ai-flashcards'
       fullPath: '/api/ai-flashcards'
       preLoaderRoute: typeof ApiAiFlashcardsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/ai-code-exercise': {
+      id: '/api/ai-code-exercise'
+      path: '/api/ai-code-exercise'
+      fullPath: '/api/ai-code-exercise'
+      preLoaderRoute: typeof ApiAiCodeExerciseRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/ai': {
@@ -501,6 +521,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   ApiAiRoute: ApiAiRoute,
+  ApiAiCodeExerciseRoute: ApiAiCodeExerciseRoute,
   ApiAiFlashcardsRoute: ApiAiFlashcardsRoute,
   ApiAiLessonPlanRoute: ApiAiLessonPlanRoute,
   ApiAiTestRoute: ApiAiTestRoute,
