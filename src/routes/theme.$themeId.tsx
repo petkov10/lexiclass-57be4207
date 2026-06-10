@@ -101,7 +101,7 @@ function ThemePage() {
 
 function ResourceCard({ r, onOpen }: { r: ResourceRow; onOpen: () => void }) {
   const Icon = ICONS[r.type] ?? FileText;
-  const isExternal = r.type === "link" || r.type === "video";
+  const isExternal = r.type === "link" || r.type === "video" || r.type === "notebooklm";
   const url = r.url || fileUrl(r.file_path);
 
   return (
@@ -117,7 +117,7 @@ function ResourceCard({ r, onOpen }: { r: ResourceRow; onOpen: () => void }) {
       </div>
       {isExternal && url ? (
         <Button asChild variant="outline" size="sm"><a href={url} target="_blank" rel="noreferrer">Отвори <ExternalLink /></a></Button>
-      ) : (r.type === "task" || r.type === "code" || r.type === "note") ? (
+      ) : (r.type === "task" || r.type === "code" || r.type === "note" || r.type === "flashcards") ? (
         <Button onClick={onOpen} variant="outline" size="sm">Преглед</Button>
       ) : url ? (
         <Button asChild variant="outline" size="sm"><a href={url} target="_blank" rel="noreferrer">Отвори <ExternalLink /></a></Button>
