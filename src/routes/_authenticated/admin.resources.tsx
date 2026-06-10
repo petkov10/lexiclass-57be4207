@@ -266,6 +266,71 @@ function ResourceForm({ themeId, existing, orderHint, onDone }: { themeId: strin
         <div><Label>Текст (Markdown)</Label><Textarea rows={8} value={content.text || ""} onChange={(e) => setC("text", e.target.value)} /></div>
       )}
 
+      {type === "notebooklm" && (
+        <div className="space-y-2">
+          <Label className="flex items-center gap-2"><BookOpen className="h-4 w-4" /> NotebookLM линк</Label>
+          <Input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://notebooklm.google.com/notebook/..." />
+          <p className="text-xs text-muted-foreground">
+            Отвори notebook-а в NotebookLM → бутон <strong>Share</strong> → копирай линка и го постави тук.
+            Ученикът ще го отвори с един клик от темата.
+          </p>
+        </div>
+      )}
+
+      {type === "flashcards" && (
+        <div className="space-y-3">
+          <div className="rounded-lg border border-primary/20 bg-primary/5 p-3 space-y-2">
+            <div className="flex items-center gap-2 text-sm font-medium"><Sparkles className="h-4 w-4 text-primary" /> Генерирай с AI</div>
+            <div className="grid grid-cols-[1fr_100px_auto] gap-2">
+              <Input placeholder="Тема (напр. „SQL JOIN-и")" value={aiTopic} onChange={(e) => setAiTopic(e.target.value)} />
+              <Input type="number" min={3} max={25} value={aiCount} onChange={(e) => setAiCount(Number(e.target.value) || 10)} />
+              <Button
+                type="button"
+                disabled={aiLoading || !aiTopic.trim()}
+                onClick={async () => {
+                  setAiLoading(true);
+                  try {
+                    const res = await fetch("/api/ai-flashcards", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ topic: aiTopic, count: aiCount, context: description }),
+                    });
+                    if (!res.ok) throw new Error(await res.text());
+                    const j = (await res.json()) as { flashcards: Flashcard[] };
+                    setCards((p) => [...p, ...j.flashcards]);
+                    if (!title.trim()) setTitle(aiTopic);
+                    toast.success(`Добавени ${j.flashcards.length} карти`);
+                  } catch (e: any) {
+                    toast.error(e.message || "Грешка при генериране");
+                  } finally {
+                    setAiLoading(false);
+                  }
+                }}
+              >
+                {aiLoading ? "..." : "Генерирай"}
+              </Button>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label className="flex items-center gap-2"><LayersIcon className="h-4 w-4" /> Карти ({cards.length})</Label>
+              <Button type="button" variant="outline" size="sm" onClick={() => setCards((p) => [...p, { front: "", back: "" }])}><Plus className="h-3.5 w-3.5" /> Добави</Button>
+            </div>
+            <div className="space-y-2 max-h-[40vh] overflow-auto pr-1">
+              {cards.map((c, i) => (
+                <div key={i} className="grid grid-cols-[1fr_1fr_auto] gap-2 items-start">
+                  <Textarea rows={2} placeholder="Лице (въпрос)" value={c.front} onChange={(e) => setCards((p) => p.map((x, j) => j === i ? { ...x, front: e.target.value } : x))} />
+                  <Textarea rows={2} placeholder="Гръб (отговор)" value={c.back} onChange={(e) => setCards((p) => p.map((x, j) => j === i ? { ...x, back: e.target.value } : x))} />
+                  <Button type="button" variant="ghost" size="sm" onClick={() => setCards((p) => p.filter((_, j) => j !== i))}><X className="h-4 w-4" /></Button>
+                </div>
+              ))}
+              {cards.length === 0 && <p className="text-xs text-muted-foreground text-center py-4">Все още няма карти. Генерирай с AI или добави ръчно.</p>}
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex justify-end gap-2">
         <Button onClick={save} disabled={saving || !title.trim()}>{saving ? "Запазване..." : "Запази"}</Button>
       </div>
