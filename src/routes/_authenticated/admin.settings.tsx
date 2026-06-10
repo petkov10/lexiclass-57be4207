@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
+import { sanitizeFileName } from "@/lib/storage";
 
 export const Route = createFileRoute("/_authenticated/admin/settings")({
   component: SettingsPage,
@@ -47,7 +48,7 @@ function SettingsPage() {
     try {
       let logo_url = form.logo_url;
       if (logoFile) {
-        const path = `logo_${Date.now()}_${logoFile.name}`;
+        const path = `logo_${Date.now()}_${sanitizeFileName(logoFile.name)}`;
         const { error: upErr } = await supabase.storage.from("branding").upload(path, logoFile, { upsert: true });
         if (upErr) throw upErr;
         const { data: pub } = supabase.storage.from("branding").getPublicUrl(path);
