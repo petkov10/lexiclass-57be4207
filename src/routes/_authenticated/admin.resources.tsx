@@ -282,7 +282,7 @@ function ResourceForm({ themeId, existing, orderHint, onDone }: { themeId: strin
           <div className="rounded-lg border border-primary/20 bg-primary/5 p-3 space-y-2">
             <div className="flex items-center gap-2 text-sm font-medium"><Sparkles className="h-4 w-4 text-primary" /> Генерирай с AI</div>
             <div className="grid grid-cols-[1fr_100px_auto] gap-2">
-              <Input placeholder="Тема (напр. „SQL JOIN-и")" value={aiTopic} onChange={(e) => setAiTopic(e.target.value)} />
+              <Input placeholder="Тема (напр. SQL JOIN-и)" value={aiTopic} onChange={(e) => setAiTopic(e.target.value)} />
               <Input type="number" min={3} max={25} value={aiCount} onChange={(e) => setAiCount(Number(e.target.value) || 10)} />
               <Button
                 type="button"
