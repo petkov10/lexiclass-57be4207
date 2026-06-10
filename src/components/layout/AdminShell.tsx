@@ -18,7 +18,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const nav = [
+type NavItem = { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean };
+const nav: NavItem[] = [
   { to: "/admin", label: "Табло", icon: LayoutDashboard, exact: true },
   { to: "/admin/classes", label: "Класове", icon: GraduationCap },
   { to: "/admin/subjects", label: "Предмети", icon: BookOpen },
@@ -27,7 +28,7 @@ const nav = [
   { to: "/admin/ai", label: "AI Асистент", icon: Sparkles },
   { to: "/admin/settings", label: "Настройки", icon: SettingsIcon },
   { to: "/admin/backup", label: "Бекъп", icon: DatabaseBackup },
-] as const;
+];
 
 export function AdminShell({ children }: { children: ReactNode }) {
   const { data: settings } = useQuery(settingsQuery);
