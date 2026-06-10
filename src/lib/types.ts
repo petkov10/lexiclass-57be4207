@@ -39,7 +39,11 @@ export type ResourceType =
   | "code"
   | "image"
   | "note"
+  | "notebooklm"
+  | "flashcards"
   | "other";
+
+export type Flashcard = { front: string; back: string };
 
 export type ResourceRow = {
   id: string;

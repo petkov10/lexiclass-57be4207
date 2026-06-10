@@ -2,8 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { fileUrl, resourcesForThemeQuery, themeByIdQuery } from "@/lib/queries";
 import { PublicShell } from "@/components/layout/PublicShell";
-import { ChevronRight, FileText, Link as LinkIcon, Video, FileCheck, Code, Image as ImgIcon, StickyNote, Presentation, Pencil, ExternalLink } from "lucide-react";
-import type { ResourceRow, ResourceType } from "@/lib/types";
+import { ChevronRight, FileText, Link as LinkIcon, Video, FileCheck, Code, Image as ImgIcon, StickyNote, Presentation, Pencil, ExternalLink, BookOpen, Layers, RotateCw } from "lucide-react";
+import type { ResourceRow, ResourceType, Flashcard } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -23,6 +23,8 @@ const ICONS: Record<ResourceType, typeof FileText> = {
   code: Code,
   image: ImgIcon,
   note: StickyNote,
+  notebooklm: BookOpen,
+  flashcards: Layers,
   other: FileText,
 };
 const LABELS: Record<ResourceType, string> = {
@@ -35,6 +37,8 @@ const LABELS: Record<ResourceType, string> = {
   code: "Код",
   image: "Изображение",
   note: "Бележка",
+  notebooklm: "NotebookLM",
+  flashcards: "Флаш карти",
   other: "Друго",
 };
 
@@ -97,7 +101,7 @@ function ThemePage() {
 
 function ResourceCard({ r, onOpen }: { r: ResourceRow; onOpen: () => void }) {
   const Icon = ICONS[r.type] ?? FileText;
-  const isExternal = r.type === "link" || r.type === "video";
+  const isExternal = r.type === "link" || r.type === "video" || r.type === "notebooklm";
   const url = r.url || fileUrl(r.file_path);
 
   return (
@@ -113,7 +117,7 @@ function ResourceCard({ r, onOpen }: { r: ResourceRow; onOpen: () => void }) {
       </div>
       {isExternal && url ? (
         <Button asChild variant="outline" size="sm"><a href={url} target="_blank" rel="noreferrer">Отвори <ExternalLink /></a></Button>
-      ) : (r.type === "task" || r.type === "code" || r.type === "note") ? (
+      ) : (r.type === "task" || r.type === "code" || r.type === "note" || r.type === "flashcards") ? (
         <Button onClick={onOpen} variant="outline" size="sm">Преглед</Button>
       ) : url ? (
         <Button asChild variant="outline" size="sm"><a href={url} target="_blank" rel="noreferrer">Отвори <ExternalLink /></a></Button>
@@ -151,6 +155,10 @@ function ResourceViewer({ r }: { r: ResourceRow }) {
     const c = (r.content ?? {}) as Record<string, string>;
     return <div className="prose prose-sm max-w-none"><Markdown text={c.text || r.description || ""} /></div>;
   }
+  if (r.type === "flashcards") {
+    const cards = (((r.content ?? {}) as { flashcards?: Flashcard[] }).flashcards ?? []).filter((c) => c?.front);
+    return <FlashcardsViewer cards={cards} />;
+  }
   if (url) {
     return (
       <div className="space-y-3">
@@ -173,4 +181,33 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 function Markdown({ text }: { text: string }) {
   return <div className="prose prose-sm max-w-none dark:prose-invert"><ReactMarkdown>{text}</ReactMarkdown></div>;
+}
+
+function FlashcardsViewer({ cards }: { cards: Flashcard[] }) {
+  const [idx, setIdx] = useState(0);
+  const [flipped, setFlipped] = useState(false);
+  if (cards.length === 0) return <p className="text-sm text-muted-foreground">Няма карти.</p>;
+  const card = cards[Math.min(idx, cards.length - 1)];
+  const go = (d: number) => { setFlipped(false); setIdx((i) => (i + d + cards.length) % cards.length); };
+  return (
+    <div className="space-y-4">
+      <div className="text-xs text-muted-foreground text-center">{idx + 1} / {cards.length}</div>
+      <button
+        onClick={() => setFlipped((f) => !f)}
+        className="w-full min-h-[220px] rounded-xl border-2 border-primary/20 bg-card hover:bg-accent/40 transition-colors p-8 grid place-items-center text-center"
+      >
+        <div>
+          <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-3">
+            {flipped ? "Отговор" : "Въпрос"}
+          </div>
+          <div className="text-lg font-medium whitespace-pre-wrap">{flipped ? card.back : card.front}</div>
+          <div className="text-xs text-muted-foreground mt-4 flex items-center justify-center gap-1"><RotateCw className="h-3 w-3" /> Кликни за обръщане</div>
+        </div>
+      </button>
+      <div className="flex justify-between gap-2">
+        <Button variant="outline" onClick={() => go(-1)}>← Предишна</Button>
+        <Button variant="outline" onClick={() => go(1)}>Следваща →</Button>
+      </div>
+    </div>
+  );
 }
