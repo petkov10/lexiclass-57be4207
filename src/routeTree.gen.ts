@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ThemeThemeIdRouteImport } from './routes/theme.$themeId'
 import { Route as ClassClassIdRouteImport } from './routes/class.$classId'
+import { Route as ApiAiTestRouteImport } from './routes/api/ai-test'
 import { Route as ApiAiFlashcardsRouteImport } from './routes/api/ai-flashcards'
 import { Route as ApiAiRouteImport } from './routes/api/ai'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
@@ -51,6 +52,11 @@ const ThemeThemeIdRoute = ThemeThemeIdRouteImport.update({
 const ClassClassIdRoute = ClassClassIdRouteImport.update({
   id: '/class/$classId',
   path: '/class/$classId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAiTestRoute = ApiAiTestRouteImport.update({
+  id: '/api/ai-test',
+  path: '/api/ai-test',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAiFlashcardsRoute = ApiAiFlashcardsRouteImport.update({
@@ -138,6 +144,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/api/ai': typeof ApiAiRoute
   '/api/ai-flashcards': typeof ApiAiFlashcardsRoute
+  '/api/ai-test': typeof ApiAiTestRoute
   '/class/$classId': typeof ClassClassIdRouteWithChildren
   '/theme/$themeId': typeof ThemeThemeIdRoute
   '/admin/ai': typeof AuthenticatedAdminAiRoute
@@ -157,6 +164,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/api/ai': typeof ApiAiRoute
   '/api/ai-flashcards': typeof ApiAiFlashcardsRoute
+  '/api/ai-test': typeof ApiAiTestRoute
   '/class/$classId': typeof ClassClassIdRouteWithChildren
   '/theme/$themeId': typeof ThemeThemeIdRoute
   '/admin/ai': typeof AuthenticatedAdminAiRoute
@@ -179,6 +187,7 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/api/ai': typeof ApiAiRoute
   '/api/ai-flashcards': typeof ApiAiFlashcardsRoute
+  '/api/ai-test': typeof ApiAiTestRoute
   '/class/$classId': typeof ClassClassIdRouteWithChildren
   '/theme/$themeId': typeof ThemeThemeIdRoute
   '/_authenticated/admin/ai': typeof AuthenticatedAdminAiRoute
@@ -201,6 +210,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/api/ai'
     | '/api/ai-flashcards'
+    | '/api/ai-test'
     | '/class/$classId'
     | '/theme/$themeId'
     | '/admin/ai'
@@ -220,6 +230,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/api/ai'
     | '/api/ai-flashcards'
+    | '/api/ai-test'
     | '/class/$classId'
     | '/theme/$themeId'
     | '/admin/ai'
@@ -241,6 +252,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/api/ai'
     | '/api/ai-flashcards'
+    | '/api/ai-test'
     | '/class/$classId'
     | '/theme/$themeId'
     | '/_authenticated/admin/ai'
@@ -262,6 +274,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   ApiAiRoute: typeof ApiAiRoute
   ApiAiFlashcardsRoute: typeof ApiAiFlashcardsRoute
+  ApiAiTestRoute: typeof ApiAiTestRoute
   ClassClassIdRoute: typeof ClassClassIdRouteWithChildren
   ThemeThemeIdRoute: typeof ThemeThemeIdRoute
 }
@@ -301,6 +314,13 @@ declare module '@tanstack/react-router' {
       path: '/class/$classId'
       fullPath: '/class/$classId'
       preLoaderRoute: typeof ClassClassIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/ai-test': {
+      id: '/api/ai-test'
+      path: '/api/ai-test'
+      fullPath: '/api/ai-test'
+      preLoaderRoute: typeof ApiAiTestRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/ai-flashcards': {
@@ -462,6 +482,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   ApiAiRoute: ApiAiRoute,
   ApiAiFlashcardsRoute: ApiAiFlashcardsRoute,
+  ApiAiTestRoute: ApiAiTestRoute,
   ClassClassIdRoute: ClassClassIdRouteWithChildren,
   ThemeThemeIdRoute: ThemeThemeIdRoute,
 }
