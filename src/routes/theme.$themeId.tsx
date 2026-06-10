@@ -182,3 +182,32 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 function Markdown({ text }: { text: string }) {
   return <div className="prose prose-sm max-w-none dark:prose-invert"><ReactMarkdown>{text}</ReactMarkdown></div>;
 }
+
+function FlashcardsViewer({ cards }: { cards: Flashcard[] }) {
+  const [idx, setIdx] = useState(0);
+  const [flipped, setFlipped] = useState(false);
+  if (cards.length === 0) return <p className="text-sm text-muted-foreground">Няма карти.</p>;
+  const card = cards[Math.min(idx, cards.length - 1)];
+  const go = (d: number) => { setFlipped(false); setIdx((i) => (i + d + cards.length) % cards.length); };
+  return (
+    <div className="space-y-4">
+      <div className="text-xs text-muted-foreground text-center">{idx + 1} / {cards.length}</div>
+      <button
+        onClick={() => setFlipped((f) => !f)}
+        className="w-full min-h-[220px] rounded-xl border-2 border-primary/20 bg-card hover:bg-accent/40 transition-colors p-8 grid place-items-center text-center"
+      >
+        <div>
+          <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-3">
+            {flipped ? "Отговор" : "Въпрос"}
+          </div>
+          <div className="text-lg font-medium whitespace-pre-wrap">{flipped ? card.back : card.front}</div>
+          <div className="text-xs text-muted-foreground mt-4 flex items-center justify-center gap-1"><RotateCw className="h-3 w-3" /> Кликни за обръщане</div>
+        </div>
+      </button>
+      <div className="flex justify-between gap-2">
+        <Button variant="outline" onClick={() => go(-1)}>← Предишна</Button>
+        <Button variant="outline" onClick={() => go(1)}>Следваща →</Button>
+      </div>
+    </div>
+  );
+}
