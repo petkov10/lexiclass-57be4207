@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ThemeThemeIdRouteImport } from './routes/theme.$themeId'
 import { Route as ClassClassIdRouteImport } from './routes/class.$classId'
+import { Route as ApiAiRouteImport } from './routes/api/ai'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminThemesRouteImport } from './routes/_authenticated/admin.themes'
@@ -22,6 +23,7 @@ import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminResourcesRouteImport } from './routes/_authenticated/admin.resources'
 import { Route as AuthenticatedAdminClassesRouteImport } from './routes/_authenticated/admin.classes'
 import { Route as AuthenticatedAdminBackupRouteImport } from './routes/_authenticated/admin.backup'
+import { Route as AuthenticatedAdminAiRouteImport } from './routes/_authenticated/admin.ai'
 import { Route as ClassClassIdSubjectSubjectIdRouteImport } from './routes/class.$classId.subject.$subjectId'
 
 const AuthRoute = AuthRouteImport.update({
@@ -46,6 +48,11 @@ const ThemeThemeIdRoute = ThemeThemeIdRouteImport.update({
 const ClassClassIdRoute = ClassClassIdRouteImport.update({
   id: '/class/$classId',
   path: '/class/$classId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAiRoute = ApiAiRouteImport.update({
+  id: '/api/ai',
+  path: '/api/ai',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
@@ -94,6 +101,11 @@ const AuthenticatedAdminBackupRoute =
     path: '/backup',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminAiRoute = AuthenticatedAdminAiRouteImport.update({
+  id: '/ai',
+  path: '/ai',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
 const ClassClassIdSubjectSubjectIdRoute =
   ClassClassIdSubjectSubjectIdRouteImport.update({
     id: '/subject/$subjectId',
@@ -105,8 +117,10 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/api/ai': typeof ApiAiRoute
   '/class/$classId': typeof ClassClassIdRouteWithChildren
   '/theme/$themeId': typeof ThemeThemeIdRoute
+  '/admin/ai': typeof AuthenticatedAdminAiRoute
   '/admin/backup': typeof AuthenticatedAdminBackupRoute
   '/admin/classes': typeof AuthenticatedAdminClassesRoute
   '/admin/resources': typeof AuthenticatedAdminResourcesRoute
@@ -119,8 +133,10 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/api/ai': typeof ApiAiRoute
   '/class/$classId': typeof ClassClassIdRouteWithChildren
   '/theme/$themeId': typeof ThemeThemeIdRoute
+  '/admin/ai': typeof AuthenticatedAdminAiRoute
   '/admin/backup': typeof AuthenticatedAdminBackupRoute
   '/admin/classes': typeof AuthenticatedAdminClassesRoute
   '/admin/resources': typeof AuthenticatedAdminResourcesRoute
@@ -136,8 +152,10 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/api/ai': typeof ApiAiRoute
   '/class/$classId': typeof ClassClassIdRouteWithChildren
   '/theme/$themeId': typeof ThemeThemeIdRoute
+  '/_authenticated/admin/ai': typeof AuthenticatedAdminAiRoute
   '/_authenticated/admin/backup': typeof AuthenticatedAdminBackupRoute
   '/_authenticated/admin/classes': typeof AuthenticatedAdminClassesRoute
   '/_authenticated/admin/resources': typeof AuthenticatedAdminResourcesRoute
@@ -153,8 +171,10 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/admin'
+    | '/api/ai'
     | '/class/$classId'
     | '/theme/$themeId'
+    | '/admin/ai'
     | '/admin/backup'
     | '/admin/classes'
     | '/admin/resources'
@@ -167,8 +187,10 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/api/ai'
     | '/class/$classId'
     | '/theme/$themeId'
+    | '/admin/ai'
     | '/admin/backup'
     | '/admin/classes'
     | '/admin/resources'
@@ -183,8 +205,10 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/admin'
+    | '/api/ai'
     | '/class/$classId'
     | '/theme/$themeId'
+    | '/_authenticated/admin/ai'
     | '/_authenticated/admin/backup'
     | '/_authenticated/admin/classes'
     | '/_authenticated/admin/resources'
@@ -199,6 +223,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ApiAiRoute: typeof ApiAiRoute
   ClassClassIdRoute: typeof ClassClassIdRouteWithChildren
   ThemeThemeIdRoute: typeof ThemeThemeIdRoute
 }
@@ -238,6 +263,13 @@ declare module '@tanstack/react-router' {
       path: '/class/$classId'
       fullPath: '/class/$classId'
       preLoaderRoute: typeof ClassClassIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/ai': {
+      id: '/api/ai'
+      path: '/api/ai'
+      fullPath: '/api/ai'
+      preLoaderRoute: typeof ApiAiRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin': {
@@ -296,6 +328,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminBackupRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/ai': {
+      id: '/_authenticated/admin/ai'
+      path: '/ai'
+      fullPath: '/admin/ai'
+      preLoaderRoute: typeof AuthenticatedAdminAiRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/class/$classId/subject/$subjectId': {
       id: '/class/$classId/subject/$subjectId'
       path: '/subject/$subjectId'
@@ -307,6 +346,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminAiRoute: typeof AuthenticatedAdminAiRoute
   AuthenticatedAdminBackupRoute: typeof AuthenticatedAdminBackupRoute
   AuthenticatedAdminClassesRoute: typeof AuthenticatedAdminClassesRoute
   AuthenticatedAdminResourcesRoute: typeof AuthenticatedAdminResourcesRoute
@@ -317,6 +357,7 @@ interface AuthenticatedAdminRouteChildren {
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminAiRoute: AuthenticatedAdminAiRoute,
   AuthenticatedAdminBackupRoute: AuthenticatedAdminBackupRoute,
   AuthenticatedAdminClassesRoute: AuthenticatedAdminClassesRoute,
   AuthenticatedAdminResourcesRoute: AuthenticatedAdminResourcesRoute,
@@ -356,6 +397,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  ApiAiRoute: ApiAiRoute,
   ClassClassIdRoute: ClassClassIdRouteWithChildren,
   ThemeThemeIdRoute: ThemeThemeIdRoute,
 }
