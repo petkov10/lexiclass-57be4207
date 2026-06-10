@@ -2,8 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { fileUrl, resourcesForThemeQuery, themeByIdQuery } from "@/lib/queries";
 import { PublicShell } from "@/components/layout/PublicShell";
-import { ChevronRight, FileText, Link as LinkIcon, Video, FileCheck, Code, Image as ImgIcon, StickyNote, Presentation, Pencil, ExternalLink } from "lucide-react";
-import type { ResourceRow, ResourceType } from "@/lib/types";
+import { ChevronRight, FileText, Link as LinkIcon, Video, FileCheck, Code, Image as ImgIcon, StickyNote, Presentation, Pencil, ExternalLink, BookOpen, Layers, RotateCw } from "lucide-react";
+import type { ResourceRow, ResourceType, Flashcard } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -23,6 +23,8 @@ const ICONS: Record<ResourceType, typeof FileText> = {
   code: Code,
   image: ImgIcon,
   note: StickyNote,
+  notebooklm: BookOpen,
+  flashcards: Layers,
   other: FileText,
 };
 const LABELS: Record<ResourceType, string> = {
@@ -35,6 +37,8 @@ const LABELS: Record<ResourceType, string> = {
   code: "Код",
   image: "Изображение",
   note: "Бележка",
+  notebooklm: "NotebookLM",
+  flashcards: "Флаш карти",
   other: "Друго",
 };
 
