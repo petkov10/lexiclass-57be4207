@@ -169,7 +169,12 @@ function ResourceForm({ themeId, existing, orderHint, onDone }: { themeId: strin
         description: description || null,
         url: url || null,
         file_path: filePath,
-        content: ["task", "code", "note"].includes(type) ? content : null,
+        content:
+          type === "flashcards"
+            ? { flashcards: cards.filter((c) => c.front.trim() || c.back.trim()) }
+            : ["task", "code", "note"].includes(type)
+            ? content
+            : null,
         order_index: existing?.order_index ?? orderHint,
       };
       const { error } = existing
