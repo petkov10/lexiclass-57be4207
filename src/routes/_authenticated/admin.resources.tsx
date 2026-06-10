@@ -144,6 +144,12 @@ function ResourceForm({ themeId, existing, orderHint, onDone }: { themeId: strin
   const [content, setContent] = useState<Record<string, string>>(
     (existing?.content as Record<string, string>) ?? {}
   );
+  const [cards, setCards] = useState<Flashcard[]>(
+    ((existing?.content as { flashcards?: Flashcard[] } | null)?.flashcards) ?? []
+  );
+  const [aiTopic, setAiTopic] = useState("");
+  const [aiCount, setAiCount] = useState(10);
+  const [aiLoading, setAiLoading] = useState(false);
   const [saving, setSaving] = useState(false);
 
   const save = async () => {
