@@ -48,7 +48,7 @@ function SettingsPage() {
     try {
       let logo_url = form.logo_url;
       if (logoFile) {
-        const path = `logo_${Date.now()}_${logoFile.name}`;
+        const path = `logo_${Date.now()}_${sanitizeFileName(logoFile.name)}`;
         const { error: upErr } = await supabase.storage.from("branding").upload(path, logoFile, { upsert: true });
         if (upErr) throw upErr;
         const { data: pub } = supabase.storage.from("branding").getPublicUrl(path);
