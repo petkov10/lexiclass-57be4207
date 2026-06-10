@@ -10,33 +10,57 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ClassClassIdRouteImport } from './routes/class.$classId'
+import { Route as ClassClassIdSubjectSubjectIdRouteImport } from './routes/class.$classId.subject.$subjectId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ClassClassIdRoute = ClassClassIdRouteImport.update({
+  id: '/class/$classId',
+  path: '/class/$classId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ClassClassIdSubjectSubjectIdRoute =
+  ClassClassIdSubjectSubjectIdRouteImport.update({
+    id: '/subject/$subjectId',
+    path: '/subject/$subjectId',
+    getParentRoute: () => ClassClassIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/class/$classId': typeof ClassClassIdRouteWithChildren
+  '/class/$classId/subject/$subjectId': typeof ClassClassIdSubjectSubjectIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/class/$classId': typeof ClassClassIdRouteWithChildren
+  '/class/$classId/subject/$subjectId': typeof ClassClassIdSubjectSubjectIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/class/$classId': typeof ClassClassIdRouteWithChildren
+  '/class/$classId/subject/$subjectId': typeof ClassClassIdSubjectSubjectIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/class/$classId' | '/class/$classId/subject/$subjectId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/class/$classId' | '/class/$classId/subject/$subjectId'
+  id:
+    | '__root__'
+    | '/'
+    | '/class/$classId'
+    | '/class/$classId/subject/$subjectId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ClassClassIdRoute: typeof ClassClassIdRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -48,12 +72,49 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/class/$classId': {
+      id: '/class/$classId'
+      path: '/class/$classId'
+      fullPath: '/class/$classId'
+      preLoaderRoute: typeof ClassClassIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/class/$classId/subject/$subjectId': {
+      id: '/class/$classId/subject/$subjectId'
+      path: '/subject/$subjectId'
+      fullPath: '/class/$classId/subject/$subjectId'
+      preLoaderRoute: typeof ClassClassIdSubjectSubjectIdRouteImport
+      parentRoute: typeof ClassClassIdRoute
+    }
   }
 }
 
+interface ClassClassIdRouteChildren {
+  ClassClassIdSubjectSubjectIdRoute: typeof ClassClassIdSubjectSubjectIdRoute
+}
+
+const ClassClassIdRouteChildren: ClassClassIdRouteChildren = {
+  ClassClassIdSubjectSubjectIdRoute: ClassClassIdSubjectSubjectIdRoute,
+}
+
+const ClassClassIdRouteWithChildren = ClassClassIdRoute._addFileChildren(
+  ClassClassIdRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ClassClassIdRoute: ClassClassIdRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
