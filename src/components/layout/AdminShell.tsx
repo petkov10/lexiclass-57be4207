@@ -48,7 +48,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
             {(settings?.logo_text || settings?.site_name || "E").slice(0, 1).toUpperCase()}
           </div>
           <span className="font-semibold tracking-tight text-sm">
-            {settings?.site_name || "EduHub"}
+            {settings?.site_name || "Izvor"}
           </span>
         </div>
         <nav className="flex-1 p-2 space-y-0.5">
