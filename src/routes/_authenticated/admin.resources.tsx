@@ -237,7 +237,13 @@ function ResourceForm({ themeId, existing, orderHint, onDone }: { themeId: strin
 
       {type === "code" && (
         <div className="grid grid-cols-[1fr_3fr] gap-3">
-          <div><Label>Език</Label><Input value={content.language || ""} onChange={(e) => setC("language", e.target.value)} /></div>
+          <div>
+            <Label>Език</Label>
+            <Select value={content.language || "csharp"} onValueChange={(v) => setC("language", v)}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>{CODE_LANGUAGES.map((l) => <SelectItem key={l} value={l}>{l}</SelectItem>)}</SelectContent>
+            </Select>
+          </div>
           <div><Label>Код</Label><Textarea rows={10} className="font-mono text-xs" value={content.code || ""} onChange={(e) => setC("code", e.target.value)} /></div>
         </div>
       )}
