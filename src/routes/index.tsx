@@ -17,7 +17,7 @@ function Index() {
       <div className="max-w-5xl mx-auto px-4 py-12">
         <div className="mb-10 text-center">
           <h1 className="text-3xl md:text-4xl font-semibold tracking-tight">
-            Добре дошли в {settings?.site_name || "EduHub"}
+            Добре дошли в {settings?.site_name || "Izvor"}
           </h1>
           <p className="mt-3 text-muted-foreground">Изберете клас, за да продължите.</p>
         </div>
