@@ -13,6 +13,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Plus, Trash2, Edit, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import type { ResourceRow, ResourceType } from "@/lib/types";
+import { sanitizeFileName } from "@/lib/storage";
+
+const CODE_LANGUAGES = ["csharp", "html", "css", "sql", "javascript", "typescript", "python", "cpp", "java", "json", "bash"];
 
 const TYPES: { value: ResourceType; label: string }[] = [
   { value: "presentation", label: "Презентация" },
