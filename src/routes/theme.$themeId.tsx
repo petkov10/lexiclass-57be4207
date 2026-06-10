@@ -155,6 +155,10 @@ function ResourceViewer({ r }: { r: ResourceRow }) {
     const c = (r.content ?? {}) as Record<string, string>;
     return <div className="prose prose-sm max-w-none"><Markdown text={c.text || r.description || ""} /></div>;
   }
+  if (r.type === "flashcards") {
+    const cards = (((r.content ?? {}) as { flashcards?: Flashcard[] }).flashcards ?? []).filter((c) => c?.front);
+    return <FlashcardsViewer cards={cards} />;
+  }
   if (url) {
     return (
       <div className="space-y-3">
