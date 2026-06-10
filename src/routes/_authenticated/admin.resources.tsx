@@ -27,6 +27,8 @@ const TYPES: { value: ResourceType; label: string }[] = [
   { value: "code", label: "Код" },
   { value: "image", label: "Изображение" },
   { value: "note", label: "Бележка" },
+  { value: "notebooklm", label: "NotebookLM" },
+  { value: "flashcards", label: "Флаш карти" },
   { value: "other", label: "Друго" },
 ];
 
