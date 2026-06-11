@@ -134,6 +134,7 @@ function ResourceCard({ r, onOpen }: { r: ResourceRow; onOpen: () => void }) {
   const Icon = ICONS[r.type] ?? FileText;
   const isExternal = r.type === "link" || r.type === "video" || r.type === "notebooklm";
   const url = r.url || fileUrl(r.file_path);
+  const isTest = r.type === "test";
   return (
     <div className="hover-lift group flex items-center gap-4 rounded-lg border bg-card px-4 py-3">
       <div className="h-10 w-10 rounded-md bg-primary/10 text-primary grid place-items-center"><Icon className="h-5 w-5" /></div>
@@ -141,7 +142,9 @@ function ResourceCard({ r, onOpen }: { r: ResourceRow; onOpen: () => void }) {
         <div className="font-medium truncate">{r.title}</div>
         <div className="text-xs text-muted-foreground">{LABELS[r.type]} {r.description ? `· ${r.description}` : ""}</div>
       </div>
-      {isExternal && url ? (
+      {isTest ? (
+        <Button asChild size="sm"><a href={`/test/${r.id}`}>Започни теста</a></Button>
+      ) : isExternal && url ? (
         <Button asChild variant="outline" size="sm"><a href={url} target="_blank" rel="noreferrer">Отвори <ExternalLink /></a></Button>
       ) : (
         <Button onClick={onOpen} variant="outline" size="sm">Преглед</Button>

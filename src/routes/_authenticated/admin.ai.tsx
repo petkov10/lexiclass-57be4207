@@ -13,6 +13,7 @@ import ReactMarkdown from "react-markdown";
 import { useQuery } from "@tanstack/react-query";
 import { allThemesQuery } from "@/lib/queries";
 import { supabase } from "@/integrations/supabase/client";
+import { QrCodeButton } from "@/components/QrCodeButton";
 
 export const Route = createFileRoute("/_authenticated/admin/ai")({
   component: AIPage,
@@ -132,9 +133,11 @@ function TestGen() {
   const [loading, setLoading] = useState(false);
   const [test, setTest] = useState<any>(null);
   const [themeId, setThemeId] = useState("");
+  const [savedId, setSavedId] = useState<string>("");
 
   const gen = async () => {
     setLoading(true);
+    setSavedId("");
     try {
       const res = await fetch("/api/ai-test", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ topic, count, kind }) });
       if (!res.ok) throw new Error(await res.text());
@@ -145,13 +148,14 @@ function TestGen() {
 
   const save = async () => {
     if (!themeId || !test) return;
-    const { error } = await supabase.from("resources").insert({
+    const { data, error } = await supabase.from("resources").insert({
       theme_id: themeId, type: "test", title: test.title || topic,
       description: `${test.questions?.length ?? 0} въпроса`,
       content: test as any, order_index: 999,
-    });
+    }).select("id").single();
     if (error) return toast.error(error.message);
-    toast.success("Тестът е запазен");
+    setSavedId(data.id);
+    toast.success("Тестът е запазен — можете да го споделите с QR код");
   };
 
   return (
@@ -183,9 +187,15 @@ function TestGen() {
               </li>
             ))}
           </ol>
-          <div className="flex gap-2 items-end border-t pt-3">
-            <div className="flex-1"><ThemePicker themeId={themeId} setThemeId={setThemeId} /></div>
+          <div className="flex gap-2 items-end border-t pt-3 flex-wrap">
+            <div className="flex-1 min-w-[200px]"><ThemePicker themeId={themeId} setThemeId={setThemeId} /></div>
             <Button onClick={save} disabled={!themeId}><Save /> Запази като ресурс</Button>
+            {savedId && (
+              <>
+                <QrCodeButton url={`${typeof window !== "undefined" ? window.location.origin : ""}/test/${savedId}`} label="QR за теста" />
+                <Button asChild variant="outline"><a href={`/test/${savedId}/print`} target="_blank" rel="noreferrer">Печат</a></Button>
+              </>
+            )}
           </div>
         </div>
       )}

@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import type { ResourceRow, ResourceType, Flashcard } from "@/lib/types";
 import { sanitizeFileName } from "@/lib/storage";
 import { Sparkles, BookOpen, Layers as LayersIcon, X } from "lucide-react";
+import { QrCodeButton } from "@/components/QrCodeButton";
 
 const CODE_LANGUAGES = ["csharp", "html", "css", "sql", "javascript", "typescript", "python", "cpp", "java", "json", "bash"];
 
@@ -111,13 +112,16 @@ function ResourcesAdmin() {
           <Card className="divide-y">
             {(resources ?? []).map((r) => {
               const url = r.url || fileUrl(r.file_path);
+              const testUrl = r.type === "test" ? `${typeof window !== "undefined" ? window.location.origin : ""}/test/${r.id}` : null;
               return (
-                <div key={r.id} className="p-3 flex items-center gap-3">
+                <div key={r.id} className="p-3 flex items-center gap-3 flex-wrap">
                   <div className="text-xs uppercase tracking-wider rounded bg-muted px-2 py-1 w-28 text-center font-medium shrink-0">{TYPES.find((t) => t.value === r.type)?.label}</div>
-                  <div className="flex-1 min-w-0">
+                  <div className="flex-1 min-w-[200px]">
                     <div className="font-medium truncate">{r.title}</div>
                     {r.description && <div className="text-xs text-muted-foreground truncate">{r.description}</div>}
                   </div>
+                  {testUrl && <QrCodeButton url={testUrl} label="QR" title={`QR за ${r.title}`} />}
+                  {r.type === "test" && <Button asChild variant="outline" size="sm"><a href={`/test/${r.id}/print`} target="_blank" rel="noreferrer">Печат</a></Button>}
                   {url && <Button asChild variant="ghost" size="sm"><a href={url} target="_blank" rel="noreferrer"><ExternalLink /></a></Button>}
                   <Button variant="ghost" size="sm" onClick={() => { setEditing(r as ResourceRow); setOpen(true); }}><Edit /></Button>
                   <Button variant="ghost" size="sm" onClick={async () => {

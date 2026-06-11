@@ -30,17 +30,25 @@ function SettingsPage() {
   const [form, setForm] = useState({
     site_name: "", logo_text: "", logo_url: "", color_scheme: "blue", theme_mode: "light",
   });
+  const [scale, setScale] = useState<{ min_percent: number; grade: number }[]>([
+    { min_percent: 90, grade: 6 }, { min_percent: 75, grade: 5 },
+    { min_percent: 60, grade: 4 }, { min_percent: 45, grade: 3 }, { min_percent: 0, grade: 2 },
+  ]);
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (data) setForm({
-      site_name: data.site_name || "",
-      logo_text: data.logo_text || "",
-      logo_url: data.logo_url || "",
-      color_scheme: data.color_scheme || "blue",
-      theme_mode: data.theme_mode || "light",
-    });
+    if (data) {
+      setForm({
+        site_name: data.site_name || "",
+        logo_text: data.logo_text || "",
+        logo_url: data.logo_url || "",
+        color_scheme: data.color_scheme || "blue",
+        theme_mode: data.theme_mode || "light",
+      });
+      const gs = (data as any).grading_scale;
+      if (Array.isArray(gs) && gs.length > 0) setScale(gs);
+    }
   }, [data]);
 
   const save = async () => {
@@ -54,7 +62,8 @@ function SettingsPage() {
         const { data: pub } = supabase.storage.from("branding").getPublicUrl(path);
         logo_url = pub.publicUrl;
       }
-      const { error } = await supabase.from("app_settings").update({ ...form, logo_url }).eq("id", 1);
+      const sortedScale = [...scale].sort((a, b) => b.min_percent - a.min_percent);
+      const { error } = await supabase.from("app_settings").update({ ...form, logo_url, grading_scale: sortedScale as any }).eq("id", 1);
       if (error) throw error;
       toast.success("Запазено");
       qc.invalidateQueries({ queryKey: ["app_settings"] });
@@ -106,6 +115,31 @@ function SettingsPage() {
               </button>
             ))}
           </div>
+        </div>
+      </Card>
+
+      <Card className="p-6 space-y-4">
+        <div>
+          <h2 className="font-semibold">Скала за оценяване</h2>
+          <p className="text-xs text-muted-foreground mt-1">Праг (%) → оценка. Използва се при автоматичното оценяване на тестове.</p>
+        </div>
+        <div className="space-y-2">
+          {scale.map((row, i) => (
+            <div key={i} className="grid grid-cols-[1fr_1fr_auto] gap-2 items-center">
+              <div>
+                <Label className="text-xs">Над (%)</Label>
+                <Input type="number" min={0} max={100} value={row.min_percent}
+                  onChange={(e) => setScale((p) => p.map((r, j) => j === i ? { ...r, min_percent: Math.max(0, Math.min(100, +e.target.value || 0)) } : r))} />
+              </div>
+              <div>
+                <Label className="text-xs">Оценка</Label>
+                <Input type="number" min={2} max={6} step={0.01} value={row.grade}
+                  onChange={(e) => setScale((p) => p.map((r, j) => j === i ? { ...r, grade: +e.target.value || 2 } : r))} />
+              </div>
+              <Button variant="ghost" size="sm" onClick={() => setScale((p) => p.filter((_, j) => j !== i))} className="mt-5">✕</Button>
+            </div>
+          ))}
+          <Button variant="outline" size="sm" onClick={() => setScale((p) => [...p, { min_percent: 0, grade: 2 }])}>+ Добави праг</Button>
         </div>
       </Card>
 

@@ -18,6 +18,7 @@ export type Database = {
         Row: {
           color_scheme: string
           extra: Json
+          grading_scale: Json
           id: number
           logo_text: string | null
           logo_url: string | null
@@ -28,6 +29,7 @@ export type Database = {
         Insert: {
           color_scheme?: string
           extra?: Json
+          grading_scale?: Json
           id?: number
           logo_text?: string | null
           logo_url?: string | null
@@ -38,6 +40,7 @@ export type Database = {
         Update: {
           color_scheme?: string
           extra?: Json
+          grading_scale?: Json
           id?: number
           logo_text?: string | null
           logo_url?: string | null
@@ -339,6 +342,85 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      test_attempts: {
+        Row: {
+          answers: Json
+          class_id: string | null
+          created_at: string
+          duration_seconds: number
+          grade: number | null
+          id: string
+          max_score: number
+          percent: number
+          resource_id: string
+          score: number
+          started_at: string
+          student_class: string | null
+          student_name: string
+          student_number: string | null
+          submitted_at: string
+          theme_id: string | null
+        }
+        Insert: {
+          answers?: Json
+          class_id?: string | null
+          created_at?: string
+          duration_seconds?: number
+          grade?: number | null
+          id?: string
+          max_score?: number
+          percent?: number
+          resource_id: string
+          score?: number
+          started_at?: string
+          student_class?: string | null
+          student_name: string
+          student_number?: string | null
+          submitted_at?: string
+          theme_id?: string | null
+        }
+        Update: {
+          answers?: Json
+          class_id?: string | null
+          created_at?: string
+          duration_seconds?: number
+          grade?: number | null
+          id?: string
+          max_score?: number
+          percent?: number
+          resource_id?: string
+          score?: number
+          started_at?: string
+          student_class?: string | null
+          student_name?: string
+          student_number?: string | null
+          submitted_at?: string
+          theme_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "test_attempts_class_id_fkey"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "classes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "test_attempts_resource_id_fkey"
+            columns: ["resource_id"]
+            isOneToOne: false
+            referencedRelation: "resources"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "test_attempts_theme_id_fkey"
+            columns: ["theme_id"]
+            isOneToOne: false
+            referencedRelation: "themes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       themes: {
         Row: {

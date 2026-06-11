@@ -1,60 +1,64 @@
-## Какво ще направя
+## Какво ще добавя
 
-### 1. 👥 Потребители и роля `editor`
-- Нова стойност `editor` в enum `app_role`
-- Нова страница `/admin/users` (само за admin) — списък потребители, смяна на роля, деактивация
-- **Покани** — admin въвежда email, системата създава "pending invite" запис; потребителят се регистрира със същия email и автоматично получава ролята
-- Updated RLS: `editor` може да управлява classes/subjects/themes/resources, НЕ вижда settings/backup/users/AI настройки
-- Sidebar в админа крие линкове според ролята
+### 1. Поправка на навигацията „клас → предмет → тема"
+Бутонът от темата към ресурси не отваря нищо в някои случаи — ще проверя `class.$classId.subject.$subjectId.tsx` в браузъра (със screenshot), ще видя реалната грешка (вероятно от `mySchedulesQuery` без enabled gate или несъответствие в линк params) и ще я отстраня.
 
-### 2. ⚡ Bulk admin операции
-- **Multi-file drag&drop upload** в админ резурси: пускаш 10 файла наведнъж, всеки получава тип авто-разпознат (pdf/pptx/docx/image/code), batch upload progress
-- **Дублиране на тема** между класове/предмети — модал "Копирай в..." с избор на target class+subject, копира всички ресурси и метаданни
-- **Drag&drop подреждане** на теми и ресурси (`@dnd-kit/core` + `@dnd-kit/sortable`), записва нов `order_index`
-- **Inline edit** на име на тема/ресурс — клик → input → Enter/Esc
+### 2. База данни (нова миграция)
+Нови таблици + полета:
 
-### 3. 🎯 Бърз вход в час
-- Начален екран `/` — **големи бутони с класове** (grid), 1 клик до класа
-- **"Продължи последния урок"** карта най-отгоре (последно отворена тема от current user, в `localStorage`)
-- **Fullscreen presentation mode** — бутон в theme view, скрива header/sidebar, F11-стил пълноекранно, ESC за изход
-- Клавишни shortcut: `F` за fullscreen, `←/→` за навигация между ресурси
+- `test_attempts` — записва опит на ученик:
+  `id, resource_id (FK → resources), theme_id, student_name, student_number, student_class, answers (jsonb), score, max_score, percent, grade (numeric 2.00–6.00), started_at, submitted_at, duration_seconds, ip`
+- `app_settings` ще получи `grading_scale jsonb` (по подразбиране българската скала 2/3/4/5/6 по процент).
+- RLS: всеки може да INSERT в `test_attempts` (анонимни ученици); SELECT/UPDATE/DELETE — само admin/editor.
+- GRANT-и за `anon` + `authenticated` за INSERT.
 
-### 4. 🧠 AI разширения
-- **AI Тестове** — нов tab в `/admin/ai`: задаваш тема + брой въпроси + тип (multiple choice / отворени / смесени), AI връща структуриран JSON тест с верни отговори, запазва се като ресурс тип `test`
-- **AI План за урок** — задаваш тема + продължителност (40/45/90 мин) + клас, AI генерира timeline (въведение → теория → упражнение → обобщение → ДЗ), markdown, запазва се като ресурс
-- **AI Код упражнения** — език (C#/SQL/HTML) + ниво + тема → starter code + решение + тестови случаи, запазва се като ресурс тип `code`
+### 3. Ученически интерфейс за тестове
+Нов публичен route `/test/$resourceId`:
 
-### 5. 📅 Календар, домашни, бележки
-- **Schedule таблица** (`schedules`) — ден от седмицата + час + class + subject + theme (по избор). Нова страница `/admin/schedule` за управление. На начален екран **"Днес в час"** widget с дневното разписание + директни линкове.
-- **Homework таблица** (`homework`) — текст, deadline, прикачени файлове, към тема. Нов tab в admin themes за добавяне; публично се показва в theme view.
-- **Teacher notes** — `private_notes` text колона на `themes`, видима само в admin, не се показва публично
+1. **Стартов екран** — форма: име, номер в клас, клас (избор от списъка). Запазва в `localStorage` за следващ път.
+2. **Тестов екран** — въпросите се разбъркват (seed = attempt id), опциите на MC също. Прогрес-бар, навигация „напред/назад", индикация „отговорено / общо". Автоматично запис на междинни отговори в `localStorage`.
+3. **Финален екран** — точки, процент, оценка по скалата, преглед на грешните въпроси с обяснение.
+4. Резултатът се записва в `test_attempts` веднага щом ученикът натисне „Предай".
+5. Работи и без login (anon insert).
+
+### 4. QR код за достъп
+- Добавям `qrcode` пакет.
+- В админ панела за всеки тест-ресурс — бутон „QR" → диалог с QR (линк към `/test/$resourceId`), бутон „Свали PNG" и „Копирай линка".
+- Същият QR се показва и на тема ресурса в админ изгледа.
+
+### 5. Свали тест (за принтиране)
+- Бутон „Свали PDF" / „Свали като HTML" — генерира print-friendly страница с въпросите (без отговорите) и втора с отговорите за учителя. Използвам `window.print()` от подготвена route `/test/$resourceId/print` — без външни тежки PDF библиотеки.
+
+### 6. Оценки за учителя
+Нов админ route `/admin/grades`:
+- Списък с всички attempts, филтър по клас / предмет / тест / дата / ученик.
+- Колони: дата, име, клас, № в клас, тест, точки, %, оценка.
+- Експорт CSV.
+- Клик на ред → подробен преглед на отговорите.
+
+### 7. Скала за оценяване
+В `/admin/settings` нова секция „Скала за оценяване" — таблица праг (%) → оценка. По подразбиране:
+```
+≥90% → 6.00
+≥75% → 5.00
+≥60% → 4.00
+≥45% → 3.00
+<45% → 2.00
+```
+Учителят може да редактира праговете.
+
+### 8. Малки UX подобрения
+- При генериран AI тест — веднага опция „Покажи QR" и „Сподели линк".
+- На admin.resources карта на ресурс тип `test` — индикатор „N опита" с линк към филтрираните оценки.
 
 ## Технически детайли
 
-**Нови таблици:**
-- `pending_invites` (email, role, invited_by, created_at)
-- `schedules` (id, day_of_week, start_time, end_time, class_id, subject_id, theme_id?, owner_id)
-- `homework` (id, theme_id, title, description, deadline, attachments jsonb)
+- Нова зависимост: `qrcode` (lightweight, ~20kb).
+- Не пипам авто-генерирани файлове (types, routeTree).
+- Миграцията добавя GRANT-ите за `anon` INSERT, защото учениците не са логнати.
+- Bug fix-ът ще се отрази в commit на `index.tsx` или съответния файл (зависи от диагнозата).
 
-**Промени на съществуващи:**
-- `themes`: добавя `private_notes text`
-- `app_role` enum: добавя `editor`
-- Resource type enum: добавя `test`, `lesson_plan`, `code_exercise`
-- RLS политики обновени: `has_role(uid, 'admin') OR has_role(uid, 'editor')` за content tables; само admin за settings/users/backup
-
-**Auto-assign role при регистрация:** обновявам `handle_new_user()` да чете `pending_invites` по email и да задава ролята оттам.
-
-**Нови dependencies:**
-- `@dnd-kit/core` + `@dnd-kit/sortable` за drag&drop
-- (всичко останало вече е инсталирано)
-
-**Нови route файлове:**
-- `src/routes/_authenticated/admin.users.tsx`
-- `src/routes/_authenticated/admin.schedule.tsx`
-- `src/routes/api/ai-test.ts`
-- `src/routes/api/ai-lesson-plan.ts`
-- `src/routes/api/ai-code-exercise.ts`
-
-**Обхват:** Това е голям sprint (≈15-20 файла). Ако някоя част предпочиташ да отложиш — кажи и ще я махна.
-
-Потвърди и стартирам с миграцията.
+## Ред на изпълнение
+1. Миграция (изисква одобрение).
+2. След approval — UI route-ове, QR компонент, оценки страница, settings секция, fix на навигацията.
+3. Verify в preview.
