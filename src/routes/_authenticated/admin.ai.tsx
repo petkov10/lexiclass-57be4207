@@ -13,6 +13,7 @@ import ReactMarkdown from "react-markdown";
 import { useQuery } from "@tanstack/react-query";
 import { allThemesQuery } from "@/lib/queries";
 import { supabase } from "@/integrations/supabase/client";
+import { QrCodeButton } from "@/components/QrCodeButton";
 
 export const Route = createFileRoute("/_authenticated/admin/ai")({
   component: AIPage,
