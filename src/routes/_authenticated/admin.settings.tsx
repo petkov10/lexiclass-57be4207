@@ -30,17 +30,25 @@ function SettingsPage() {
   const [form, setForm] = useState({
     site_name: "", logo_text: "", logo_url: "", color_scheme: "blue", theme_mode: "light",
   });
+  const [scale, setScale] = useState<{ min_percent: number; grade: number }[]>([
+    { min_percent: 90, grade: 6 }, { min_percent: 75, grade: 5 },
+    { min_percent: 60, grade: 4 }, { min_percent: 45, grade: 3 }, { min_percent: 0, grade: 2 },
+  ]);
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (data) setForm({
-      site_name: data.site_name || "",
-      logo_text: data.logo_text || "",
-      logo_url: data.logo_url || "",
-      color_scheme: data.color_scheme || "blue",
-      theme_mode: data.theme_mode || "light",
-    });
+    if (data) {
+      setForm({
+        site_name: data.site_name || "",
+        logo_text: data.logo_text || "",
+        logo_url: data.logo_url || "",
+        color_scheme: data.color_scheme || "blue",
+        theme_mode: data.theme_mode || "light",
+      });
+      const gs = (data as any).grading_scale;
+      if (Array.isArray(gs) && gs.length > 0) setScale(gs);
+    }
   }, [data]);
 
   const save = async () => {
@@ -54,7 +62,8 @@ function SettingsPage() {
         const { data: pub } = supabase.storage.from("branding").getPublicUrl(path);
         logo_url = pub.publicUrl;
       }
-      const { error } = await supabase.from("app_settings").update({ ...form, logo_url }).eq("id", 1);
+      const sortedScale = [...scale].sort((a, b) => b.min_percent - a.min_percent);
+      const { error } = await supabase.from("app_settings").update({ ...form, logo_url, grading_scale: sortedScale as any }).eq("id", 1);
       if (error) throw error;
       toast.success("Запазено");
       qc.invalidateQueries({ queryKey: ["app_settings"] });
