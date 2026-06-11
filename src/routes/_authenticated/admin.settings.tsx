@@ -118,6 +118,31 @@ function SettingsPage() {
         </div>
       </Card>
 
+      <Card className="p-6 space-y-4">
+        <div>
+          <h2 className="font-semibold">Скала за оценяване</h2>
+          <p className="text-xs text-muted-foreground mt-1">Праг (%) → оценка. Използва се при автоматичното оценяване на тестове.</p>
+        </div>
+        <div className="space-y-2">
+          {scale.map((row, i) => (
+            <div key={i} className="grid grid-cols-[1fr_1fr_auto] gap-2 items-center">
+              <div>
+                <Label className="text-xs">Над (%)</Label>
+                <Input type="number" min={0} max={100} value={row.min_percent}
+                  onChange={(e) => setScale((p) => p.map((r, j) => j === i ? { ...r, min_percent: Math.max(0, Math.min(100, +e.target.value || 0)) } : r))} />
+              </div>
+              <div>
+                <Label className="text-xs">Оценка</Label>
+                <Input type="number" min={2} max={6} step={0.01} value={row.grade}
+                  onChange={(e) => setScale((p) => p.map((r, j) => j === i ? { ...r, grade: +e.target.value || 2 } : r))} />
+              </div>
+              <Button variant="ghost" size="sm" onClick={() => setScale((p) => p.filter((_, j) => j !== i))} className="mt-5">✕</Button>
+            </div>
+          ))}
+          <Button variant="outline" size="sm" onClick={() => setScale((p) => [...p, { min_percent: 0, grade: 2 }])}>+ Добави праг</Button>
+        </div>
+      </Card>
+
       <Button onClick={save} disabled={saving}>{saving ? "Запазване..." : "Запази настройките"}</Button>
     </div>
   );
