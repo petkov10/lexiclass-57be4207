@@ -186,9 +186,15 @@ function TestGen() {
               </li>
             ))}
           </ol>
-          <div className="flex gap-2 items-end border-t pt-3">
-            <div className="flex-1"><ThemePicker themeId={themeId} setThemeId={setThemeId} /></div>
+          <div className="flex gap-2 items-end border-t pt-3 flex-wrap">
+            <div className="flex-1 min-w-[200px]"><ThemePicker themeId={themeId} setThemeId={setThemeId} /></div>
             <Button onClick={save} disabled={!themeId}><Save /> Запази като ресурс</Button>
+            {savedId && (
+              <>
+                <QrCodeButton url={`${typeof window !== "undefined" ? window.location.origin : ""}/test/${savedId}`} label="QR за теста" />
+                <Button asChild variant="outline"><a href={`/test/${savedId}/print`} target="_blank" rel="noreferrer">Печат</a></Button>
+              </>
+            )}
           </div>
         </div>
       )}
