@@ -132,9 +132,11 @@ function TestGen() {
   const [loading, setLoading] = useState(false);
   const [test, setTest] = useState<any>(null);
   const [themeId, setThemeId] = useState("");
+  const [savedId, setSavedId] = useState<string>("");
 
   const gen = async () => {
     setLoading(true);
+    setSavedId("");
     try {
       const res = await fetch("/api/ai-test", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ topic, count, kind }) });
       if (!res.ok) throw new Error(await res.text());
@@ -145,13 +147,14 @@ function TestGen() {
 
   const save = async () => {
     if (!themeId || !test) return;
-    const { error } = await supabase.from("resources").insert({
+    const { data, error } = await supabase.from("resources").insert({
       theme_id: themeId, type: "test", title: test.title || topic,
       description: `${test.questions?.length ?? 0} въпроса`,
       content: test as any, order_index: 999,
-    });
+    }).select("id").single();
     if (error) return toast.error(error.message);
-    toast.success("Тестът е запазен");
+    setSavedId(data.id);
+    toast.success("Тестът е запазен — можете да го споделите с QR код");
   };
 
   return (
