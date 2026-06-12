@@ -35,7 +35,7 @@ function ThemePage() {
   // Save last visited theme
   useEffect(() => {
     if (theme) {
-      localStorage.setItem("izvor:last-theme", JSON.stringify({
+      localStorage.setItem("lexiclass:last-theme", JSON.stringify({
         themeId, themeName: theme.name, classId: theme.class_id, subjectId: theme.subject_id, at: Date.now(),
       }));
     }
