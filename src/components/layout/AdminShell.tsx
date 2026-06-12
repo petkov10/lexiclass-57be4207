@@ -55,10 +55,10 @@ export function AdminShell({ children }: { children: ReactNode }) {
     <div className="min-h-screen flex bg-background">
       <aside className="w-60 border-r bg-sidebar text-sidebar-foreground flex flex-col">
         <div className="h-14 px-4 flex items-center gap-2 border-b">
-          <div className="h-7 w-7 rounded-md bg-sidebar-primary text-sidebar-primary-foreground grid place-items-center text-sm">
-            {(settings?.logo_text || settings?.site_name || "I").slice(0, 1).toUpperCase()}
+          <div className="h-7 w-7 rounded-md gradient-bg text-primary-foreground grid place-items-center text-sm font-bold shadow-sm">
+            {(settings?.logo_text || settings?.site_name || "L").slice(0, 1).toUpperCase()}
           </div>
-          <span className="font-semibold tracking-tight text-sm">{settings?.site_name || "Izvor"}</span>
+          <span className="font-semibold tracking-tight text-sm gradient-text">{settings?.site_name || "LexiClass"}</span>
           {role && role !== "user" && (
             <span className="ml-auto text-[10px] uppercase tracking-wider rounded bg-sidebar-accent px-1.5 py-0.5">{role}</span>
           )}

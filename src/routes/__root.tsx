@@ -13,6 +13,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
 import { useApplySettings } from "@/hooks/useAppSettings";
 import { supabase } from "@/integrations/supabase/client";
+import { CommandPalette } from "@/components/CommandPalette";
 
 function NotFoundComponent() {
   return (
@@ -50,12 +51,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "IZVOR — Учителски ресурси" },
-      { name: "description", content: "Бърз достъп до учебни ресурси по класове, предмети и теми." },
-      { property: "og:title", content: "IZVOR — Учителски ресурси" },
-      { name: "twitter:title", content: "IZVOR — Учителски ресурси" },
-      { property: "og:description", content: "Бърз достъп до учебни ресурси по класове, предмети и теми." },
-      { name: "twitter:description", content: "Бърз достъп до учебни ресурси по класове, предмети и теми." },
+      { title: "LexiClass — Учителски ресурси и AI инструменти" },
+      { name: "description", content: "Цветна и модерна платформа за управление на класове, теми, ресурси и AI тестове." },
+      { property: "og:title", content: "LexiClass — Учителски ресурси и AI инструменти" },
+      { name: "twitter:title", content: "LexiClass — Учителски ресурси и AI инструменти" },
+      { property: "og:description", content: "Цветна и модерна платформа за управление на класове, теми, ресурси и AI тестове." },
+      { name: "twitter:description", content: "Цветна и модерна платформа за управление на класове, теми, ресурси и AI тестове." },
       { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/88ee3775-ed67-4aad-afb7-e7bbabd86272" },
       { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/88ee3775-ed67-4aad-afb7-e7bbabd86272" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -102,6 +103,7 @@ function AppInner() {
   return (
     <>
       <Outlet />
+      <CommandPalette />
       <Toaster richColors position="top-right" />
     </>
   );
