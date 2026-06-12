@@ -1,3 +1,5 @@
+import type { CSSProperties } from "react";
+
 // Deterministic hue (0-360) from any string id/name — used for colorful class/subject cards.
 export function hueFromString(s: string): number {
   let h = 0;
@@ -5,6 +7,6 @@ export function hueFromString(s: string): number {
   return h % 360;
 }
 
-export function tintStyle(seed: string): React.CSSProperties {
+export function tintStyle(seed: string): CSSProperties {
   return { ["--hue" as any]: String(hueFromString(seed)) };
 }
