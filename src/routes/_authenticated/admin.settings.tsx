@@ -16,12 +16,16 @@ export const Route = createFileRoute("/_authenticated/admin/settings")({
 });
 
 const SCHEMES = [
-  { v: "blue", label: "Синя", color: "#3b82f6" },
-  { v: "emerald", label: "Зелена", color: "#10b981" },
-  { v: "violet", label: "Виолетова", color: "#8b5cf6" },
-  { v: "rose", label: "Розова", color: "#f43f5e" },
-  { v: "amber", label: "Жълто-оранжева", color: "#f59e0b" },
-  { v: "slate", label: "Графитена", color: "#475569" },
+  { v: "blue", label: "Синя", color: "linear-gradient(135deg,#3b82f6,#a855f7)" },
+  { v: "emerald", label: "Зелена", color: "linear-gradient(135deg,#10b981,#22d3ee)" },
+  { v: "violet", label: "Виолетова", color: "linear-gradient(135deg,#8b5cf6,#ec4899)" },
+  { v: "rose", label: "Розова", color: "linear-gradient(135deg,#f43f5e,#f59e0b)" },
+  { v: "amber", label: "Жълто-оранжева", color: "linear-gradient(135deg,#f59e0b,#facc15)" },
+  { v: "slate", label: "Графитена", color: "linear-gradient(135deg,#475569,#94a3b8)" },
+  { v: "sunset", label: "Sunset Blaze", color: "linear-gradient(135deg,#ff6b35,#e84393)" },
+  { v: "mint", label: "Neon Mint", color: "linear-gradient(135deg,#2dd4a8,#73ffb8)" },
+  { v: "vapor", label: "Vapor Chrome", color: "linear-gradient(135deg,#818cf8,#67e8f9)" },
+  { v: "coral", label: "Electric Coral", color: "linear-gradient(135deg,#ff6b6b,#c44569)" },
 ];
 
 function SettingsPage() {
@@ -105,15 +109,19 @@ function SettingsPage() {
         </div>
         <div>
           <Label>Цветова схема</Label>
-          <div className="grid grid-cols-3 gap-2 mt-2">
-            {SCHEMES.map((s) => (
-              <button key={s.v} onClick={() => setForm((f) => ({ ...f, color_scheme: s.v }))}
-                className="flex items-center gap-2 rounded-lg border px-3 py-2 hover:bg-accent"
-                style={{ borderColor: form.color_scheme === s.v ? "var(--ring)" : undefined, borderWidth: form.color_scheme === s.v ? 2 : 1 }}>
-                <div className="h-5 w-5 rounded-full" style={{ background: s.color }} />
-                <span className="text-sm">{s.label}</span>
-              </button>
-            ))}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-2">
+            {SCHEMES.map((s) => {
+              const active = form.color_scheme === s.v;
+              return (
+                <button key={s.v} type="button" onClick={() => setForm((f) => ({ ...f, color_scheme: s.v }))}
+                  className="group flex items-center gap-3 rounded-xl border-2 p-3 hover:bg-accent transition-all text-left"
+                  style={{ borderColor: active ? "var(--ring)" : "var(--border)" }}>
+                  <div className="h-9 w-9 rounded-lg shrink-0 shadow-sm" style={{ background: s.color }} />
+                  <span className="text-sm font-medium">{s.label}</span>
+                  {active && <span className="ml-auto text-xs text-primary">✓</span>}
+                </button>
+              );
+            })}
           </div>
         </div>
       </Card>

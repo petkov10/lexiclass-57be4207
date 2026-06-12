@@ -24,7 +24,7 @@ export function PublicShell({ children }: { children: ReactNode }) {
                 {(settings?.logo_text || settings?.site_name || "E").slice(0, 1).toUpperCase()}
               </div>
             )}
-            <span>{settings?.logo_text || settings?.site_name || "Izvor"}</span>
+            <span className="gradient-text">{settings?.logo_text || settings?.site_name || "LexiClass"}</span>
           </Link>
           <nav className="flex items-center gap-1">
             {pathname !== "/" && (
