@@ -21,6 +21,7 @@ import { Route as ApiAiFlashcardsRouteImport } from './routes/api/ai-flashcards'
 import { Route as ApiAiCodeExerciseRouteImport } from './routes/api/ai-code-exercise'
 import { Route as ApiAiRouteImport } from './routes/api/ai'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as ClassClassIdIndexRouteImport } from './routes/class.$classId.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as TestResourceIdPrintRouteImport } from './routes/test.$resourceId.print'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
@@ -93,6 +94,11 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const ClassClassIdIndexRoute = ClassClassIdIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ClassClassIdRoute,
 } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
@@ -193,6 +199,7 @@ export interface FileRoutesByFullPath {
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/test/$resourceId/print': typeof TestResourceIdPrintRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/class/$classId/': typeof ClassClassIdIndexRoute
   '/class/$classId/subject/$subjectId': typeof ClassClassIdSubjectSubjectIdRoute
 }
 export interface FileRoutesByTo {
@@ -203,7 +210,6 @@ export interface FileRoutesByTo {
   '/api/ai-flashcards': typeof ApiAiFlashcardsRoute
   '/api/ai-lesson-plan': typeof ApiAiLessonPlanRoute
   '/api/ai-test': typeof ApiAiTestRoute
-  '/class/$classId': typeof ClassClassIdRouteWithChildren
   '/test/$resourceId': typeof TestResourceIdRouteWithChildren
   '/theme/$themeId': typeof ThemeThemeIdRoute
   '/admin/ai': typeof AuthenticatedAdminAiRoute
@@ -218,6 +224,7 @@ export interface FileRoutesByTo {
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/test/$resourceId/print': typeof TestResourceIdPrintRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/class/$classId': typeof ClassClassIdIndexRoute
   '/class/$classId/subject/$subjectId': typeof ClassClassIdSubjectSubjectIdRoute
 }
 export interface FileRoutesById {
@@ -246,6 +253,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/test/$resourceId/print': typeof TestResourceIdPrintRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/class/$classId/': typeof ClassClassIdIndexRoute
   '/class/$classId/subject/$subjectId': typeof ClassClassIdSubjectSubjectIdRoute
 }
 export interface FileRouteTypes {
@@ -274,6 +282,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/test/$resourceId/print'
     | '/admin/'
+    | '/class/$classId/'
     | '/class/$classId/subject/$subjectId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -284,7 +293,6 @@ export interface FileRouteTypes {
     | '/api/ai-flashcards'
     | '/api/ai-lesson-plan'
     | '/api/ai-test'
-    | '/class/$classId'
     | '/test/$resourceId'
     | '/theme/$themeId'
     | '/admin/ai'
@@ -299,6 +307,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/test/$resourceId/print'
     | '/admin'
+    | '/class/$classId'
     | '/class/$classId/subject/$subjectId'
   id:
     | '__root__'
@@ -326,6 +335,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/users'
     | '/test/$resourceId/print'
     | '/_authenticated/admin/'
+    | '/class/$classId/'
     | '/class/$classId/subject/$subjectId'
   fileRoutesById: FileRoutesById
 }
@@ -428,6 +438,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin'
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/class/$classId/': {
+      id: '/class/$classId/'
+      path: '/'
+      fullPath: '/class/$classId/'
+      preLoaderRoute: typeof ClassClassIdIndexRouteImport
+      parentRoute: typeof ClassClassIdRoute
     }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
@@ -566,10 +583,12 @@ const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 interface ClassClassIdRouteChildren {
+  ClassClassIdIndexRoute: typeof ClassClassIdIndexRoute
   ClassClassIdSubjectSubjectIdRoute: typeof ClassClassIdSubjectSubjectIdRoute
 }
 
 const ClassClassIdRouteChildren: ClassClassIdRouteChildren = {
+  ClassClassIdIndexRoute: ClassClassIdIndexRoute,
   ClassClassIdSubjectSubjectIdRoute: ClassClassIdSubjectSubjectIdRoute,
 }
 
