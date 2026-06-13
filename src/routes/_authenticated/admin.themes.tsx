@@ -202,7 +202,8 @@ function ThemesAdmin() {
                       onCancelEdit={() => setEditId(null)}
                       onSave={save}
                       onRemove={() => remove(t.id)}
-                      onOpenNotes={() => setNotesFor({ id: t.id, name: t.name, notes: (t as any).private_notes ?? "" })}
+                      onOpenNotes={() => openNotes(t.id, t.name)}
+                      hasNotes={notedThemeIds?.has(t.id) ?? false}
                       onDuplicate={() => setDuplicateFor({ id: t.id, name: t.name })}
                       onHomework={() => setHomeworkFor({ id: t.id, name: t.name })}
                     />
@@ -241,7 +242,7 @@ function ThemesAdmin() {
   );
 }
 
-function SortableThemeRow({ t, isEditing, editValues, setEditValues, onStartEdit, onCancelEdit, onSave, onRemove, onOpenNotes, onDuplicate, onHomework }: any) {
+function SortableThemeRow({ t, isEditing, editValues, setEditValues, onStartEdit, onCancelEdit, onSave, onRemove, onOpenNotes, onDuplicate, onHomework, hasNotes }: any) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: t.id });
   const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.5 : 1 };
   return (
@@ -264,7 +265,7 @@ function SortableThemeRow({ t, isEditing, editValues, setEditValues, onStartEdit
             <div className="font-medium truncate">{t.name}</div>
             {t.description && <div className="text-xs text-muted-foreground truncate">{t.description}</div>}
           </div>
-          {t.private_notes && <span title="Има лични бележки" className="text-amber-500"><StickyNote className="h-3.5 w-3.5" /></span>}
+          {hasNotes && <span title="Има лични бележки" className="text-amber-500"><StickyNote className="h-3.5 w-3.5" /></span>}
           <Button size="sm" variant="ghost" onClick={onHomework} title="Домашни"><BookCheck className="h-4 w-4" /></Button>
           <Button size="sm" variant="ghost" onClick={onOpenNotes} title="Лични бележки"><StickyNote className="h-4 w-4" /></Button>
           <Button size="sm" variant="ghost" onClick={onDuplicate} title="Копирай в друг клас"><Copy className="h-4 w-4" /></Button>
