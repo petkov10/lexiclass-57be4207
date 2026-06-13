@@ -16,8 +16,10 @@ export type Database = {
     Tables: {
       app_settings: {
         Row: {
+          access_mode: string
           color_scheme: string
           extra: Json
+          global_pin: string | null
           grading_scale: Json
           id: number
           logo_text: string | null
@@ -27,8 +29,10 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          access_mode?: string
           color_scheme?: string
           extra?: Json
+          global_pin?: string | null
           grading_scale?: Json
           id?: number
           logo_text?: string | null
@@ -38,8 +42,10 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          access_mode?: string
           color_scheme?: string
           extra?: Json
+          global_pin?: string | null
           grading_scale?: Json
           id?: number
           logo_text?: string | null
@@ -180,22 +186,31 @@ export type Database = {
       }
       profiles: {
         Row: {
+          access_pin: string | null
           avatar_url: string | null
           created_at: string
           display_name: string | null
           id: string
+          is_paused: boolean
+          last_login_at: string | null
         }
         Insert: {
+          access_pin?: string | null
           avatar_url?: string | null
           created_at?: string
           display_name?: string | null
           id: string
+          is_paused?: boolean
+          last_login_at?: string | null
         }
         Update: {
+          access_pin?: string | null
           avatar_url?: string | null
           created_at?: string
           display_name?: string | null
           id?: string
+          is_paused?: boolean
+          last_login_at?: string | null
         }
         Relationships: []
       }
@@ -525,13 +540,48 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_list_user_pins: {
+        Args: never
+        Returns: {
+          access_pin: string
+          is_paused: boolean
+          last_login_at: string
+          user_id: string
+        }[]
+      }
+      admin_set_access: {
+        Args: { _global_pin: string; _mode: string }
+        Returns: undefined
+      }
+      admin_set_user_display_name: {
+        Args: { _name: string; _user_id: string }
+        Returns: undefined
+      }
+      admin_set_user_paused: {
+        Args: { _paused: boolean; _user_id: string }
+        Returns: undefined
+      }
+      admin_set_user_pin: {
+        Args: { _pin: string; _user_id: string }
+        Returns: undefined
+      }
       can_edit: { Args: { _user_id: string }; Returns: boolean }
+      get_access_mode: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      verify_access_pin: {
+        Args: { _pin: string }
+        Returns: {
+          display_name: string
+          mode: string
+          ok: boolean
+          user_id: string
+        }[]
       }
     }
     Enums: {
