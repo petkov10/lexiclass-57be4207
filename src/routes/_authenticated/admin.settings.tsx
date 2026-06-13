@@ -40,6 +40,9 @@ function SettingsPage() {
   ]);
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
+  const [accessMode, setAccessMode] = useState<"free" | "global_pin" | "user_pin">("free");
+  const [globalPin, setGlobalPin] = useState("");
+  const [savingAccess, setSavingAccess] = useState(false);
 
   useEffect(() => {
     if (data) {
@@ -52,8 +55,27 @@ function SettingsPage() {
       });
       const gs = (data as any).grading_scale;
       if (Array.isArray(gs) && gs.length > 0) setScale(gs);
+      setAccessMode(((data as any).access_mode as any) || "free");
+      setGlobalPin((data as any).global_pin || "");
     }
   }, [data]);
+
+  const saveAccess = async () => {
+    if (accessMode === "global_pin" && !/^\d{4}$/.test(globalPin)) {
+      toast.error("PIN трябва да е 4 цифри"); return;
+    }
+    setSavingAccess(true);
+    try {
+      const { error } = await supabase.rpc("admin_set_access", {
+        _mode: accessMode,
+        _global_pin: accessMode === "global_pin" ? globalPin : null,
+      });
+      if (error) throw error;
+      toast.success("Достъпът е обновен");
+      qc.invalidateQueries({ queryKey: ["app_settings"] });
+    } catch (e: any) { toast.error(e.message); }
+    finally { setSavingAccess(false); }
+  };
 
   const save = async () => {
     setSaving(true);
