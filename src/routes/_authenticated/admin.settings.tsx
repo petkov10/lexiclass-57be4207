@@ -68,7 +68,7 @@ function SettingsPage() {
     try {
       const { error } = await supabase.rpc("admin_set_access", {
         _mode: accessMode,
-        _global_pin: accessMode === "global_pin" ? globalPin : null,
+        _global_pin: accessMode === "global_pin" ? globalPin : (null as any),
       });
       if (error) throw error;
       toast.success("Достъпът е обновен");
