@@ -40,6 +40,9 @@ function SettingsPage() {
   ]);
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
+  const [accessMode, setAccessMode] = useState<"free" | "global_pin" | "user_pin">("free");
+  const [globalPin, setGlobalPin] = useState("");
+  const [savingAccess, setSavingAccess] = useState(false);
 
   useEffect(() => {
     if (data) {
@@ -52,8 +55,27 @@ function SettingsPage() {
       });
       const gs = (data as any).grading_scale;
       if (Array.isArray(gs) && gs.length > 0) setScale(gs);
+      setAccessMode(((data as any).access_mode as any) || "free");
+      setGlobalPin((data as any).global_pin || "");
     }
   }, [data]);
+
+  const saveAccess = async () => {
+    if (accessMode === "global_pin" && !/^\d{4}$/.test(globalPin)) {
+      toast.error("PIN трябва да е 4 цифри"); return;
+    }
+    setSavingAccess(true);
+    try {
+      const { error } = await supabase.rpc("admin_set_access", {
+        _mode: accessMode,
+        _global_pin: accessMode === "global_pin" ? globalPin : (null as any),
+      });
+      if (error) throw error;
+      toast.success("Достъпът е обновен");
+      qc.invalidateQueries({ queryKey: ["app_settings"] });
+    } catch (e: any) { toast.error(e.message); }
+    finally { setSavingAccess(false); }
+  };
 
   const save = async () => {
     setSaving(true);
@@ -149,6 +171,46 @@ function SettingsPage() {
           ))}
           <Button variant="outline" size="sm" onClick={() => setScale((p) => [...p, { min_percent: 0, grade: 2 }])}>+ Добави праг</Button>
         </div>
+      </Card>
+
+      <Card className="p-6 space-y-4">
+        <div>
+          <h2 className="font-semibold">Достъп до сайта</h2>
+          <p className="text-xs text-muted-foreground mt-1">
+            Изберете кой може да отваря публичните страници. Администратори и редактори винаги имат достъп.
+          </p>
+        </div>
+        <div className="grid sm:grid-cols-3 gap-2">
+          {[
+            { v: "free", label: "Свободен", desc: "Без PIN" },
+            { v: "global_pin", label: "Общ PIN", desc: "Един код за всички" },
+            { v: "user_pin", label: "Личен PIN", desc: "Код за всеки ученик" },
+          ].map((opt) => {
+            const active = accessMode === (opt.v as any);
+            return (
+              <button key={opt.v} type="button" onClick={() => setAccessMode(opt.v as any)}
+                className="rounded-xl border-2 p-3 text-left hover:bg-accent transition-all"
+                style={{ borderColor: active ? "var(--ring)" : "var(--border)" }}>
+                <div className="font-medium text-sm">{opt.label}</div>
+                <div className="text-xs text-muted-foreground">{opt.desc}</div>
+              </button>
+            );
+          })}
+        </div>
+        {accessMode === "global_pin" && (
+          <div className="max-w-xs">
+            <Label>Общ PIN (4 цифри)</Label>
+            <Input inputMode="numeric" maxLength={4} value={globalPin}
+              onChange={(e) => setGlobalPin(e.target.value.replace(/\D/g, "").slice(0, 4))}
+              placeholder="••••" />
+          </div>
+        )}
+        {accessMode === "user_pin" && (
+          <p className="text-xs text-muted-foreground">PIN-овете се управляват в <strong>Потребители</strong>.</p>
+        )}
+        <Button onClick={saveAccess} disabled={savingAccess} variant="secondary">
+          {savingAccess ? "Запазване…" : "Запази достъпа"}
+        </Button>
       </Card>
 
       <Button onClick={save} disabled={saving}>{saving ? "Запазване..." : "Запази настройките"}</Button>

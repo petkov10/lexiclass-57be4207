@@ -14,6 +14,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { useApplySettings } from "@/hooks/useAppSettings";
 import { supabase } from "@/integrations/supabase/client";
 import { CommandPalette } from "@/components/CommandPalette";
+import { PinGate } from "@/components/PinGate";
 
 function NotFoundComponent() {
   return (
@@ -102,7 +103,7 @@ function AppInner() {
   }, [router, queryClient]);
   return (
     <>
-      <Outlet />
+      <PinGate><Outlet /></PinGate>
       <CommandPalette />
       <Toaster richColors position="top-right" />
     </>
