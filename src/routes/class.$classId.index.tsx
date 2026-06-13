@@ -4,7 +4,7 @@ import { classesQuery, classSubjectsQuery, subjectsQuery } from "@/lib/queries";
 import { PublicShell } from "@/components/layout/PublicShell";
 import { BookOpen, ChevronRight } from "lucide-react";
 
-export const Route = createFileRoute("/class/$classId")({
+export const Route = createFileRoute("/class/$classId/")({
   component: ClassPage,
 });
 
