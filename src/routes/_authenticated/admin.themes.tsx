@@ -37,6 +37,17 @@ function ThemesAdmin() {
 
   const { data: themes } = useQuery({ ...themesQuery(classId, subjectId), enabled: !!classId && !!subjectId });
 
+  const { data: notedThemeIds } = useQuery({
+    queryKey: ["theme_private_notes_ids", classId, subjectId, (themes ?? []).map((t) => t.id).join(",")],
+    enabled: !!themes && themes.length > 0,
+    queryFn: async () => {
+      const ids = (themes ?? []).map((t) => t.id);
+      if (ids.length === 0) return new Set<string>();
+      const { data } = await supabase.from("theme_private_notes").select("theme_id").in("theme_id", ids);
+      return new Set((data ?? []).map((r) => r.theme_id));
+    },
+  });
+
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [week, setWeek] = useState("");
@@ -47,7 +58,15 @@ function ThemesAdmin() {
   const [homeworkFor, setHomeworkFor] = useState<{ id: string; name: string } | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const refresh = () => qc.invalidateQueries({ queryKey: ["themes", classId, subjectId] });
+  const refresh = () => {
+    qc.invalidateQueries({ queryKey: ["themes", classId, subjectId] });
+    qc.invalidateQueries({ queryKey: ["theme_private_notes_ids"] });
+  };
+
+  const openNotes = async (id: string, name: string) => {
+    const { data } = await supabase.from("theme_private_notes").select("notes").eq("theme_id", id).maybeSingle();
+    setNotesFor({ id, name, notes: data?.notes ?? "" });
+  };
 
   const add = async () => {
     if (!classId || !subjectId || !name.trim()) return;
@@ -79,8 +98,14 @@ function ThemesAdmin() {
 
   const saveNotes = async () => {
     if (!notesFor) return;
-    const { error } = await supabase.from("themes").update({ private_notes: notesFor.notes || null }).eq("id", notesFor.id);
-    if (error) return toast.error(error.message);
+    const trimmed = notesFor.notes.trim();
+    if (!trimmed) {
+      const { error } = await supabase.from("theme_private_notes").delete().eq("theme_id", notesFor.id);
+      if (error) return toast.error(error.message);
+    } else {
+      const { error } = await supabase.from("theme_private_notes").upsert({ theme_id: notesFor.id, notes: trimmed });
+      if (error) return toast.error(error.message);
+    }
     setNotesFor(null); refresh();
     toast.success("Бележките са запазени");
   };
