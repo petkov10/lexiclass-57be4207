@@ -2,14 +2,14 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { settingsQuery } from "@/lib/queries";
-import { useAuth, useIsAdmin } from "@/hooks/useAuth";
+import { useAuth, useRole } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { LogIn, Settings as SettingsIcon, Home } from "lucide-react";
 
 export function PublicShell({ children }: { children: ReactNode }) {
   const { data: settings } = useQuery(settingsQuery);
   const { user } = useAuth();
-  const { isAdmin } = useIsAdmin(user?.id);
+  const { canEdit } = useRole(user?.id);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   return (
@@ -32,7 +32,7 @@ export function PublicShell({ children }: { children: ReactNode }) {
                 <Link to="/"><Home /> Начало</Link>
               </Button>
             )}
-            {isAdmin ? (
+            {canEdit ? (
               <Button asChild variant="outline" size="sm">
                 <Link to="/admin"><SettingsIcon /> Админ</Link>
               </Button>
