@@ -422,6 +422,32 @@ export type Database = {
           },
         ]
       }
+      theme_private_notes: {
+        Row: {
+          notes: string | null
+          theme_id: string
+          updated_at: string
+        }
+        Insert: {
+          notes?: string | null
+          theme_id: string
+          updated_at?: string
+        }
+        Update: {
+          notes?: string | null
+          theme_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "theme_private_notes_theme_id_fkey"
+            columns: ["theme_id"]
+            isOneToOne: true
+            referencedRelation: "themes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       themes: {
         Row: {
           class_id: string
@@ -430,7 +456,6 @@ export type Database = {
           id: string
           name: string
           order_index: number
-          private_notes: string | null
           subject_id: string
           updated_at: string
           week_number: number | null
@@ -442,7 +467,6 @@ export type Database = {
           id?: string
           name: string
           order_index?: number
-          private_notes?: string | null
           subject_id: string
           updated_at?: string
           week_number?: number | null
@@ -454,7 +478,6 @@ export type Database = {
           id?: string
           name?: string
           order_index?: number
-          private_notes?: string | null
           subject_id?: string
           updated_at?: string
           week_number?: number | null
