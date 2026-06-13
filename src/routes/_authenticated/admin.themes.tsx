@@ -37,6 +37,17 @@ function ThemesAdmin() {
 
   const { data: themes } = useQuery({ ...themesQuery(classId, subjectId), enabled: !!classId && !!subjectId });
 
+  const { data: notedThemeIds } = useQuery({
+    queryKey: ["theme_private_notes_ids", classId, subjectId, (themes ?? []).map((t) => t.id).join(",")],
+    enabled: !!themes && themes.length > 0,
+    queryFn: async () => {
+      const ids = (themes ?? []).map((t) => t.id);
+      if (ids.length === 0) return new Set<string>();
+      const { data } = await supabase.from("theme_private_notes").select("theme_id").in("theme_id", ids);
+      return new Set((data ?? []).map((r) => r.theme_id));
+    },
+  });
+
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [week, setWeek] = useState("");
@@ -47,7 +58,15 @@ function ThemesAdmin() {
   const [homeworkFor, setHomeworkFor] = useState<{ id: string; name: string } | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const refresh = () => qc.invalidateQueries({ queryKey: ["themes", classId, subjectId] });
+  const refresh = () => {
+    qc.invalidateQueries({ queryKey: ["themes", classId, subjectId] });
+    qc.invalidateQueries({ queryKey: ["theme_private_notes_ids"] });
+  };
+
+  const openNotes = async (id: string, name: string) => {
+    const { data } = await supabase.from("theme_private_notes").select("notes").eq("theme_id", id).maybeSingle();
+    setNotesFor({ id, name, notes: data?.notes ?? "" });
+  };
 
   const add = async () => {
     if (!classId || !subjectId || !name.trim()) return;
@@ -79,8 +98,14 @@ function ThemesAdmin() {
 
   const saveNotes = async () => {
     if (!notesFor) return;
-    const { error } = await supabase.from("themes").update({ private_notes: notesFor.notes || null }).eq("id", notesFor.id);
-    if (error) return toast.error(error.message);
+    const trimmed = notesFor.notes.trim();
+    if (!trimmed) {
+      const { error } = await supabase.from("theme_private_notes").delete().eq("theme_id", notesFor.id);
+      if (error) return toast.error(error.message);
+    } else {
+      const { error } = await supabase.from("theme_private_notes").upsert({ theme_id: notesFor.id, notes: trimmed });
+      if (error) return toast.error(error.message);
+    }
     setNotesFor(null); refresh();
     toast.success("Бележките са запазени");
   };
@@ -177,7 +202,8 @@ function ThemesAdmin() {
                       onCancelEdit={() => setEditId(null)}
                       onSave={save}
                       onRemove={() => remove(t.id)}
-                      onOpenNotes={() => setNotesFor({ id: t.id, name: t.name, notes: (t as any).private_notes ?? "" })}
+                      onOpenNotes={() => openNotes(t.id, t.name)}
+                      hasNotes={notedThemeIds?.has(t.id) ?? false}
                       onDuplicate={() => setDuplicateFor({ id: t.id, name: t.name })}
                       onHomework={() => setHomeworkFor({ id: t.id, name: t.name })}
                     />
@@ -216,7 +242,7 @@ function ThemesAdmin() {
   );
 }
 
-function SortableThemeRow({ t, isEditing, editValues, setEditValues, onStartEdit, onCancelEdit, onSave, onRemove, onOpenNotes, onDuplicate, onHomework }: any) {
+function SortableThemeRow({ t, isEditing, editValues, setEditValues, onStartEdit, onCancelEdit, onSave, onRemove, onOpenNotes, onDuplicate, onHomework, hasNotes }: any) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: t.id });
   const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.5 : 1 };
   return (
@@ -239,7 +265,7 @@ function SortableThemeRow({ t, isEditing, editValues, setEditValues, onStartEdit
             <div className="font-medium truncate">{t.name}</div>
             {t.description && <div className="text-xs text-muted-foreground truncate">{t.description}</div>}
           </div>
-          {t.private_notes && <span title="Има лични бележки" className="text-amber-500"><StickyNote className="h-3.5 w-3.5" /></span>}
+          {hasNotes && <span title="Има лични бележки" className="text-amber-500"><StickyNote className="h-3.5 w-3.5" /></span>}
           <Button size="sm" variant="ghost" onClick={onHomework} title="Домашни"><BookCheck className="h-4 w-4" /></Button>
           <Button size="sm" variant="ghost" onClick={onOpenNotes} title="Лични бележки"><StickyNote className="h-4 w-4" /></Button>
           <Button size="sm" variant="ghost" onClick={onDuplicate} title="Копирай в друг клас"><Copy className="h-4 w-4" /></Button>
@@ -271,9 +297,13 @@ function DuplicateForm({ themeId, onDone }: { themeId: string; onDone: () => voi
       const { data: newTheme, error } = await supabase.from("themes").insert({
         class_id: classId, subject_id: subjectId,
         name: src.name, description: src.description, week_number: src.week_number,
-        private_notes: src.private_notes, order_index: (cnt ?? 0) + 1,
+        order_index: (cnt ?? 0) + 1,
       }).select().single();
       if (error) throw error;
+      const { data: srcNotes } = await supabase.from("theme_private_notes").select("notes").eq("theme_id", themeId).maybeSingle();
+      if (srcNotes?.notes) {
+        await supabase.from("theme_private_notes").insert({ theme_id: newTheme.id, notes: srcNotes.notes });
+      }
       if (copyResources) {
         const { data: res } = await supabase.from("resources").select("*").eq("theme_id", themeId);
         if (res?.length) {
