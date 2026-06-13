@@ -296,9 +296,13 @@ function DuplicateForm({ themeId, onDone }: { themeId: string; onDone: () => voi
       const { data: newTheme, error } = await supabase.from("themes").insert({
         class_id: classId, subject_id: subjectId,
         name: src.name, description: src.description, week_number: src.week_number,
-        private_notes: src.private_notes, order_index: (cnt ?? 0) + 1,
+        order_index: (cnt ?? 0) + 1,
       }).select().single();
       if (error) throw error;
+      const { data: srcNotes } = await supabase.from("theme_private_notes").select("notes").eq("theme_id", themeId).maybeSingle();
+      if (srcNotes?.notes) {
+        await supabase.from("theme_private_notes").insert({ theme_id: newTheme.id, notes: srcNotes.notes });
+      }
       if (copyResources) {
         const { data: res } = await supabase.from("resources").select("*").eq("theme_id", themeId);
         if (res?.length) {
