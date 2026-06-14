@@ -21,7 +21,7 @@ const ICONS: Record<ResourceType, typeof FileText> = {
 const LABELS: Record<ResourceType, string> = {
   presentation: "Презентация", document: "Документ", link: "Линк", video: "Видео",
   test: "Тест", task: "Задача", code: "Код", image: "Изображение", note: "Бележка",
-  notebooklm: "NotebookLM", flashcards: "Флаш карти", lesson_plan: "План за урок", code_exercise: "Код упражнение", other: "Друго",
+  notebooklm: "NotebookLM", flashcards: "Флаш карти", lesson_plan: "Педагогически материал", code_exercise: "Код упражнение", other: "Друго",
 };
 
 function ThemePage() {
@@ -249,25 +249,71 @@ function Markdown({ text }: { text: string }) {
   return <div className="prose prose-sm max-w-none dark:prose-invert"><ReactMarkdown>{text}</ReactMarkdown></div>;
 }
 
-function FlashcardsViewer({ cards }: { cards: Flashcard[] }) {
+function FlashcardsViewer({ cards, fullscreen }: { cards: Flashcard[]; fullscreen?: boolean }) {
+  const [order, setOrder] = useState<number[]>(() => cards.map((_, i) => i));
   const [idx, setIdx] = useState(0);
   const [flipped, setFlipped] = useState(false);
-  if (cards.length === 0) return <p className="text-sm text-muted-foreground">Няма карти.</p>;
-  const card = cards[Math.min(idx, cards.length - 1)];
+  const [autoplay, setAutoplay] = useState(false);
+
+  useEffect(() => { setOrder(cards.map((_, i) => i)); setIdx(0); setFlipped(false); }, [cards]);
+
   const go = (d: number) => { setFlipped(false); setIdx((i) => (i + d + cards.length) % cards.length); };
+  const shuffle = () => {
+    const a = [...order];
+    for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+    setOrder(a); setIdx(0); setFlipped(false);
+  };
+
+  useEffect(() => {
+    if (!autoplay || cards.length === 0) return;
+    const t = setInterval(() => {
+      setFlipped((f) => {
+        if (!f) return true;
+        setIdx((i) => (i + 1) % cards.length);
+        return false;
+      });
+    }, 3500);
+    return () => clearInterval(t);
+  }, [autoplay, cards.length]);
+
+  useEffect(() => {
+    const h = (e: KeyboardEvent) => {
+      if (e.key === " ") { e.preventDefault(); setFlipped((f) => !f); }
+      if (e.key === "ArrowRight") go(1);
+      if (e.key === "ArrowLeft") go(-1);
+      if (e.key.toLowerCase() === "s") shuffle();
+    };
+    window.addEventListener("keydown", h);
+    return () => window.removeEventListener("keydown", h);
+  }, [cards.length, order]);
+
+  if (cards.length === 0) return <p className="text-sm text-muted-foreground">Няма карти.</p>;
+  const card = cards[order[Math.min(idx, order.length - 1)]];
+  const minH = fullscreen ? "min-h-[calc(100vh-14rem)]" : "min-h-[260px]";
+  const fontCls = fullscreen
+    ? "font-semibold whitespace-pre-wrap leading-tight [font-size:clamp(2rem,6vw,5.5rem)]"
+    : "text-xl md:text-2xl font-medium whitespace-pre-wrap";
   return (
     <div className="space-y-4">
-      <div className="text-xs text-muted-foreground text-center">{idx + 1} / {cards.length}</div>
-      <button onClick={() => setFlipped((f) => !f)} className="w-full min-h-[220px] rounded-xl border-2 border-primary/20 bg-card hover:bg-accent/40 p-8 grid place-items-center text-center">
-        <div>
-          <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-3">{flipped ? "Отговор" : "Въпрос"}</div>
-          <div className="text-lg font-medium whitespace-pre-wrap">{flipped ? card.back : card.front}</div>
-          <div className="text-xs text-muted-foreground mt-4 flex items-center justify-center gap-1"><RotateCw className="h-3 w-3" /> Кликни за обръщане</div>
+      <div className="flex items-center justify-between text-sm">
+        <div className="text-muted-foreground">{idx + 1} / {cards.length}</div>
+        <div className="flex items-center gap-2">
+          <Button size="sm" variant="outline" onClick={shuffle} title="S — разбърквай">Разбъркай</Button>
+          <Button size="sm" variant={autoplay ? "default" : "outline"} onClick={() => setAutoplay((a) => !a)}>
+            {autoplay ? "■ Спри" : "▶ Авто"}
+          </Button>
+        </div>
+      </div>
+      <button onClick={() => setFlipped((f) => !f)} className={`w-full ${minH} rounded-2xl border-2 border-primary/30 bg-card hover:bg-accent/40 p-8 md:p-12 grid place-items-center text-center transition-all`}>
+        <div className="max-w-full">
+          <div className="text-xs md:text-sm uppercase tracking-wider text-muted-foreground mb-4">{flipped ? "Отговор" : "Въпрос"}</div>
+          <div className={fontCls}>{flipped ? card.back : card.front}</div>
+          {!fullscreen && <div className="text-xs text-muted-foreground mt-6 flex items-center justify-center gap-1"><RotateCw className="h-3 w-3" /> Кликни / Space за обръщане</div>}
         </div>
       </button>
       <div className="flex justify-between gap-2">
-        <Button variant="outline" onClick={() => go(-1)}>← Предишна</Button>
-        <Button variant="outline" onClick={() => go(1)}>Следваща →</Button>
+        <Button variant="outline" onClick={() => go(-1)} size={fullscreen ? "lg" : "default"}>← Предишна</Button>
+        <Button variant="outline" onClick={() => go(1)} size={fullscreen ? "lg" : "default"}>Следваща →</Button>
       </div>
     </div>
   );

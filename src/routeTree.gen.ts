@@ -16,6 +16,7 @@ import { Route as ThemeThemeIdRouteImport } from './routes/theme.$themeId'
 import { Route as TestResourceIdRouteImport } from './routes/test.$resourceId'
 import { Route as ClassClassIdRouteImport } from './routes/class.$classId'
 import { Route as ApiAiTestRouteImport } from './routes/api/ai-test'
+import { Route as ApiAiPedagogyRouteImport } from './routes/api/ai-pedagogy'
 import { Route as ApiAiLessonPlanRouteImport } from './routes/api/ai-lesson-plan'
 import { Route as ApiAiFlashcardsRouteImport } from './routes/api/ai-flashcards'
 import { Route as ApiAiCodeExerciseRouteImport } from './routes/api/ai-code-exercise'
@@ -68,6 +69,11 @@ const ClassClassIdRoute = ClassClassIdRouteImport.update({
 const ApiAiTestRoute = ApiAiTestRouteImport.update({
   id: '/api/ai-test',
   path: '/api/ai-test',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAiPedagogyRoute = ApiAiPedagogyRouteImport.update({
+  id: '/api/ai-pedagogy',
+  path: '/api/ai-pedagogy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAiLessonPlanRoute = ApiAiLessonPlanRouteImport.update({
@@ -183,6 +189,7 @@ export interface FileRoutesByFullPath {
   '/api/ai-code-exercise': typeof ApiAiCodeExerciseRoute
   '/api/ai-flashcards': typeof ApiAiFlashcardsRoute
   '/api/ai-lesson-plan': typeof ApiAiLessonPlanRoute
+  '/api/ai-pedagogy': typeof ApiAiPedagogyRoute
   '/api/ai-test': typeof ApiAiTestRoute
   '/class/$classId': typeof ClassClassIdRouteWithChildren
   '/test/$resourceId': typeof TestResourceIdRouteWithChildren
@@ -209,6 +216,7 @@ export interface FileRoutesByTo {
   '/api/ai-code-exercise': typeof ApiAiCodeExerciseRoute
   '/api/ai-flashcards': typeof ApiAiFlashcardsRoute
   '/api/ai-lesson-plan': typeof ApiAiLessonPlanRoute
+  '/api/ai-pedagogy': typeof ApiAiPedagogyRoute
   '/api/ai-test': typeof ApiAiTestRoute
   '/test/$resourceId': typeof TestResourceIdRouteWithChildren
   '/theme/$themeId': typeof ThemeThemeIdRoute
@@ -237,6 +245,7 @@ export interface FileRoutesById {
   '/api/ai-code-exercise': typeof ApiAiCodeExerciseRoute
   '/api/ai-flashcards': typeof ApiAiFlashcardsRoute
   '/api/ai-lesson-plan': typeof ApiAiLessonPlanRoute
+  '/api/ai-pedagogy': typeof ApiAiPedagogyRoute
   '/api/ai-test': typeof ApiAiTestRoute
   '/class/$classId': typeof ClassClassIdRouteWithChildren
   '/test/$resourceId': typeof TestResourceIdRouteWithChildren
@@ -266,6 +275,7 @@ export interface FileRouteTypes {
     | '/api/ai-code-exercise'
     | '/api/ai-flashcards'
     | '/api/ai-lesson-plan'
+    | '/api/ai-pedagogy'
     | '/api/ai-test'
     | '/class/$classId'
     | '/test/$resourceId'
@@ -292,6 +302,7 @@ export interface FileRouteTypes {
     | '/api/ai-code-exercise'
     | '/api/ai-flashcards'
     | '/api/ai-lesson-plan'
+    | '/api/ai-pedagogy'
     | '/api/ai-test'
     | '/test/$resourceId'
     | '/theme/$themeId'
@@ -319,6 +330,7 @@ export interface FileRouteTypes {
     | '/api/ai-code-exercise'
     | '/api/ai-flashcards'
     | '/api/ai-lesson-plan'
+    | '/api/ai-pedagogy'
     | '/api/ai-test'
     | '/class/$classId'
     | '/test/$resourceId'
@@ -347,6 +359,7 @@ export interface RootRouteChildren {
   ApiAiCodeExerciseRoute: typeof ApiAiCodeExerciseRoute
   ApiAiFlashcardsRoute: typeof ApiAiFlashcardsRoute
   ApiAiLessonPlanRoute: typeof ApiAiLessonPlanRoute
+  ApiAiPedagogyRoute: typeof ApiAiPedagogyRoute
   ApiAiTestRoute: typeof ApiAiTestRoute
   ClassClassIdRoute: typeof ClassClassIdRouteWithChildren
   TestResourceIdRoute: typeof TestResourceIdRouteWithChildren
@@ -402,6 +415,13 @@ declare module '@tanstack/react-router' {
       path: '/api/ai-test'
       fullPath: '/api/ai-test'
       preLoaderRoute: typeof ApiAiTestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/ai-pedagogy': {
+      id: '/api/ai-pedagogy'
+      path: '/api/ai-pedagogy'
+      fullPath: '/api/ai-pedagogy'
+      preLoaderRoute: typeof ApiAiPedagogyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/ai-lesson-plan': {
@@ -616,6 +636,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAiCodeExerciseRoute: ApiAiCodeExerciseRoute,
   ApiAiFlashcardsRoute: ApiAiFlashcardsRoute,
   ApiAiLessonPlanRoute: ApiAiLessonPlanRoute,
+  ApiAiPedagogyRoute: ApiAiPedagogyRoute,
   ApiAiTestRoute: ApiAiTestRoute,
   ClassClassIdRoute: ClassClassIdRouteWithChildren,
   TestResourceIdRoute: TestResourceIdRouteWithChildren,
@@ -624,13 +645,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
