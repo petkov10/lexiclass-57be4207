@@ -19,6 +19,7 @@ import {
   Users,
   CalendarDays,
   ClipboardCheck,
+  FolderUp,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -29,6 +30,7 @@ const nav: NavItem[] = [
   { to: "/admin/subjects", label: "Предмети", icon: BookOpen },
   { to: "/admin/themes", label: "Теми", icon: ListTree },
   { to: "/admin/resources", label: "Ресурси", icon: FileStack },
+  { to: "/admin/import", label: "Импорт от папка", icon: FolderUp },
   { to: "/admin/grades", label: "Оценки", icon: ClipboardCheck },
   { to: "/admin/schedule", label: "Разписание", icon: CalendarDays },
   { to: "/admin/ai", label: "AI Асистент", icon: Sparkles },
