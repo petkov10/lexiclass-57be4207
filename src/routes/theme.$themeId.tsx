@@ -197,7 +197,7 @@ function ResourceViewer({ r, fullscreen }: { r: ResourceRow; fullscreen: boolean
   }
   if (r.type === "flashcards") {
     const cards = (((r.content ?? {}) as { flashcards?: Flashcard[] }).flashcards ?? []).filter((c) => c?.front);
-    return <FlashcardsViewer cards={cards} />;
+    return <FlashcardsViewer cards={cards} fullscreen={fullscreen} />;
   }
   if (url) {
     return (
