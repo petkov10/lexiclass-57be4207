@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Sparkles, Send, User, Bot, ClipboardList, BookOpen, Code2, Copy, Save } from "lucide-react";
+import { Sparkles, Send, User, Bot, ClipboardList, BookOpen, Code2, Copy, Save, GraduationCap } from "lucide-react";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
 import { useQuery } from "@tanstack/react-query";
@@ -27,15 +27,17 @@ function AIPage() {
         <p className="text-sm text-muted-foreground mt-1">Чат, генериране на тестове, планове за урок и код упражнения.</p>
       </div>
       <Tabs defaultValue="chat">
-        <TabsList>
+        <TabsList className="flex-wrap h-auto">
           <TabsTrigger value="chat"><Bot className="h-4 w-4" /> Чат</TabsTrigger>
           <TabsTrigger value="test"><ClipboardList className="h-4 w-4" /> Тестове</TabsTrigger>
           <TabsTrigger value="plan"><BookOpen className="h-4 w-4" /> План за урок</TabsTrigger>
+          <TabsTrigger value="pedagogy"><GraduationCap className="h-4 w-4" /> Педагогически</TabsTrigger>
           <TabsTrigger value="code"><Code2 className="h-4 w-4" /> Код упражнение</TabsTrigger>
         </TabsList>
         <TabsContent value="chat" className="mt-4"><Chat /></TabsContent>
         <TabsContent value="test" className="mt-4"><TestGen /></TabsContent>
         <TabsContent value="plan" className="mt-4"><PlanGen /></TabsContent>
+        <TabsContent value="pedagogy" className="mt-4"><PedagogyGen /></TabsContent>
         <TabsContent value="code" className="mt-4"><CodeGen /></TabsContent>
       </Tabs>
     </div>
