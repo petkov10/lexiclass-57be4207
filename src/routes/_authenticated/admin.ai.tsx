@@ -209,6 +209,8 @@ function PlanGen() {
   const [topic, setTopic] = useState("");
   const [duration, setDuration] = useState(45);
   const [grade, setGrade] = useState("");
+  const [lessonType, setLessonType] = useState<"new" | "practice" | "review" | "assessment">("new");
+  const [methods, setMethods] = useState("");
   const [loading, setLoading] = useState(false);
   const [plan, setPlan] = useState("");
   const [themeId, setThemeId] = useState("");
@@ -216,7 +218,10 @@ function PlanGen() {
   const gen = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/ai-lesson-plan", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ topic, duration, grade }) });
+      const res = await fetch("/api/ai-lesson-plan", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ topic, duration, grade, lesson_type: lessonType, methods }),
+      });
       if (!res.ok) throw new Error(await res.text());
       const j = await res.json();
       setPlan(j.plan);
@@ -236,21 +241,110 @@ function PlanGen() {
 
   return (
     <Card className="p-4 space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-[1fr_120px_140px_auto] gap-3 items-end">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <div><Label>Тема на урока</Label><Input value={topic} onChange={(e) => setTopic(e.target.value)} placeholder="напр. Цикли в C#" /></div>
-        <div><Label>Минути</Label><Input type="number" value={duration} onChange={(e) => setDuration(+e.target.value || 45)} /></div>
         <div><Label>Клас</Label><Input value={grade} onChange={(e) => setGrade(e.target.value)} placeholder="напр. 9А" /></div>
-        <Button onClick={gen} disabled={loading || !topic.trim()}><Sparkles /> {loading ? "..." : "Генерирай"}</Button>
+        <div><Label>Минути</Label><Input type="number" value={duration} onChange={(e) => setDuration(+e.target.value || 45)} /></div>
+        <div><Label>Тип урок</Label>
+          <Select value={lessonType} onValueChange={(v) => setLessonType(v as any)}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="new">Нов материал</SelectItem>
+              <SelectItem value="practice">Упражнение</SelectItem>
+              <SelectItem value="review">Обобщение</SelectItem>
+              <SelectItem value="assessment">Оценяване</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="md:col-span-2"><Label>Предпочитани методи (по желание)</Label>
+          <Input value={methods} onChange={(e) => setMethods(e.target.value)} placeholder="напр. групова работа, обърната класна стая" /></div>
       </div>
+      <Button onClick={gen} disabled={loading || !topic.trim()}><Sparkles /> {loading ? "Генериране..." : "Генерирай методическа разработка"}</Button>
       {plan && (
         <>
           <Card className="p-4 max-h-[60vh] overflow-auto">
             <div className="prose prose-sm max-w-none dark:prose-invert"><ReactMarkdown>{plan}</ReactMarkdown></div>
           </Card>
-          <div className="flex gap-2 items-end">
-            <div className="flex-1"><ThemePicker themeId={themeId} setThemeId={setThemeId} /></div>
+          <div className="flex gap-2 items-end flex-wrap">
+            <div className="flex-1 min-w-[200px]"><ThemePicker themeId={themeId} setThemeId={setThemeId} /></div>
             <Button variant="outline" onClick={() => { navigator.clipboard.writeText(plan); toast.success("Копирано"); }}><Copy /> Копирай</Button>
-            <Button onClick={save} disabled={!themeId}><Save /> Запази</Button>
+            <Button onClick={save} disabled={!themeId}><Save /> Запази към темата</Button>
+          </div>
+        </>
+      )}
+    </Card>
+  );
+}
+
+const PEDAGOGY_KINDS = [
+  { value: "worksheet", label: "Работен лист (за принтиране)" },
+  { value: "discussion", label: "Дискусионни въпроси" },
+  { value: "case_study", label: "Казус (case study)" },
+  { value: "project", label: "Проектно задание" },
+  { value: "quick_quiz", label: "Бърз тест (вх./изх. контрол)" },
+] as const;
+
+function PedagogyGen() {
+  const [topic, setTopic] = useState("");
+  const [kind, setKind] = useState<typeof PEDAGOGY_KINDS[number]["value"]>("worksheet");
+  const [grade, setGrade] = useState("");
+  const [duration, setDuration] = useState(45);
+  const [context, setContext] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [text, setText] = useState("");
+  const [genTitle, setGenTitle] = useState("");
+  const [themeId, setThemeId] = useState("");
+
+  const gen = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/ai-pedagogy", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ topic, kind, grade, duration, context }),
+      });
+      if (!res.ok) throw new Error(await res.text());
+      const j = await res.json();
+      setText(j.text); setGenTitle(j.title);
+    } catch (e: any) { toast.error(e.message); } finally { setLoading(false); }
+  };
+
+  const save = async () => {
+    if (!themeId || !text) return;
+    const label = PEDAGOGY_KINDS.find((k) => k.value === kind)?.label ?? "";
+    const { error } = await supabase.from("resources").insert({
+      theme_id: themeId, type: "lesson_plan", title: genTitle || `${label}: ${topic}`,
+      description: `${label}${grade ? ` · ${grade}` : ""}`,
+      content: { text, kind } as any, order_index: 999,
+    });
+    if (error) return toast.error(error.message);
+    toast.success("Запазено като ресурс");
+  };
+
+  return (
+    <Card className="p-4 space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div><Label>Вид материал</Label>
+          <Select value={kind} onValueChange={(v) => setKind(v as any)}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent>{PEDAGOGY_KINDS.map((k) => <SelectItem key={k.value} value={k.value}>{k.label}</SelectItem>)}</SelectContent>
+          </Select>
+        </div>
+        <div><Label>Тема</Label><Input value={topic} onChange={(e) => setTopic(e.target.value)} placeholder="напр. Фотосинтеза" /></div>
+        <div><Label>Клас</Label><Input value={grade} onChange={(e) => setGrade(e.target.value)} placeholder="напр. 7А" /></div>
+        <div><Label>Минути</Label><Input type="number" value={duration} onChange={(e) => setDuration(+e.target.value || 45)} /></div>
+        <div className="md:col-span-2"><Label>Допълнителен контекст (по желание)</Label>
+          <Textarea rows={2} value={context} onChange={(e) => setContext(e.target.value)} placeholder="специфики на класа, цели, предходни знания..." /></div>
+      </div>
+      <Button onClick={gen} disabled={loading || !topic.trim()}><Sparkles /> {loading ? "Генериране..." : "Генерирай"}</Button>
+      {text && (
+        <>
+          <Card className="p-4 max-h-[60vh] overflow-auto">
+            <div className="prose prose-sm max-w-none dark:prose-invert"><ReactMarkdown>{text}</ReactMarkdown></div>
+          </Card>
+          <div className="flex gap-2 items-end flex-wrap">
+            <div className="flex-1 min-w-[200px]"><ThemePicker themeId={themeId} setThemeId={setThemeId} /></div>
+            <Button variant="outline" onClick={() => { navigator.clipboard.writeText(text); toast.success("Копирано"); }}><Copy /> Копирай</Button>
+            <Button onClick={save} disabled={!themeId}><Save /> Запази към темата</Button>
           </div>
         </>
       )}
