@@ -31,10 +31,12 @@ import { Route as AuthenticatedAdminSubjectsRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin.settings'
 import { Route as AuthenticatedAdminScheduleRouteImport } from './routes/_authenticated/admin.schedule'
 import { Route as AuthenticatedAdminResourcesRouteImport } from './routes/_authenticated/admin.resources'
+import { Route as AuthenticatedAdminImportRouteImport } from './routes/_authenticated/admin.import'
 import { Route as AuthenticatedAdminGradesRouteImport } from './routes/_authenticated/admin.grades'
 import { Route as AuthenticatedAdminClassesRouteImport } from './routes/_authenticated/admin.classes'
 import { Route as AuthenticatedAdminBackupRouteImport } from './routes/_authenticated/admin.backup'
 import { Route as AuthenticatedAdminAiRouteImport } from './routes/_authenticated/admin.ai'
+import { Route as AuthenticatedAdminImportRouteImport } from './routes/_authenticated/admin.import'
 import { Route as ClassClassIdSubjectSubjectIdRouteImport } from './routes/class.$classId.subject.$subjectId'
 
 const AuthRoute = AuthRouteImport.update({
@@ -151,6 +153,12 @@ const AuthenticatedAdminResourcesRoute =
     path: '/resources',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminImportRoute =
+  AuthenticatedAdminImportRouteImport.update({
+    id: '/import',
+    path: '/import',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminGradesRoute =
   AuthenticatedAdminGradesRouteImport.update({
     id: '/grades',
@@ -198,6 +206,7 @@ export interface FileRoutesByFullPath {
   '/admin/backup': typeof AuthenticatedAdminBackupRoute
   '/admin/classes': typeof AuthenticatedAdminClassesRoute
   '/admin/grades': typeof AuthenticatedAdminGradesRoute
+  '/admin/import': typeof AuthenticatedAdminImportRoute
   '/admin/resources': typeof AuthenticatedAdminResourcesRoute
   '/admin/schedule': typeof AuthenticatedAdminScheduleRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
@@ -224,6 +233,7 @@ export interface FileRoutesByTo {
   '/admin/backup': typeof AuthenticatedAdminBackupRoute
   '/admin/classes': typeof AuthenticatedAdminClassesRoute
   '/admin/grades': typeof AuthenticatedAdminGradesRoute
+  '/admin/import': typeof AuthenticatedAdminImportRoute
   '/admin/resources': typeof AuthenticatedAdminResourcesRoute
   '/admin/schedule': typeof AuthenticatedAdminScheduleRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
@@ -254,6 +264,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/backup': typeof AuthenticatedAdminBackupRoute
   '/_authenticated/admin/classes': typeof AuthenticatedAdminClassesRoute
   '/_authenticated/admin/grades': typeof AuthenticatedAdminGradesRoute
+  '/_authenticated/admin/import': typeof AuthenticatedAdminImportRoute
   '/_authenticated/admin/resources': typeof AuthenticatedAdminResourcesRoute
   '/_authenticated/admin/schedule': typeof AuthenticatedAdminScheduleRoute
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
@@ -284,6 +295,7 @@ export interface FileRouteTypes {
     | '/admin/backup'
     | '/admin/classes'
     | '/admin/grades'
+    | '/admin/import'
     | '/admin/resources'
     | '/admin/schedule'
     | '/admin/settings'
@@ -310,6 +322,7 @@ export interface FileRouteTypes {
     | '/admin/backup'
     | '/admin/classes'
     | '/admin/grades'
+    | '/admin/import'
     | '/admin/resources'
     | '/admin/schedule'
     | '/admin/settings'
@@ -339,6 +352,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/backup'
     | '/_authenticated/admin/classes'
     | '/_authenticated/admin/grades'
+    | '/_authenticated/admin/import'
     | '/_authenticated/admin/resources'
     | '/_authenticated/admin/schedule'
     | '/_authenticated/admin/settings'
@@ -522,6 +536,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminResourcesRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/import': {
+      id: '/_authenticated/admin/import'
+      path: '/import'
+      fullPath: '/admin/import'
+      preLoaderRoute: typeof AuthenticatedAdminImportRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/grades': {
       id: '/_authenticated/admin/grades'
       path: '/grades'
@@ -565,6 +586,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminBackupRoute: typeof AuthenticatedAdminBackupRoute
   AuthenticatedAdminClassesRoute: typeof AuthenticatedAdminClassesRoute
   AuthenticatedAdminGradesRoute: typeof AuthenticatedAdminGradesRoute
+  AuthenticatedAdminImportRoute: typeof AuthenticatedAdminImportRoute
   AuthenticatedAdminResourcesRoute: typeof AuthenticatedAdminResourcesRoute
   AuthenticatedAdminScheduleRoute: typeof AuthenticatedAdminScheduleRoute
   AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
@@ -579,6 +601,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminBackupRoute: AuthenticatedAdminBackupRoute,
   AuthenticatedAdminClassesRoute: AuthenticatedAdminClassesRoute,
   AuthenticatedAdminGradesRoute: AuthenticatedAdminGradesRoute,
+  AuthenticatedAdminImportRoute: AuthenticatedAdminImportRoute,
   AuthenticatedAdminResourcesRoute: AuthenticatedAdminResourcesRoute,
   AuthenticatedAdminScheduleRoute: AuthenticatedAdminScheduleRoute,
   AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
