@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { settingsQuery } from "@/lib/queries";
+import { settingsQuery, classesQuery, subjectsQuery, allThemesQuery } from "@/lib/queries";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -214,6 +214,110 @@ function SettingsPage() {
       </Card>
 
       <Button onClick={save} disabled={saving}>{saving ? "Запазване..." : "Запази настройките"}</Button>
+
+      <DangerZone />
     </div>
+  );
+}
+
+function DangerZone() {
+  const qc = useQueryClient();
+  const { data: classes } = useQuery(classesQuery);
+  const { data: subjects } = useQuery(subjectsQuery);
+  const { data: themes } = useQuery(allThemesQuery);
+  const [classId, setClassId] = useState("");
+  const [subjectId, setSubjectId] = useState("");
+  const [themeId, setThemeId] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [resetConfirm, setResetConfirm] = useState("");
+
+  const refresh = () => {
+    qc.invalidateQueries({ queryKey: ["classes"] });
+    qc.invalidateQueries({ queryKey: ["subjects"] });
+    qc.invalidateQueries({ queryKey: ["themes-all"] });
+    qc.invalidateQueries({ queryKey: ["class_subjects"] });
+  };
+
+  const run = async (label: string, fn: () => Promise<{ error: any }>) => {
+    if (!confirm(`Сигурен ли си? ${label}\n\nТова е необратимо.`)) return;
+    setBusy(true);
+    try {
+      const { error } = await fn();
+      if (error) throw error;
+      toast.success("Изтрито");
+      refresh();
+    } catch (e: any) { toast.error(e.message); }
+    finally { setBusy(false); }
+  };
+
+  return (
+    <Card className="p-6 space-y-5 border-destructive/40">
+      <div>
+        <h2 className="font-semibold text-destructive">Опасна зона</h2>
+        <p className="text-xs text-muted-foreground mt-1">Каскадно изтриване — премахва избрания елемент заедно с всички теми, ресурси, домашни и програма.</p>
+      </div>
+
+      <div className="space-y-3">
+        <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-2">
+          <Select value={classId} onValueChange={setClassId}>
+            <SelectTrigger><SelectValue placeholder="Изтрий клас със всичко в него" /></SelectTrigger>
+            <SelectContent>{classes?.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}</SelectContent>
+          </Select>
+          <Button variant="destructive" disabled={!classId || busy}
+            onClick={() => run(`Изтриване на клас със всички предмети, теми и ресурси.`,
+              async () => { const { error } = await supabase.rpc("admin_delete_class", { _id: classId }); return { error }; })}>
+            Изтрий клас
+          </Button>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-2">
+          <Select value={subjectId} onValueChange={setSubjectId}>
+            <SelectTrigger><SelectValue placeholder="Изтрий предмет със всичко в него" /></SelectTrigger>
+            <SelectContent>{subjects?.map((s) => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent>
+          </Select>
+          <Button variant="destructive" disabled={!subjectId || busy}
+            onClick={() => run(`Изтриване на предмет със всички теми и ресурси (във всички класове).`,
+              async () => { const { error } = await supabase.rpc("admin_delete_subject", { _id: subjectId }); return { error }; })}>
+            Изтрий предмет
+          </Button>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-2">
+          <Select value={themeId} onValueChange={setThemeId}>
+            <SelectTrigger><SelectValue placeholder="Изтрий тема със всички ресурси" /></SelectTrigger>
+            <SelectContent>{themes?.map((t) => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}</SelectContent>
+          </Select>
+          <Button variant="destructive" disabled={!themeId || busy}
+            onClick={() => run(`Изтриване на тема със всички ресурси и домашни.`,
+              async () => { const { error } = await supabase.rpc("admin_delete_theme", { _id: themeId }); return { error }; })}>
+            Изтрий тема
+          </Button>
+        </div>
+      </div>
+
+      <div className="pt-4 border-t border-destructive/30 space-y-2">
+        <Label className="text-destructive">Нулиране на цялото съдържание</Label>
+        <p className="text-xs text-muted-foreground">Изтрива ВСИЧКИ класове, предмети, теми, ресурси, тестови резултати, домашни и програма. Потребителите и настройките остават.</p>
+        <p className="text-xs text-muted-foreground">Напиши <code className="bg-muted px-1 rounded">ИЗТРИЙ ВСИЧКО</code> за потвърждение:</p>
+        <div className="flex gap-2">
+          <Input value={resetConfirm} onChange={(e) => setResetConfirm(e.target.value)} placeholder="ИЗТРИЙ ВСИЧКО" />
+          <Button variant="destructive" disabled={resetConfirm !== "ИЗТРИЙ ВСИЧКО" || busy}
+            onClick={async () => {
+              if (!confirm("Последно потвърждение: всички класове, предмети, теми и ресурси ще бъдат изтрити необратимо.")) return;
+              setBusy(true);
+              try {
+                const { error } = await supabase.rpc("admin_reset_all");
+                if (error) throw error;
+                toast.success("Всичко е изтрито.");
+                setResetConfirm("");
+                refresh();
+              } catch (e: any) { toast.error(e.message); }
+              finally { setBusy(false); }
+            }}>
+            Нулирай всичко
+          </Button>
+        </div>
+      </div>
+    </Card>
   );
 }

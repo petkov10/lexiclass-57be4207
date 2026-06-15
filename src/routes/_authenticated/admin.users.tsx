@@ -17,7 +17,7 @@ export const Route = createFileRoute("/_authenticated/admin/users")({
 });
 
 type RoleVal = "admin" | "editor" | "user";
-type PinRow = { user_id: string; access_pin: string | null; is_paused: boolean; last_login_at: string | null };
+type PinRow = { user_id: string; access_pin: string | null; is_paused: boolean; is_approved: boolean; last_login_at: string | null };
 
 function UsersAdmin() {
   const qc = useQueryClient();
@@ -96,6 +96,13 @@ function UsersAdmin() {
     loadPins();
   };
 
+  const toggleApproved = async (userId: string, approved: boolean) => {
+    const { error } = await supabase.rpc("admin_set_user_approved", { _user_id: userId, _approved: approved });
+    if (error) { toast.error(error.message); return; }
+    toast.success(approved ? "Потребителят е одобрен" : "Одобрението е премахнато");
+    loadPins();
+  };
+
   const renameUser = async (userId: string, name: string) => {
     const { error } = await supabase.rpc("admin_set_user_display_name", { _user_id: userId, _name: name });
     if (error) { toast.error(error.message); return; }
@@ -161,8 +168,9 @@ function UsersAdmin() {
             const pin = pinRow?.access_pin ?? "";
             const paused = pinRow?.is_paused ?? false;
             const editing = editName[p.id] !== undefined;
+            const approved = pinRow?.is_approved ?? true;
             return (
-              <div key={p.id} className={`p-3 grid grid-cols-1 md:grid-cols-[auto_1fr_auto_auto_auto] gap-3 items-center ${paused ? "opacity-60" : ""}`}>
+              <div key={p.id} className={`p-3 grid grid-cols-1 md:grid-cols-[auto_1fr_auto_auto_auto_auto] gap-3 items-center ${paused || !approved ? "opacity-60" : ""}`}>
                 <div className="h-8 w-8 rounded-full bg-primary/10 text-primary grid place-items-center">
                   <Icon className="h-4 w-4" />
                 </div>
@@ -179,6 +187,7 @@ function UsersAdmin() {
                       <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => setEditName((s) => ({ ...s, [p.id]: p.display_name ?? "" }))}><Pencil className="h-3 w-3" /></Button>
                     </div>
                   )}
+                  {!approved && <div className="text-xs text-amber-600 dark:text-amber-400 font-medium mt-0.5">⏳ Чака одобрение</div>}
                   {pinRow?.last_login_at && (
                     <div className="text-xs text-muted-foreground">Последен вход: {new Date(pinRow.last_login_at).toLocaleString("bg-BG")}</div>
                   )}
@@ -193,7 +202,7 @@ function UsersAdmin() {
                     value={showPin[p.id] ? pin : pin ? "••••" : ""}
                     onChange={(e) => {
                       const v = e.target.value.replace(/\D/g, "").slice(0, 4);
-                      setPinRows((s) => ({ ...s, [p.id]: { ...(s[p.id] || { user_id: p.id, is_paused: false, last_login_at: null, access_pin: null }), access_pin: v } }));
+                      setPinRows((s) => ({ ...s, [p.id]: { ...(s[p.id] || { user_id: p.id, is_paused: false, is_approved: true, last_login_at: null, access_pin: null }), access_pin: v } }));
                       setShowPin((s) => ({ ...s, [p.id]: true }));
                     }}
                     onBlur={(e) => {
@@ -215,6 +224,12 @@ function UsersAdmin() {
                       <Copy className="h-4 w-4" />
                     </Button>
                   )}
+                </div>
+
+                {/* Approval toggle */}
+                <div className="flex items-center gap-2">
+                  <Switch checked={approved} disabled={isMe} onCheckedChange={(v) => toggleApproved(p.id, v)} />
+                  <span className="text-xs text-muted-foreground">{approved ? "Одобрен" : "Чака"}</span>
                 </div>
 
                 {/* Pause toggle */}

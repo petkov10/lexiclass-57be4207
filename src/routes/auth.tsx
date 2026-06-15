@@ -36,12 +36,12 @@ function AuthPage() {
           options: { emailRedirectTo: window.location.origin, data: { full_name: name } },
         });
         if (error) throw error;
-        toast.success("Регистрацията е успешна!");
+        toast.success("Регистрацията е успешна! Изчакай администратор да одобри акаунта ти.", { duration: 8000 });
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
       }
-      navigate({ to: "/admin" });
+      navigate({ to: "/" });
     } catch (err: any) {
       toast.error(err.message || "Възникна грешка");
     } finally {
