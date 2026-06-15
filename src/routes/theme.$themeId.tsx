@@ -130,20 +130,59 @@ function ThemePage() {
   );
 }
 
+const GROUP_ORDER: { types: ResourceType[]; label: string }[] = [
+  { types: ["presentation"], label: "Презентации" },
+  { types: ["document"], label: "Документи" },
+  { types: ["video"], label: "Видео" },
+  { types: ["notebooklm"], label: "NotebookLM" },
+  { types: ["lesson_plan", "note"], label: "Материали и бележки" },
+  { types: ["flashcards"], label: "Флаш карти" },
+  { types: ["test"], label: "Тестове" },
+  { types: ["task", "code_exercise", "code"], label: "Задачи и код" },
+  { types: ["link"], label: "Връзки" },
+  { types: ["image"], label: "Изображения" },
+  { types: ["other"], label: "Други" },
+];
+
+function ResourceGroups({ resources, onOpen }: { resources: ResourceRow[]; onOpen: (i: number) => void }) {
+  const indexMap = new Map(resources.map((r, i) => [r.id, i]));
+  return (
+    <div className="space-y-8">
+      {GROUP_ORDER.map((g) => {
+        const items = resources.filter((r) => g.types.includes(r.type));
+        if (items.length === 0) return null;
+        return (
+          <section key={g.label}>
+            <div className="flex items-center gap-2 mb-3">
+              <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">{g.label}</h2>
+              <span className="text-xs text-muted-foreground">· {items.length}</span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {items.map((r) => (
+                <ResourceCard key={r.id} r={r} onOpen={() => onOpen(indexMap.get(r.id)!)} />
+              ))}
+            </div>
+          </section>
+        );
+      })}
+    </div>
+  );
+}
+
 function ResourceCard({ r, onOpen }: { r: ResourceRow; onOpen: () => void }) {
   const Icon = ICONS[r.type] ?? FileText;
   const isExternal = r.type === "link" || r.type === "video" || r.type === "notebooklm";
   const url = r.url || fileUrl(r.file_path);
   const isTest = r.type === "test";
   return (
-    <div className="hover-lift group flex items-center gap-4 rounded-lg border bg-card px-4 py-3">
-      <div className="h-10 w-10 rounded-md bg-primary/10 text-primary grid place-items-center"><Icon className="h-5 w-5" /></div>
+    <div className="hover-lift group flex items-center gap-3 rounded-xl border bg-card p-3">
+      <div className="h-11 w-11 rounded-lg bg-primary/10 text-primary grid place-items-center shrink-0"><Icon className="h-5 w-5" /></div>
       <div className="flex-1 min-w-0">
         <div className="font-medium truncate">{r.title}</div>
-        <div className="text-xs text-muted-foreground">{LABELS[r.type]} {r.description ? `· ${r.description}` : ""}</div>
+        {r.description && <div className="text-xs text-muted-foreground truncate">{r.description}</div>}
       </div>
       {isTest ? (
-        <Button asChild size="sm"><a href={`/test/${r.id}`}>Започни теста</a></Button>
+        <Button asChild size="sm"><a href={`/test/${r.id}`}>Започни</a></Button>
       ) : isExternal && url ? (
         <Button asChild variant="outline" size="sm"><a href={url} target="_blank" rel="noreferrer">Отвори <ExternalLink /></a></Button>
       ) : (
