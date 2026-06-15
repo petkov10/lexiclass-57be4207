@@ -96,6 +96,13 @@ function UsersAdmin() {
     loadPins();
   };
 
+  const toggleApproved = async (userId: string, approved: boolean) => {
+    const { error } = await supabase.rpc("admin_set_user_approved", { _user_id: userId, _approved: approved });
+    if (error) { toast.error(error.message); return; }
+    toast.success(approved ? "Потребителят е одобрен" : "Одобрението е премахнато");
+    loadPins();
+  };
+
   const renameUser = async (userId: string, name: string) => {
     const { error } = await supabase.rpc("admin_set_user_display_name", { _user_id: userId, _name: name });
     if (error) { toast.error(error.message); return; }
