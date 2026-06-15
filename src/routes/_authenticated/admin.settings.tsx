@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { settingsQuery } from "@/lib/queries";
+import { settingsQuery, classesQuery, subjectsQuery, allThemesQuery } from "@/lib/queries";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
