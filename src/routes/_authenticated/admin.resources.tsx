@@ -353,9 +353,28 @@ function inferType(name: string): ResourceType {
   return "other";
 }
 
+async function uploadAndVerify(file: File, path: string): Promise<void> {
+  const { error } = await supabase.storage.from("resources").upload(path, file, {
+    upsert: true,
+    contentType: file.type || undefined,
+  });
+  if (error) throw new Error(error.message);
+  // Verify the file actually exists in storage (some platforms accept the request
+  // but silently reject oversized payloads). We list the parent prefix and look for it.
+  const slash = path.lastIndexOf("/");
+  const prefix = slash > 0 ? path.slice(0, slash) : "";
+  const name = slash > 0 ? path.slice(slash + 1) : path;
+  const { data: list, error: listErr } = await supabase.storage.from("resources").list(prefix, { limit: 100, search: name });
+  if (listErr) throw new Error("Не успях да проверя файла: " + listErr.message);
+  const found = (list ?? []).find((o) => o.name === name);
+  if (!found) {
+    throw new Error(`Файлът „${file.name}" не е записан (вероятно е твърде голям). Опитай с по-малък файл или го качи на Google Drive и добави линк.`);
+  }
+}
+
 function BulkUploader({ themeId, baseOrder, onDone }: { themeId: string; baseOrder: number; onDone: () => void }) {
   const [dragOver, setDragOver] = useState(false);
-  const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
+  const [progress, setProgress] = useState<{ done: number; total: number; current?: string } | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const upload = async (files: FileList | File[]) => {
@@ -363,24 +382,29 @@ function BulkUploader({ themeId, baseOrder, onDone }: { themeId: string; baseOrd
     if (arr.length === 0) return;
     setProgress({ done: 0, total: arr.length });
     let i = 0;
+    let ok = 0;
+    let failed = 0;
     for (const file of arr) {
+      setProgress({ done: i, total: arr.length, current: file.name });
       const type = inferType(file.name);
       try {
         const path = `${themeId}/${Date.now()}_${i}_${sanitizeFileName(file.name)}`;
-        const { error: upErr } = await supabase.storage.from("resources").upload(path, file);
-        if (upErr) throw upErr;
-        await supabase.from("resources").insert({
+        await uploadAndVerify(file, path);
+        const { error: insErr } = await supabase.from("resources").insert({
           theme_id: themeId, type, title: file.name.replace(/\.[^.]+$/, ""),
           file_path: path, order_index: baseOrder + i + 1,
         });
+        if (insErr) throw new Error(insErr.message);
+        ok++;
       } catch (e: any) {
-        toast.error(`${file.name}: ${e.message}`);
+        failed++;
+        toast.error(`${file.name}: ${e.message}`, { duration: 8000 });
       }
       i++;
       setProgress({ done: i, total: arr.length });
     }
     setProgress(null);
-    toast.success(`Качени ${arr.length} файла`);
+    if (ok > 0) toast.success(`Качени ${ok} от ${arr.length} файла${failed ? ` · ${failed} грешки` : ""}`);
     onDone();
   };
 
@@ -395,11 +419,14 @@ function BulkUploader({ themeId, baseOrder, onDone }: { themeId: string; baseOrd
       <input ref={inputRef} type="file" multiple className="hidden" onChange={(e) => e.target.files && upload(e.target.files)} />
       <Upload className="h-6 w-6 mx-auto text-muted-foreground mb-2" />
       {progress ? (
-        <div className="text-sm">Качване... <strong>{progress.done}/{progress.total}</strong></div>
+        <div className="text-sm">
+          Качване... <strong>{progress.done}/{progress.total}</strong>
+          {progress.current && <div className="text-xs text-muted-foreground truncate mt-1">{progress.current}</div>}
+        </div>
       ) : (
         <>
           <div className="font-medium text-sm">Влачи и пусни файлове тук</div>
-          <div className="text-xs text-muted-foreground mt-1">или кликни — типът се разпознава автоматично</div>
+          <div className="text-xs text-muted-foreground mt-1">Препоръчителен макс. размер ~50 MB. По-големи файлове качи в Google Drive и добави като линк.</div>
         </>
       )}
     </div>
