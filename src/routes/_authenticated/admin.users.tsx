@@ -168,8 +168,9 @@ function UsersAdmin() {
             const pin = pinRow?.access_pin ?? "";
             const paused = pinRow?.is_paused ?? false;
             const editing = editName[p.id] !== undefined;
+            const approved = pinRow?.is_approved ?? true;
             return (
-              <div key={p.id} className={`p-3 grid grid-cols-1 md:grid-cols-[auto_1fr_auto_auto_auto] gap-3 items-center ${paused ? "opacity-60" : ""}`}>
+              <div key={p.id} className={`p-3 grid grid-cols-1 md:grid-cols-[auto_1fr_auto_auto_auto_auto] gap-3 items-center ${paused || !approved ? "opacity-60" : ""}`}>
                 <div className="h-8 w-8 rounded-full bg-primary/10 text-primary grid place-items-center">
                   <Icon className="h-4 w-4" />
                 </div>
