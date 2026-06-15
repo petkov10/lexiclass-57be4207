@@ -277,7 +277,7 @@ function DangerZone() {
           </Select>
           <Button variant="destructive" disabled={!subjectId || busy}
             onClick={() => run(`Изтриване на предмет със всички теми и ресурси (във всички класове).`,
-              () => supabase.rpc("admin_delete_subject", { _id: subjectId }).then((r) => ({ error: r.error })))}>
+              async () => { const { error } = await supabase.rpc("admin_delete_subject", { _id: subjectId }); return { error }; })}>
             Изтрий предмет
           </Button>
         </div>
@@ -289,7 +289,7 @@ function DangerZone() {
           </Select>
           <Button variant="destructive" disabled={!themeId || busy}
             onClick={() => run(`Изтриване на тема със всички ресурси и домашни.`,
-              () => supabase.rpc("admin_delete_theme", { _id: themeId }).then((r) => ({ error: r.error })))}>
+              async () => { const { error } = await supabase.rpc("admin_delete_theme", { _id: themeId }); return { error }; })}>
             Изтрий тема
           </Button>
         </div>
