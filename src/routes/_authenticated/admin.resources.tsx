@@ -163,8 +163,7 @@ function ResourceForm({ themeId, existing, orderHint, onDone }: { themeId: strin
       let filePath = existing?.file_path ?? null;
       if (file) {
         const path = `${themeId}/${Date.now()}_${sanitizeFileName(file.name)}`;
-        const { error } = await supabase.storage.from("resources").upload(path, file);
-        if (error) throw error;
+        await uploadAndVerify(file, path);
         filePath = path;
       }
       const payload = {
