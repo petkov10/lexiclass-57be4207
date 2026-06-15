@@ -187,6 +187,7 @@ function UsersAdmin() {
                       <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => setEditName((s) => ({ ...s, [p.id]: p.display_name ?? "" }))}><Pencil className="h-3 w-3" /></Button>
                     </div>
                   )}
+                  {!approved && <div className="text-xs text-amber-600 dark:text-amber-400 font-medium mt-0.5">⏳ Чака одобрение</div>}
                   {pinRow?.last_login_at && (
                     <div className="text-xs text-muted-foreground">Последен вход: {new Date(pinRow.last_login_at).toLocaleString("bg-BG")}</div>
                   )}
