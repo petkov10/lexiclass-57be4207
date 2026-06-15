@@ -226,6 +226,12 @@ function UsersAdmin() {
                   )}
                 </div>
 
+                {/* Approval toggle */}
+                <div className="flex items-center gap-2">
+                  <Switch checked={approved} disabled={isMe} onCheckedChange={(v) => toggleApproved(p.id, v)} />
+                  <span className="text-xs text-muted-foreground">{approved ? "Одобрен" : "Чака"}</span>
+                </div>
+
                 {/* Pause toggle */}
                 <div className="flex items-center gap-2">
                   <Switch checked={!paused} disabled={isMe} onCheckedChange={(v) => togglePause(p.id, !v)} />
