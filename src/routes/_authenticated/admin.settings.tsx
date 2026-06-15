@@ -265,7 +265,7 @@ function DangerZone() {
           </Select>
           <Button variant="destructive" disabled={!classId || busy}
             onClick={() => run(`Изтриване на клас със всички предмети, теми и ресурси.`,
-              () => supabase.rpc("admin_delete_class", { _id: classId }).then((r) => ({ error: r.error })))}>
+              async () => { const { error } = await supabase.rpc("admin_delete_class", { _id: classId }); return { error }; })}>
             Изтрий клас
           </Button>
         </div>
