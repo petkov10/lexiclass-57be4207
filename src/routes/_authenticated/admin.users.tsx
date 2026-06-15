@@ -202,7 +202,7 @@ function UsersAdmin() {
                     value={showPin[p.id] ? pin : pin ? "••••" : ""}
                     onChange={(e) => {
                       const v = e.target.value.replace(/\D/g, "").slice(0, 4);
-                      setPinRows((s) => ({ ...s, [p.id]: { ...(s[p.id] || { user_id: p.id, is_paused: false, last_login_at: null, access_pin: null }), access_pin: v } }));
+                      setPinRows((s) => ({ ...s, [p.id]: { ...(s[p.id] || { user_id: p.id, is_paused: false, is_approved: true, last_login_at: null, access_pin: null }), access_pin: v } }));
                       setShowPin((s) => ({ ...s, [p.id]: true }));
                     }}
                     onBlur={(e) => {
