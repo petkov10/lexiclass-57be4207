@@ -191,6 +191,7 @@ export type Database = {
           created_at: string
           display_name: string | null
           id: string
+          is_approved: boolean
           is_paused: boolean
           last_login_at: string | null
         }
@@ -200,6 +201,7 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id: string
+          is_approved?: boolean
           is_paused?: boolean
           last_login_at?: string | null
         }
@@ -209,6 +211,7 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id?: string
+          is_approved?: boolean
           is_paused?: boolean
           last_login_at?: string | null
         }
@@ -540,17 +543,26 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_delete_class: { Args: { _id: string }; Returns: undefined }
+      admin_delete_subject: { Args: { _id: string }; Returns: undefined }
+      admin_delete_theme: { Args: { _id: string }; Returns: undefined }
       admin_list_user_pins: {
         Args: never
         Returns: {
           access_pin: string
+          is_approved: boolean
           is_paused: boolean
           last_login_at: string
           user_id: string
         }[]
       }
+      admin_reset_all: { Args: never; Returns: undefined }
       admin_set_access: {
         Args: { _global_pin: string; _mode: string }
+        Returns: undefined
+      }
+      admin_set_user_approved: {
+        Args: { _approved: boolean; _user_id: string }
         Returns: undefined
       }
       admin_set_user_display_name: {
