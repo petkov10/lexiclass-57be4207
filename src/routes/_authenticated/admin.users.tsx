@@ -17,7 +17,7 @@ export const Route = createFileRoute("/_authenticated/admin/users")({
 });
 
 type RoleVal = "admin" | "editor" | "user";
-type PinRow = { user_id: string; access_pin: string | null; is_paused: boolean; last_login_at: string | null };
+type PinRow = { user_id: string; access_pin: string | null; is_paused: boolean; is_approved: boolean; last_login_at: string | null };
 
 function UsersAdmin() {
   const qc = useQueryClient();
