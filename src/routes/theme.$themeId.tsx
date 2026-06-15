@@ -76,13 +76,13 @@ function ThemePage() {
         <h1 className="text-2xl font-semibold tracking-tight">{theme?.name}</h1>
         {theme?.description && <p className="mt-2 text-muted-foreground">{theme.description}</p>}
 
-        <div className="mt-8 space-y-3">
+        <div className="mt-8 space-y-8">
           {isLoading ? (
-            Array.from({ length: 3 }).map((_, i) => <div key={i} className="h-20 rounded-lg bg-muted animate-pulse" />)
+            <div className="space-y-3">
+              {Array.from({ length: 3 }).map((_, i) => <div key={i} className="h-20 rounded-lg bg-muted animate-pulse" />)}
+            </div>
           ) : resources && resources.length > 0 ? (
-            resources.map((r, i) => (
-              <ResourceCard key={r.id} r={r as ResourceRow} onOpen={() => setOpenIdx(i)} />
-            ))
+            <ResourceGroups resources={resources as ResourceRow[]} onOpen={(i) => setOpenIdx(i)} />
           ) : (
             <p className="text-muted-foreground">Все още няма ресурси за тази тема.</p>
           )}
