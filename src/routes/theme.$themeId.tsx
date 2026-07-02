@@ -241,15 +241,24 @@ function ResourceViewer({ r, fullscreen }: { r: ResourceRow; fullscreen: boolean
     const cards = (((r.content ?? {}) as { flashcards?: Flashcard[] }).flashcards ?? []).filter((c) => c?.front);
     return <FlashcardsViewer cards={cards} fullscreen={fullscreen} />;
   }
+  if (loading) {
+    return <div className="p-8 text-center text-sm text-muted-foreground">Зареждане на файла…</div>;
+  }
+  if (error) {
+    return <div className="p-6 text-sm text-destructive">Грешка при достъп до файла. Опитай да опресниш страницата или качи ресурса отново.</div>;
+  }
   if (url) {
     return (
       <div className="space-y-3 h-full">
         {r.description && !fullscreen && <p className="text-sm text-muted-foreground">{r.description}</p>}
         <iframe src={url} className={fullscreen ? "w-full h-[calc(100vh-7rem)] rounded border" : "w-full h-[70vh] rounded border"} />
+        <div className="text-xs text-muted-foreground">
+          Ако прегледът не се зарежда, <a href={url} target="_blank" rel="noreferrer" className="text-primary underline">отвори в нов таб</a>.
+        </div>
       </div>
     );
   }
-  return <p>Няма съдържание.</p>;
+  return <p className="p-4 text-sm text-muted-foreground">Няма съдържание за преглед.</p>;
 }
 
 function TestViewer({ content }: { content: any }) {
