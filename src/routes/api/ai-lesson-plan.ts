@@ -4,6 +4,7 @@ type Body = {
   topic?: string;
   duration?: number;
   grade?: string;
+  subject?: string;
   context?: string;
   lesson_type?: "new" | "practice" | "review" | "assessment";
   methods?: string;
@@ -131,7 +132,7 @@ export const Route = createFileRoute("/api/ai-lesson-plan")({
 - Съобрази възрастовите особености на посочения клас.
 - При STEM/езиков/хуманитарен предмет — използвай подходящата специфична методика.`;
 
-        const usr = `Тема: ${topic}\nПродължителност: ${duration} минути${body.grade ? `\nКлас: ${body.grade}` : ""}${lessonTypeLabel ? `\nТип урок: ${lessonTypeLabel}` : ""}${body.methods ? `\nПредпочитани методи: ${body.methods}` : ""}${body.context ? `\nДопълнителен контекст: ${body.context}` : ""}`;
+        const usr = `Тема: ${topic}${body.subject ? `\nУчебен предмет: ${body.subject}` : ""}\nПродължителност: ${duration} минути${body.grade ? `\nКлас: ${body.grade}` : ""}${lessonTypeLabel ? `\nТип урок: ${lessonTypeLabel}` : ""}${body.methods ? `\nПредпочитани методи: ${body.methods}` : ""}${body.context ? `\nДопълнителен контекст: ${body.context}` : ""}`;
 
         const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
           method: "POST",
