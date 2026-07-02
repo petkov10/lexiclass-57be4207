@@ -112,7 +112,7 @@ function ResourcesAdmin() {
 
           <Card className="divide-y">
             {(resources ?? []).map((r) => (
-              <ResourceRow
+              <ResourceListRow
                 key={r.id}
                 r={r as ResourceRow}
                 onEdit={() => { setEditing(r as ResourceRow); setOpen(true); }}
