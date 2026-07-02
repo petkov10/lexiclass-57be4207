@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { classesQuery, subjectsQuery, themesQuery, classSubjectsQuery, resourcesForThemeQuery, fileUrl } from "@/lib/queries";
+import { classesQuery, subjectsQuery, themesQuery, classSubjectsQuery, resourcesForThemeQuery } from "@/lib/queries";
+import { useResourceUrl } from "@/hooks/useResourceUrl";
 import { supabase } from "@/integrations/supabase/client";
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
@@ -110,32 +111,41 @@ function ResourcesAdmin() {
           </div>
 
           <Card className="divide-y">
-            {(resources ?? []).map((r) => {
-              const url = r.url || fileUrl(r.file_path);
-              const testUrl = r.type === "test" ? `${typeof window !== "undefined" ? window.location.origin : ""}/test/${r.id}` : null;
-              return (
-                <div key={r.id} className="p-3 flex items-center gap-3 flex-wrap">
-                  <div className="text-xs uppercase tracking-wider rounded bg-muted px-2 py-1 w-28 text-center font-medium shrink-0">{TYPES.find((t) => t.value === r.type)?.label}</div>
-                  <div className="flex-1 min-w-[200px]">
-                    <div className="font-medium truncate">{r.title}</div>
-                    {r.description && <div className="text-xs text-muted-foreground truncate">{r.description}</div>}
-                  </div>
-                  {testUrl && <QrCodeButton url={testUrl} label="QR" title={`QR за ${r.title}`} />}
-                  {r.type === "test" && <Button asChild variant="outline" size="sm"><a href={`/test/${r.id}/print`} target="_blank" rel="noreferrer">Печат</a></Button>}
-                  {url && <Button asChild variant="ghost" size="sm"><a href={url} target="_blank" rel="noreferrer"><ExternalLink /></a></Button>}
-                  <Button variant="ghost" size="sm" onClick={() => { setEditing(r as ResourceRow); setOpen(true); }}><Edit /></Button>
-                  <Button variant="ghost" size="sm" onClick={async () => {
-                    if (!confirm("Изтрий ресурса?")) return;
-                    await supabase.from("resources").delete().eq("id", r.id);
-                    refresh();
-                  }}><Trash2 className="text-destructive" /></Button>
-                </div>
-              );
-            })}
+            {(resources ?? []).map((r) => (
+              <ResourceListRow
+                key={r.id}
+                r={r as ResourceRow}
+                onEdit={() => { setEditing(r as ResourceRow); setOpen(true); }}
+                onDelete={async () => {
+                  if (!confirm("Изтрий ресурса?")) return;
+                  await supabase.from("resources").delete().eq("id", r.id);
+                  refresh();
+                }}
+              />
+            ))}
             {(!resources || resources.length === 0) && <div className="p-6 text-sm text-muted-foreground text-center">Все още няма ресурси за тази тема.</div>}
           </Card>
         </>
       )}
+    </div>
+  );
+}
+
+function ResourceListRow({ r, onEdit, onDelete }: { r: ResourceRow; onEdit: () => void; onDelete: () => void }) {
+  const { url } = useResourceUrl({ url: r.url, file_path: r.file_path });
+  const testUrl = r.type === "test" ? `${typeof window !== "undefined" ? window.location.origin : ""}/test/${r.id}` : null;
+  return (
+    <div className="p-3 flex items-center gap-3 flex-wrap">
+      <div className="text-xs uppercase tracking-wider rounded bg-muted px-2 py-1 w-28 text-center font-medium shrink-0">{TYPES.find((t) => t.value === r.type)?.label}</div>
+      <div className="flex-1 min-w-[200px]">
+        <div className="font-medium truncate">{r.title}</div>
+        {r.description && <div className="text-xs text-muted-foreground truncate">{r.description}</div>}
+      </div>
+      {testUrl && <QrCodeButton url={testUrl} label="QR" title={`QR за ${r.title}`} />}
+      {r.type === "test" && <Button asChild variant="outline" size="sm"><a href={`/test/${r.id}/print`} target="_blank" rel="noreferrer">Печат</a></Button>}
+      {url && <Button asChild variant="ghost" size="sm"><a href={url} target="_blank" rel="noreferrer"><ExternalLink /></a></Button>}
+      <Button variant="ghost" size="sm" onClick={onEdit}><Edit /></Button>
+      <Button variant="ghost" size="sm" onClick={onDelete}><Trash2 className="text-destructive" /></Button>
     </div>
   );
 }

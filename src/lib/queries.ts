@@ -131,6 +131,28 @@ export const usersWithRolesQuery = queryOptions({
   },
 });
 
+// Signed URL for a file in the private "resources" bucket.
+// Cached by react-query (1h TTL matching the signed URL lifetime).
+export const signedFileUrlQuery = (path: string | null | undefined) =>
+  queryOptions({
+    queryKey: ["signed-url", path],
+    enabled: !!path,
+    staleTime: 55 * 60 * 1000,
+    gcTime: 60 * 60 * 1000,
+    retry: 1,
+    queryFn: async () => {
+      const { data, error } = await supabase.storage
+        .from("resources")
+        .createSignedUrl(path!, 60 * 60);
+      if (error) throw error;
+      return data.signedUrl;
+    },
+  });
+
+/**
+ * @deprecated Bucket „resources" е частен. Използвайте useResourceUrl / signedFileUrlQuery.
+ * Оставено само за обратна съвместимост — не гарантира достъп.
+ */
 export const fileUrl = (path: string | null) => {
   if (!path) return null;
   const { data } = supabase.storage.from("resources").getPublicUrl(path);

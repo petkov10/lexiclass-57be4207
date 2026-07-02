@@ -8,9 +8,9 @@ const normalize = (s: string) =>
   s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
 
 type Hit =
-  | { kind: "class"; id: string; name: string }
-  | { kind: "subject"; id: string; name: string }
-  | { kind: "theme"; id: string; name: string };
+  | { kind: "class"; id: string; name: string; sub?: string }
+  | { kind: "subject"; id: string; name: string; sub?: string }
+  | { kind: "theme"; id: string; name: string; sub?: string };
 
 export function SearchBar({ autoFocus = false }: { autoFocus?: boolean }) {
   const [q, setQ] = useState("");
@@ -47,10 +47,16 @@ export function SearchBar({ autoFocus = false }: { autoFocus?: boolean }) {
   const hits = useMemo<Hit[]>(() => {
     const n = normalize(q);
     if (!n) return [];
+    const classById = new Map((classes ?? []).map((c) => [c.id, c.name]));
+    const subjectById = new Map((subjects ?? []).map((s) => [s.id, s.name]));
     const out: Hit[] = [];
     (classes ?? []).forEach((c) => normalize(c.name).includes(n) && out.push({ kind: "class", id: c.id, name: c.name }));
     (subjects ?? []).forEach((s) => normalize(s.name).includes(n) && out.push({ kind: "subject", id: s.id, name: s.name }));
-    (themes ?? []).forEach((t) => normalize(t.name).includes(n) && out.push({ kind: "theme", id: t.id, name: t.name }));
+    (themes ?? []).forEach((t) => {
+      if (!normalize(t.name).includes(n)) return;
+      const parts = [classById.get(t.class_id), subjectById.get(t.subject_id)].filter(Boolean) as string[];
+      out.push({ kind: "theme", id: t.id, name: t.name, sub: parts.join(" · ") });
+    });
     return out.slice(0, 30);
   }, [q, classes, subjects, themes]);
 
@@ -69,7 +75,7 @@ export function SearchBar({ autoFocus = false }: { autoFocus?: boolean }) {
   };
 
   return (
-    <div ref={wrapRef} className="relative w-full max-w-xl mx-auto">
+    <div ref={wrapRef} className="relative w-full max-w-2xl mx-auto">
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
         <input
@@ -111,10 +117,12 @@ export function SearchBar({ autoFocus = false }: { autoFocus?: boolean }) {
                       onClick={() => goto(h)}
                       className={`w-full text-left px-3 py-2 flex items-center gap-3 ${active ? "bg-accent" : ""}`}
                     >
-                      <Icon className="h-4 w-4 text-primary shrink-0" />
+                      <Icon className="h-4 w-4 text-primary shrink-0 mt-0.5" />
                       <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium truncate">{h.name}</div>
-                        <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</div>
+                        <div className="text-sm font-medium leading-snug break-words">{h.name}</div>
+                        <div className="text-[10px] uppercase tracking-wider text-muted-foreground mt-0.5">
+                          {label}{h.sub ? <span className="normal-case tracking-normal text-muted-foreground/80"> · {h.sub}</span> : null}
+                        </div>
                       </div>
                     </button>
                   </li>

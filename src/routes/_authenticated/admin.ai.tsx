@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Sparkles, Send, User, Bot, ClipboardList, BookOpen, Code2, Copy, Save, GraduationCap } from "lucide-react";
+import { Sparkles, Send, User, Bot, ClipboardList, BookOpen, Code2, Copy, Save, GraduationCap, Eye, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
 import { useQuery } from "@tanstack/react-query";
@@ -175,20 +175,58 @@ function TestGen() {
 
       {test && (
         <div className="space-y-3">
-          <h3 className="font-semibold text-lg">{test.title}</h3>
-          <ol className="space-y-3 list-decimal pl-5">
-            {(test.questions ?? []).map((q: any, i: number) => (
-              <li key={i} className="space-y-1">
-                <div className="font-medium">{q.q}</div>
-                {q.type === "mc" && (
-                  <ul className="text-sm space-y-0.5">{(q.options ?? []).map((o: string, j: number) => (
-                    <li key={j} className={o === q.answer ? "text-primary font-medium" : ""}>• {o}</li>
-                  ))}</ul>
-                )}
-                <div className="text-xs text-muted-foreground"><strong>Отговор:</strong> {q.answer}{q.explanation ? ` — ${q.explanation}` : ""}</div>
-              </li>
-            ))}
-          </ol>
+          <div>
+            <Label>Заглавие на теста</Label>
+            <Input value={test.title || ""} onChange={(e) => setTest({ ...test, title: e.target.value })} />
+          </div>
+          <div className="space-y-3">
+            {(test.questions ?? []).map((q: any, i: number) => {
+              const patch = (upd: any) => setTest({ ...test, questions: test.questions.map((x: any, j: number) => j === i ? { ...x, ...upd } : x) });
+              const removeQ = () => setTest({ ...test, questions: test.questions.filter((_: any, j: number) => j !== i) });
+              return (
+                <Card key={i} className="p-3 space-y-2">
+                  <div className="flex items-start gap-2">
+                    <div className="text-xs font-semibold text-muted-foreground pt-2 w-6">{i + 1}.</div>
+                    <Textarea rows={2} value={q.q || ""} onChange={(e) => patch({ q: e.target.value })} placeholder="Въпрос" />
+                    <Select value={q.type || "mc"} onValueChange={(v) => patch({ type: v })}>
+                      <SelectTrigger className="w-[110px]"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="mc">С избор</SelectItem>
+                        <SelectItem value="open">Отворен</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Button variant="ghost" size="sm" onClick={removeQ}>✕</Button>
+                  </div>
+                  {q.type === "mc" && (
+                    <div className="pl-8 space-y-1">
+                      {(q.options ?? []).map((o: string, j: number) => (
+                        <div key={j} className="flex items-center gap-2">
+                          <input type="radio" checked={q.answer === o} onChange={() => patch({ answer: o })} />
+                          <Input value={o} onChange={(e) => {
+                            const newOpts = [...q.options]; const old = newOpts[j]; newOpts[j] = e.target.value;
+                            patch({ options: newOpts, answer: q.answer === old ? e.target.value : q.answer });
+                          }} />
+                          <Button variant="ghost" size="sm" onClick={() => patch({ options: q.options.filter((_: any, k: number) => k !== j) })}>✕</Button>
+                        </div>
+                      ))}
+                      <Button variant="outline" size="sm" onClick={() => patch({ options: [...(q.options ?? []), ""] })}>+ Опция</Button>
+                    </div>
+                  )}
+                  {q.type === "open" && (
+                    <div className="pl-8">
+                      <Label className="text-xs">Верен отговор</Label>
+                      <Input value={q.answer || ""} onChange={(e) => patch({ answer: e.target.value })} />
+                    </div>
+                  )}
+                  <div className="pl-8">
+                    <Label className="text-xs">Обяснение (по желание)</Label>
+                    <Input value={q.explanation || ""} onChange={(e) => patch({ explanation: e.target.value })} />
+                  </div>
+                </Card>
+              );
+            })}
+            <Button variant="outline" size="sm" onClick={() => setTest({ ...test, questions: [...(test.questions ?? []), { q: "", type: "mc", options: ["", "", "", ""], answer: "" }] })}>+ Добави въпрос</Button>
+          </div>
           <div className="flex gap-2 items-end border-t pt-3 flex-wrap">
             <div className="flex-1 min-w-[200px]"><ThemePicker themeId={themeId} setThemeId={setThemeId} /></div>
             <Button onClick={save} disabled={!themeId}><Save /> Запази като ресурс</Button>
@@ -207,6 +245,7 @@ function TestGen() {
 
 function PlanGen() {
   const [topic, setTopic] = useState("");
+  const [subject, setSubject] = useState("");
   const [duration, setDuration] = useState(45);
   const [grade, setGrade] = useState("");
   const [lessonType, setLessonType] = useState<"new" | "practice" | "review" | "assessment">("new");
@@ -220,7 +259,7 @@ function PlanGen() {
     try {
       const res = await fetch("/api/ai-lesson-plan", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ topic, duration, grade, lesson_type: lessonType, methods }),
+        body: JSON.stringify({ topic, subject, duration, grade, lesson_type: lessonType, methods }),
       });
       if (!res.ok) throw new Error(await res.text());
       const j = await res.json();
@@ -232,7 +271,7 @@ function PlanGen() {
     if (!themeId || !plan) return;
     const { error } = await supabase.from("resources").insert({
       theme_id: themeId, type: "lesson_plan", title: `План: ${topic}`,
-      description: `${duration} мин${grade ? ` · ${grade}` : ""}`,
+      description: `${duration} мин${grade ? ` · ${grade}` : ""}${subject ? ` · ${subject}` : ""}`,
       content: { text: plan } as any, order_index: 999,
     });
     if (error) return toast.error(error.message);
@@ -243,6 +282,7 @@ function PlanGen() {
     <Card className="p-4 space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <div><Label>Тема на урока</Label><Input value={topic} onChange={(e) => setTopic(e.target.value)} placeholder="напр. Цикли в C#" /></div>
+        <div><Label>Учебен предмет</Label><Input value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="напр. Информационни технологии" /></div>
         <div><Label>Клас</Label><Input value={grade} onChange={(e) => setGrade(e.target.value)} placeholder="напр. 9А" /></div>
         <div><Label>Минути</Label><Input type="number" value={duration} onChange={(e) => setDuration(+e.target.value || 45)} /></div>
         <div><Label>Тип урок</Label>
@@ -257,14 +297,12 @@ function PlanGen() {
           </Select>
         </div>
         <div className="md:col-span-2"><Label>Предпочитани методи (по желание)</Label>
-          <Input value={methods} onChange={(e) => setMethods(e.target.value)} placeholder="напр. групова работа, обърната класна стая" /></div>
+          <Input value={methods} onChange={(e) => setMethods(e.target.value)} placeholder="напр. групова работа, обърната класна стая, PBL" /></div>
       </div>
       <Button onClick={gen} disabled={loading || !topic.trim()}><Sparkles /> {loading ? "Генериране..." : "Генерирай методическа разработка"}</Button>
       {plan && (
         <>
-          <Card className="p-4 max-h-[60vh] overflow-auto">
-            <div className="prose prose-sm max-w-none dark:prose-invert"><ReactMarkdown>{plan}</ReactMarkdown></div>
-          </Card>
+          <EditableMarkdown value={plan} onChange={setPlan} label="Разработка на урока (редактируема)" />
           <div className="flex gap-2 items-end flex-wrap">
             <div className="flex-1 min-w-[200px]"><ThemePicker themeId={themeId} setThemeId={setThemeId} /></div>
             <Button variant="outline" onClick={() => { navigator.clipboard.writeText(plan); toast.success("Копирано"); }}><Copy /> Копирай</Button>
@@ -338,9 +376,7 @@ function PedagogyGen() {
       <Button onClick={gen} disabled={loading || !topic.trim()}><Sparkles /> {loading ? "Генериране..." : "Генерирай"}</Button>
       {text && (
         <>
-          <Card className="p-4 max-h-[60vh] overflow-auto">
-            <div className="prose prose-sm max-w-none dark:prose-invert"><ReactMarkdown>{text}</ReactMarkdown></div>
-          </Card>
+          <EditableMarkdown value={text} onChange={setText} label={`${genTitle || "Материал"} (редактируем)`} />
           <div className="flex gap-2 items-end flex-wrap">
             <div className="flex-1 min-w-[200px]"><ThemePicker themeId={themeId} setThemeId={setThemeId} /></div>
             <Button variant="outline" onClick={() => { navigator.clipboard.writeText(text); toast.success("Копирано"); }}><Copy /> Копирай</Button>
@@ -425,5 +461,31 @@ function Section({ title, children }: { title: string; children: React.ReactNode
       <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">{title}</div>
       {children}
     </div>
+  );
+}
+
+function EditableMarkdown({ value, onChange, label }: { value: string; onChange: (v: string) => void; label?: string }) {
+  const [mode, setMode] = useState<"preview" | "edit">("preview");
+  return (
+    <Card className="overflow-hidden">
+      <div className="flex items-center justify-between border-b bg-muted/40 px-3 py-2">
+        <div className="text-xs font-medium text-muted-foreground truncate">{label ?? "Съдържание"}</div>
+        <div className="flex gap-1">
+          <Button size="sm" variant={mode === "preview" ? "default" : "ghost"} onClick={() => setMode("preview")}><Eye className="h-3.5 w-3.5" /> Преглед</Button>
+          <Button size="sm" variant={mode === "edit" ? "default" : "ghost"} onClick={() => setMode("edit")}><Pencil className="h-3.5 w-3.5" /> Редакция</Button>
+        </div>
+      </div>
+      {mode === "preview" ? (
+        <div className="p-4 max-h-[60vh] overflow-auto">
+          <div className="prose prose-sm max-w-none dark:prose-invert"><ReactMarkdown>{value}</ReactMarkdown></div>
+        </div>
+      ) : (
+        <Textarea
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="font-mono text-xs min-h-[60vh] rounded-none border-0 focus-visible:ring-0"
+        />
+      )}
+    </Card>
   );
 }
