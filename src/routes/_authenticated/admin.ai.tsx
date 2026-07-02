@@ -262,9 +262,7 @@ function PlanGen() {
       <Button onClick={gen} disabled={loading || !topic.trim()}><Sparkles /> {loading ? "Генериране..." : "Генерирай методическа разработка"}</Button>
       {plan && (
         <>
-          <Card className="p-4 max-h-[60vh] overflow-auto">
-            <div className="prose prose-sm max-w-none dark:prose-invert"><ReactMarkdown>{plan}</ReactMarkdown></div>
-          </Card>
+          <EditableMarkdown value={plan} onChange={setPlan} label="Разработка на урока (редактируема)" />
           <div className="flex gap-2 items-end flex-wrap">
             <div className="flex-1 min-w-[200px]"><ThemePicker themeId={themeId} setThemeId={setThemeId} /></div>
             <Button variant="outline" onClick={() => { navigator.clipboard.writeText(plan); toast.success("Копирано"); }}><Copy /> Копирай</Button>
