@@ -423,3 +423,29 @@ function Section({ title, children }: { title: string; children: React.ReactNode
     </div>
   );
 }
+
+function EditableMarkdown({ value, onChange, label }: { value: string; onChange: (v: string) => void; label?: string }) {
+  const [mode, setMode] = useState<"preview" | "edit">("preview");
+  return (
+    <Card className="overflow-hidden">
+      <div className="flex items-center justify-between border-b bg-muted/40 px-3 py-2">
+        <div className="text-xs font-medium text-muted-foreground truncate">{label ?? "Съдържание"}</div>
+        <div className="flex gap-1">
+          <Button size="sm" variant={mode === "preview" ? "default" : "ghost"} onClick={() => setMode("preview")}><Eye className="h-3.5 w-3.5" /> Преглед</Button>
+          <Button size="sm" variant={mode === "edit" ? "default" : "ghost"} onClick={() => setMode("edit")}><Pencil className="h-3.5 w-3.5" /> Редакция</Button>
+        </div>
+      </div>
+      {mode === "preview" ? (
+        <div className="p-4 max-h-[60vh] overflow-auto">
+          <div className="prose prose-sm max-w-none dark:prose-invert"><ReactMarkdown>{value}</ReactMarkdown></div>
+        </div>
+      ) : (
+        <Textarea
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="font-mono text-xs min-h-[60vh] rounded-none border-0 focus-visible:ring-0"
+        />
+      )}
+    </Card>
+  );
+}
