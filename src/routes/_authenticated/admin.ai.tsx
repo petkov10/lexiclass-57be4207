@@ -175,20 +175,58 @@ function TestGen() {
 
       {test && (
         <div className="space-y-3">
-          <h3 className="font-semibold text-lg">{test.title}</h3>
-          <ol className="space-y-3 list-decimal pl-5">
-            {(test.questions ?? []).map((q: any, i: number) => (
-              <li key={i} className="space-y-1">
-                <div className="font-medium">{q.q}</div>
-                {q.type === "mc" && (
-                  <ul className="text-sm space-y-0.5">{(q.options ?? []).map((o: string, j: number) => (
-                    <li key={j} className={o === q.answer ? "text-primary font-medium" : ""}>• {o}</li>
-                  ))}</ul>
-                )}
-                <div className="text-xs text-muted-foreground"><strong>Отговор:</strong> {q.answer}{q.explanation ? ` — ${q.explanation}` : ""}</div>
-              </li>
-            ))}
-          </ol>
+          <div>
+            <Label>Заглавие на теста</Label>
+            <Input value={test.title || ""} onChange={(e) => setTest({ ...test, title: e.target.value })} />
+          </div>
+          <div className="space-y-3">
+            {(test.questions ?? []).map((q: any, i: number) => {
+              const patch = (upd: any) => setTest({ ...test, questions: test.questions.map((x: any, j: number) => j === i ? { ...x, ...upd } : x) });
+              const removeQ = () => setTest({ ...test, questions: test.questions.filter((_: any, j: number) => j !== i) });
+              return (
+                <Card key={i} className="p-3 space-y-2">
+                  <div className="flex items-start gap-2">
+                    <div className="text-xs font-semibold text-muted-foreground pt-2 w-6">{i + 1}.</div>
+                    <Textarea rows={2} value={q.q || ""} onChange={(e) => patch({ q: e.target.value })} placeholder="Въпрос" />
+                    <Select value={q.type || "mc"} onValueChange={(v) => patch({ type: v })}>
+                      <SelectTrigger className="w-[110px]"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="mc">С избор</SelectItem>
+                        <SelectItem value="open">Отворен</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Button variant="ghost" size="sm" onClick={removeQ}>✕</Button>
+                  </div>
+                  {q.type === "mc" && (
+                    <div className="pl-8 space-y-1">
+                      {(q.options ?? []).map((o: string, j: number) => (
+                        <div key={j} className="flex items-center gap-2">
+                          <input type="radio" checked={q.answer === o} onChange={() => patch({ answer: o })} />
+                          <Input value={o} onChange={(e) => {
+                            const newOpts = [...q.options]; const old = newOpts[j]; newOpts[j] = e.target.value;
+                            patch({ options: newOpts, answer: q.answer === old ? e.target.value : q.answer });
+                          }} />
+                          <Button variant="ghost" size="sm" onClick={() => patch({ options: q.options.filter((_: any, k: number) => k !== j) })}>✕</Button>
+                        </div>
+                      ))}
+                      <Button variant="outline" size="sm" onClick={() => patch({ options: [...(q.options ?? []), ""] })}>+ Опция</Button>
+                    </div>
+                  )}
+                  {q.type === "open" && (
+                    <div className="pl-8">
+                      <Label className="text-xs">Верен отговор</Label>
+                      <Input value={q.answer || ""} onChange={(e) => patch({ answer: e.target.value })} />
+                    </div>
+                  )}
+                  <div className="pl-8">
+                    <Label className="text-xs">Обяснение (по желание)</Label>
+                    <Input value={q.explanation || ""} onChange={(e) => patch({ explanation: e.target.value })} />
+                  </div>
+                </Card>
+              );
+            })}
+            <Button variant="outline" size="sm" onClick={() => setTest({ ...test, questions: [...(test.questions ?? []), { q: "", type: "mc", options: ["", "", "", ""], answer: "" }] })}>+ Добави въпрос</Button>
+          </div>
           <div className="flex gap-2 items-end border-t pt-3 flex-wrap">
             <div className="flex-1 min-w-[200px]"><ThemePicker themeId={themeId} setThemeId={setThemeId} /></div>
             <Button onClick={save} disabled={!themeId}><Save /> Запази като ресурс</Button>
