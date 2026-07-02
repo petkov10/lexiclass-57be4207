@@ -336,9 +336,7 @@ function PedagogyGen() {
       <Button onClick={gen} disabled={loading || !topic.trim()}><Sparkles /> {loading ? "Генериране..." : "Генерирай"}</Button>
       {text && (
         <>
-          <Card className="p-4 max-h-[60vh] overflow-auto">
-            <div className="prose prose-sm max-w-none dark:prose-invert"><ReactMarkdown>{text}</ReactMarkdown></div>
-          </Card>
+          <EditableMarkdown value={text} onChange={setText} label={`${genTitle || "Материал"} (редактируем)`} />
           <div className="flex gap-2 items-end flex-wrap">
             <div className="flex-1 min-w-[200px]"><ThemePicker themeId={themeId} setThemeId={setThemeId} /></div>
             <Button variant="outline" onClick={() => { navigator.clipboard.writeText(text); toast.success("Копирано"); }}><Copy /> Копирай</Button>
