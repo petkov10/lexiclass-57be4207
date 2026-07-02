@@ -117,10 +117,12 @@ export function SearchBar({ autoFocus = false }: { autoFocus?: boolean }) {
                       onClick={() => goto(h)}
                       className={`w-full text-left px-3 py-2 flex items-center gap-3 ${active ? "bg-accent" : ""}`}
                     >
-                      <Icon className="h-4 w-4 text-primary shrink-0" />
+                      <Icon className="h-4 w-4 text-primary shrink-0 mt-0.5" />
                       <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium truncate">{h.name}</div>
-                        <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</div>
+                        <div className="text-sm font-medium leading-snug break-words">{h.name}</div>
+                        <div className="text-[10px] uppercase tracking-wider text-muted-foreground mt-0.5">
+                          {label}{h.sub ? <span className="normal-case tracking-normal text-muted-foreground/80"> · {h.sub}</span> : null}
+                        </div>
                       </div>
                     </button>
                   </li>
