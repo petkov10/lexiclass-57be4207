@@ -245,6 +245,7 @@ function TestGen() {
 
 function PlanGen() {
   const [topic, setTopic] = useState("");
+  const [subject, setSubject] = useState("");
   const [duration, setDuration] = useState(45);
   const [grade, setGrade] = useState("");
   const [lessonType, setLessonType] = useState<"new" | "practice" | "review" | "assessment">("new");
@@ -258,7 +259,7 @@ function PlanGen() {
     try {
       const res = await fetch("/api/ai-lesson-plan", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ topic, duration, grade, lesson_type: lessonType, methods }),
+        body: JSON.stringify({ topic, subject, duration, grade, lesson_type: lessonType, methods }),
       });
       if (!res.ok) throw new Error(await res.text());
       const j = await res.json();
@@ -270,7 +271,7 @@ function PlanGen() {
     if (!themeId || !plan) return;
     const { error } = await supabase.from("resources").insert({
       theme_id: themeId, type: "lesson_plan", title: `План: ${topic}`,
-      description: `${duration} мин${grade ? ` · ${grade}` : ""}`,
+      description: `${duration} мин${grade ? ` · ${grade}` : ""}${subject ? ` · ${subject}` : ""}`,
       content: { text: plan } as any, order_index: 999,
     });
     if (error) return toast.error(error.message);
@@ -281,6 +282,7 @@ function PlanGen() {
     <Card className="p-4 space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <div><Label>Тема на урока</Label><Input value={topic} onChange={(e) => setTopic(e.target.value)} placeholder="напр. Цикли в C#" /></div>
+        <div><Label>Учебен предмет</Label><Input value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="напр. Информационни технологии" /></div>
         <div><Label>Клас</Label><Input value={grade} onChange={(e) => setGrade(e.target.value)} placeholder="напр. 9А" /></div>
         <div><Label>Минути</Label><Input type="number" value={duration} onChange={(e) => setDuration(+e.target.value || 45)} /></div>
         <div><Label>Тип урок</Label>
@@ -295,7 +297,7 @@ function PlanGen() {
           </Select>
         </div>
         <div className="md:col-span-2"><Label>Предпочитани методи (по желание)</Label>
-          <Input value={methods} onChange={(e) => setMethods(e.target.value)} placeholder="напр. групова работа, обърната класна стая" /></div>
+          <Input value={methods} onChange={(e) => setMethods(e.target.value)} placeholder="напр. групова работа, обърната класна стая, PBL" /></div>
       </div>
       <Button onClick={gen} disabled={loading || !topic.trim()}><Sparkles /> {loading ? "Генериране..." : "Генерирай методическа разработка"}</Button>
       {plan && (
