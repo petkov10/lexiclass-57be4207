@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { fileUrl, resourcesForThemeQuery, themeByIdQuery, homeworkForThemeQuery } from "@/lib/queries";
+import { resourcesForThemeQuery, themeByIdQuery, homeworkForThemeQuery } from "@/lib/queries";
+import { useResourceUrl } from "@/hooks/useResourceUrl";
 import { PublicShell } from "@/components/layout/PublicShell";
 import { ChevronRight, FileText, Link as LinkIcon, Video, FileCheck, Code, Image as ImgIcon, StickyNote, Presentation, Pencil, ExternalLink, BookOpen, Layers, RotateCw, Maximize2, Minimize2, ClipboardList, ChevronLeft, BookCheck } from "lucide-react";
 import type { ResourceRow, ResourceType, Flashcard } from "@/lib/types";
@@ -172,7 +173,7 @@ function ResourceGroups({ resources, onOpen }: { resources: ResourceRow[]; onOpe
 function ResourceCard({ r, onOpen }: { r: ResourceRow; onOpen: () => void }) {
   const Icon = ICONS[r.type] ?? FileText;
   const isExternal = r.type === "link" || r.type === "video" || r.type === "notebooklm";
-  const url = r.url || fileUrl(r.file_path);
+  const { url, loading } = useResourceUrl({ url: r.url, file_path: r.file_path });
   const isTest = r.type === "test";
   return (
     <div className="hover-lift group flex items-center gap-3 rounded-xl border bg-card p-3">
@@ -186,14 +187,16 @@ function ResourceCard({ r, onOpen }: { r: ResourceRow; onOpen: () => void }) {
       ) : isExternal && url ? (
         <Button asChild variant="outline" size="sm"><a href={url} target="_blank" rel="noreferrer">Отвори <ExternalLink /></a></Button>
       ) : (
-        <Button onClick={onOpen} variant="outline" size="sm">Преглед</Button>
+        <Button onClick={onOpen} variant="outline" size="sm" disabled={loading && !!r.file_path && !r.url}>
+          {loading && !!r.file_path && !r.url ? "..." : "Преглед"}
+        </Button>
       )}
     </div>
   );
 }
 
 function ResourceViewer({ r, fullscreen }: { r: ResourceRow; fullscreen: boolean }) {
-  const url = r.url || fileUrl(r.file_path);
+  const { url, loading, error } = useResourceUrl({ url: r.url, file_path: r.file_path });
   if (r.type === "task" || r.type === "code_exercise") {
     const c = (r.content ?? {}) as Record<string, any>;
     return (
