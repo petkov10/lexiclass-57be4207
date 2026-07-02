@@ -131,6 +131,25 @@ function ResourcesAdmin() {
   );
 }
 
+function ResourceListRow({ r, onEdit, onDelete }: { r: ResourceRow; onEdit: () => void; onDelete: () => void }) {
+  const { url } = useResourceUrl({ url: r.url, file_path: r.file_path });
+  const testUrl = r.type === "test" ? `${typeof window !== "undefined" ? window.location.origin : ""}/test/${r.id}` : null;
+  return (
+    <div className="p-3 flex items-center gap-3 flex-wrap">
+      <div className="text-xs uppercase tracking-wider rounded bg-muted px-2 py-1 w-28 text-center font-medium shrink-0">{TYPES.find((t) => t.value === r.type)?.label}</div>
+      <div className="flex-1 min-w-[200px]">
+        <div className="font-medium truncate">{r.title}</div>
+        {r.description && <div className="text-xs text-muted-foreground truncate">{r.description}</div>}
+      </div>
+      {testUrl && <QrCodeButton url={testUrl} label="QR" title={`QR за ${r.title}`} />}
+      {r.type === "test" && <Button asChild variant="outline" size="sm"><a href={`/test/${r.id}/print`} target="_blank" rel="noreferrer">Печат</a></Button>}
+      {url && <Button asChild variant="ghost" size="sm"><a href={url} target="_blank" rel="noreferrer"><ExternalLink /></a></Button>}
+      <Button variant="ghost" size="sm" onClick={onEdit}><Edit /></Button>
+      <Button variant="ghost" size="sm" onClick={onDelete}><Trash2 className="text-destructive" /></Button>
+    </div>
+  );
+}
+
 function ResourceForm({ themeId, existing, orderHint, onDone }: { themeId: string; existing: ResourceRow | null; orderHint: number; onDone: () => void }) {
   const [type, setType] = useState<ResourceType>(existing?.type ?? "presentation");
   const [title, setTitle] = useState(existing?.title ?? "");
