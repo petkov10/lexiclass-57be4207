@@ -37,7 +37,7 @@ function Index() {
   return (
     <PublicShell>
       {/* Hero */}
-      <section className="relative overflow-hidden">
+      <section className="relative">
         <div className="absolute inset-0 bg-mesh opacity-90 pointer-events-none" />
         <div className="relative max-w-5xl mx-auto px-4 pt-12 pb-8 text-center animate-float-in">
           <div className="inline-flex items-center gap-2 rounded-full border bg-card/60 backdrop-blur px-3 py-1 text-xs text-muted-foreground mb-5">
