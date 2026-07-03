@@ -87,8 +87,7 @@ function SettingsPage() {
         const path = `logo_${Date.now()}_${sanitizeFileName(logoFile.name)}`;
         const { error: upErr } = await supabase.storage.from("branding").upload(path, logoFile, { upsert: true });
         if (upErr) throw upErr;
-        const { data: pub } = supabase.storage.from("branding").getPublicUrl(path);
-        logo_url = pub.publicUrl;
+        logo_url = `${BRANDING_PREFIX}${path}`;
       }
       const sortedScale = [...scale].sort((a, b) => b.min_percent - a.min_percent);
       const { error } = await supabase.from("app_settings").update({ ...form, logo_url, grading_scale: sortedScale as any }).eq("id", 1);
