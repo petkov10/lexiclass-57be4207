@@ -149,6 +149,23 @@ export const signedFileUrlQuery = (path: string | null | undefined) =>
     },
   });
 
+// Signed URL for a file in the private "branding" bucket (logos).
+export const signedBrandingUrlQuery = (path: string | null | undefined) =>
+  queryOptions({
+    queryKey: ["signed-branding-url", path],
+    enabled: !!path,
+    staleTime: 55 * 60 * 1000,
+    gcTime: 60 * 60 * 1000,
+    retry: 1,
+    queryFn: async () => {
+      const { data, error } = await supabase.storage
+        .from("branding")
+        .createSignedUrl(path!, 60 * 60);
+      if (error) throw error;
+      return data.signedUrl;
+    },
+  });
+
 /**
  * @deprecated Bucket „resources" е частен. Използвайте useResourceUrl / signedFileUrlQuery.
  * Оставено само за обратна съвместимост — не гарантира достъп.
