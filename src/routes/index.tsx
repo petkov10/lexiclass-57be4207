@@ -91,19 +91,19 @@ function Index() {
         ) : classes && classes.length > 0 ? (
           <div>
             <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-4">Класове</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2.5">
               {classes.map((c, i) => (
                 <Link
                   key={c.id}
                   to="/class/$classId"
                   params={{ classId: c.id }}
                   style={{ ...tintStyle(c.id), animationDelay: `${i * 30}ms` }}
-                  className="tint-card hover-lift group rounded-2xl border-2 p-5 flex flex-col items-start gap-3 animate-float-in"
+                  className="tint-card hover-lift group rounded-xl border-2 p-3 flex flex-col items-start gap-2 animate-float-in"
                 >
-                  <div className="tint-icon h-11 w-11 rounded-xl grid place-items-center group-hover:scale-110 transition-transform">
-                    <GraduationCap className="h-5 w-5" />
+                  <div className="tint-icon h-8 w-8 rounded-lg grid place-items-center group-hover:scale-110 transition-transform">
+                    <GraduationCap className="h-4 w-4" />
                   </div>
-                  <div className="font-semibold tracking-tight">{c.name}</div>
+                  <div className="text-sm font-semibold tracking-tight leading-tight">{c.name}</div>
                 </Link>
               ))}
             </div>
