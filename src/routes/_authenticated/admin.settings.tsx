@@ -10,6 +10,8 @@ import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { sanitizeFileName } from "@/lib/storage";
+import { useLogoUrl, BRANDING_PREFIX } from "@/hooks/useLogoUrl";
+import { Trash2 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/settings")({
   component: SettingsPage,
