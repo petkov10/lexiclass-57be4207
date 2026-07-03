@@ -113,8 +113,22 @@ function SettingsPage() {
         <div><Label>Текстово лого (видимо до иконата)</Label><Input value={form.logo_text} onChange={(e) => setForm((f) => ({ ...f, logo_text: e.target.value }))} placeholder="Празно = името на сайта" /></div>
         <div className="space-y-2">
           <Label>Лого изображение</Label>
-          {form.logo_url && <img src={form.logo_url} alt="logo" className="h-10 rounded" />}
-          <Input type="file" accept="image/*" onChange={(e) => setLogoFile(e.target.files?.[0] ?? null)} />
+          <LogoPreview logoUrl={form.logo_url} pendingFile={logoFile} />
+          <div className="flex flex-wrap items-center gap-2">
+            <Input type="file" accept="image/*" className="max-w-xs" onChange={(e) => setLogoFile(e.target.files?.[0] ?? null)} />
+            {logoFile && (
+              <Button type="button" variant="ghost" size="sm" onClick={() => setLogoFile(null)}>
+                Отмени избора
+              </Button>
+            )}
+            {(form.logo_url || logoFile) && (
+              <Button type="button" variant="outline" size="sm"
+                onClick={() => { setLogoFile(null); setForm((f) => ({ ...f, logo_url: "" })); }}>
+                <Trash2 className="h-4 w-4" /> Премахни лого
+              </Button>
+            )}
+          </div>
+          <p className="text-xs text-muted-foreground">Промените се прилагат след натискане на „Запази".</p>
         </div>
       </Card>
 
