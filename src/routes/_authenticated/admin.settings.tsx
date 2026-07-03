@@ -10,6 +10,8 @@ import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { sanitizeFileName } from "@/lib/storage";
+import { useLogoUrl, BRANDING_PREFIX } from "@/hooks/useLogoUrl";
+import { Trash2 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/settings")({
   component: SettingsPage,
@@ -85,8 +87,7 @@ function SettingsPage() {
         const path = `logo_${Date.now()}_${sanitizeFileName(logoFile.name)}`;
         const { error: upErr } = await supabase.storage.from("branding").upload(path, logoFile, { upsert: true });
         if (upErr) throw upErr;
-        const { data: pub } = supabase.storage.from("branding").getPublicUrl(path);
-        logo_url = pub.publicUrl;
+        logo_url = `${BRANDING_PREFIX}${path}`;
       }
       const sortedScale = [...scale].sort((a, b) => b.min_percent - a.min_percent);
       const { error } = await supabase.from("app_settings").update({ ...form, logo_url, grading_scale: sortedScale as any }).eq("id", 1);
@@ -112,8 +113,22 @@ function SettingsPage() {
         <div><Label>Текстово лого (видимо до иконата)</Label><Input value={form.logo_text} onChange={(e) => setForm((f) => ({ ...f, logo_text: e.target.value }))} placeholder="Празно = името на сайта" /></div>
         <div className="space-y-2">
           <Label>Лого изображение</Label>
-          {form.logo_url && <img src={form.logo_url} alt="logo" className="h-10 rounded" />}
-          <Input type="file" accept="image/*" onChange={(e) => setLogoFile(e.target.files?.[0] ?? null)} />
+          <LogoPreview logoUrl={form.logo_url} pendingFile={logoFile} />
+          <div className="flex flex-wrap items-center gap-2">
+            <Input type="file" accept="image/*" className="max-w-xs" onChange={(e) => setLogoFile(e.target.files?.[0] ?? null)} />
+            {logoFile && (
+              <Button type="button" variant="ghost" size="sm" onClick={() => setLogoFile(null)}>
+                Отмени избора
+              </Button>
+            )}
+            {(form.logo_url || logoFile) && (
+              <Button type="button" variant="outline" size="sm"
+                onClick={() => { setLogoFile(null); setForm((f) => ({ ...f, logo_url: "" })); }}>
+                <Trash2 className="h-4 w-4" /> Премахни лого
+              </Button>
+            )}
+          </div>
+          <p className="text-xs text-muted-foreground">Промените се прилагат след натискане на „Запази".</p>
         </div>
       </Card>
 
@@ -319,5 +334,24 @@ function DangerZone() {
         </div>
       </div>
     </Card>
+  );
+}
+
+function LogoPreview({ logoUrl, pendingFile }: { logoUrl: string; pendingFile: File | null }) {
+  const savedSrc = useLogoUrl(logoUrl);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  useEffect(() => {
+    if (!pendingFile) { setPreviewUrl(null); return; }
+    const url = URL.createObjectURL(pendingFile);
+    setPreviewUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [pendingFile]);
+  const src = previewUrl ?? savedSrc;
+  if (!src) return <div className="text-xs text-muted-foreground">Няма качено лого.</div>;
+  return (
+    <div className="flex items-center gap-3">
+      <img src={src} alt="logo preview" className="h-12 w-12 rounded border object-contain bg-muted/30" />
+      {previewUrl && <span className="text-xs text-muted-foreground">Ще бъде записано при запазване</span>}
+    </div>
   );
 }
