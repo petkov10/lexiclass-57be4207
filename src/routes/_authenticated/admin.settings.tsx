@@ -336,3 +336,22 @@ function DangerZone() {
     </Card>
   );
 }
+
+function LogoPreview({ logoUrl, pendingFile }: { logoUrl: string; pendingFile: File | null }) {
+  const savedSrc = useLogoUrl(logoUrl);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  useEffect(() => {
+    if (!pendingFile) { setPreviewUrl(null); return; }
+    const url = URL.createObjectURL(pendingFile);
+    setPreviewUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [pendingFile]);
+  const src = previewUrl ?? savedSrc;
+  if (!src) return <div className="text-xs text-muted-foreground">Няма качено лого.</div>;
+  return (
+    <div className="flex items-center gap-3">
+      <img src={src} alt="logo preview" className="h-12 w-12 rounded border object-contain bg-muted/30" />
+      {previewUrl && <span className="text-xs text-muted-foreground">Ще бъде записано при запазване</span>}
+    </div>
+  );
+}
