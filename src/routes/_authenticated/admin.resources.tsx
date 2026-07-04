@@ -47,17 +47,70 @@ function ResourcesAdmin() {
   const [classId, setClassId] = useState("");
   const [subjectId, setSubjectId] = useState("");
   const [themeId, setThemeId] = useState("");
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [moveOpen, setMoveOpen] = useState(false);
+  const [moveTarget, setMoveTarget] = useState("");
+  const [bulkBusy, setBulkBusy] = useState(false);
 
   const subjectIdsForClass = new Set(links?.filter((l) => l.class_id === classId).map((l) => l.subject_id));
   const availableSubjects = subjects?.filter((s) => subjectIdsForClass.has(s.id)) ?? [];
 
   const { data: themes } = useQuery({ ...themesQuery(classId, subjectId), enabled: !!classId && !!subjectId });
+  const { data: allThemes } = useQuery({
+    queryKey: ["themes-all-with-meta"],
+    queryFn: async () => {
+      const { data } = await supabase.from("themes").select("id, name, class_id, subject_id");
+      return data ?? [];
+    },
+  });
   const { data: resources } = useQuery({ ...resourcesForThemeQuery(themeId), enabled: !!themeId });
 
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<ResourceRow | null>(null);
 
-  const refresh = () => qc.invalidateQueries({ queryKey: ["resources", themeId] });
+  const refresh = () => {
+    qc.invalidateQueries({ queryKey: ["resources", themeId] });
+    setSelected(new Set());
+  };
+
+  const toggle = (id: string) => setSelected((s) => {
+    const n = new Set(s);
+    if (n.has(id)) n.delete(id); else n.add(id);
+    return n;
+  });
+  const toggleAll = () => {
+    if (!resources) return;
+    if (selected.size === resources.length) setSelected(new Set());
+    else setSelected(new Set(resources.map((r) => r.id)));
+  };
+
+  const bulkDelete = async () => {
+    if (selected.size === 0) return;
+    if (!confirm(`Изтрий ${selected.size} ресурса?`)) return;
+    setBulkBusy(true);
+    try {
+      const { error } = await supabase.from("resources").delete().in("id", Array.from(selected));
+      if (error) throw error;
+      toast.success(`Изтрити ${selected.size} ресурса`);
+      refresh();
+    } catch (e: any) { toast.error(e.message); }
+    finally { setBulkBusy(false); }
+  };
+
+  const bulkMove = async () => {
+    if (selected.size === 0 || !moveTarget) return;
+    setBulkBusy(true);
+    try {
+      const { error } = await supabase.from("resources").update({ theme_id: moveTarget }).in("id", Array.from(selected));
+      if (error) throw error;
+      toast.success(`Преместени ${selected.size} ресурса`);
+      setMoveOpen(false);
+      setMoveTarget("");
+      qc.invalidateQueries({ queryKey: ["resources"] });
+      refresh();
+    } catch (e: any) { toast.error(e.message); }
+    finally { setBulkBusy(false); }
+  };
 
   return (
     <div className="space-y-6">
@@ -71,21 +124,21 @@ function ResourcesAdmin() {
       <Card className="p-4 grid grid-cols-1 md:grid-cols-3 gap-3">
         <div>
           <Label>Клас</Label>
-          <Select value={classId} onValueChange={(v) => { setClassId(v); setSubjectId(""); setThemeId(""); }}>
+          <Select value={classId} onValueChange={(v) => { setClassId(v); setSubjectId(""); setThemeId(""); setSelected(new Set()); }}>
             <SelectTrigger><SelectValue placeholder="Изберете" /></SelectTrigger>
             <SelectContent>{classes?.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}</SelectContent>
           </Select>
         </div>
         <div>
           <Label>Предмет</Label>
-          <Select value={subjectId} onValueChange={(v) => { setSubjectId(v); setThemeId(""); }} disabled={!classId}>
+          <Select value={subjectId} onValueChange={(v) => { setSubjectId(v); setThemeId(""); setSelected(new Set()); }} disabled={!classId}>
             <SelectTrigger><SelectValue placeholder="Изберете" /></SelectTrigger>
             <SelectContent>{availableSubjects.map((s) => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent>
           </Select>
         </div>
         <div>
           <Label>Тема</Label>
-          <Select value={themeId} onValueChange={setThemeId} disabled={!subjectId}>
+          <Select value={themeId} onValueChange={(v) => { setThemeId(v); setSelected(new Set()); }} disabled={!subjectId}>
             <SelectTrigger><SelectValue placeholder="Изберете" /></SelectTrigger>
             <SelectContent>{themes?.map((t) => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}</SelectContent>
           </Select>
@@ -110,11 +163,36 @@ function ResourcesAdmin() {
             </Dialog>
           </div>
 
+          {selected.size > 0 && (
+            <div className="sticky top-2 z-10 flex items-center gap-2 rounded-lg border bg-card/95 backdrop-blur p-3 shadow-sm">
+              <span className="text-sm font-medium">Избрани: {selected.size}</span>
+              <div className="flex-1" />
+              <Button size="sm" variant="outline" onClick={() => setSelected(new Set())}>Изчисти</Button>
+              <Button size="sm" variant="outline" onClick={() => setMoveOpen(true)} disabled={bulkBusy}>Премести</Button>
+              <Button size="sm" variant="destructive" onClick={bulkDelete} disabled={bulkBusy}>
+                <Trash2 className="h-4 w-4" /> Изтрий избраните
+              </Button>
+            </div>
+          )}
+
+          {(resources?.length ?? 0) > 0 && (
+            <label className="flex items-center gap-2 text-xs text-muted-foreground px-1">
+              <input
+                type="checkbox"
+                checked={selected.size === resources!.length}
+                onChange={toggleAll}
+              />
+              Избери всички
+            </label>
+          )}
+
           <Card className="divide-y">
             {(resources ?? []).map((r) => (
               <ResourceListRow
                 key={r.id}
                 r={r as ResourceRow}
+                checked={selected.has(r.id)}
+                onCheck={() => toggle(r.id)}
                 onEdit={() => { setEditing(r as ResourceRow); setOpen(true); }}
                 onDelete={async () => {
                   if (!confirm("Изтрий ресурса?")) return;
@@ -127,15 +205,37 @@ function ResourcesAdmin() {
           </Card>
         </>
       )}
+
+      <Dialog open={moveOpen} onOpenChange={setMoveOpen}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Премести {selected.size} ресурса</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <Label>Целева тема</Label>
+            <Select value={moveTarget} onValueChange={setMoveTarget}>
+              <SelectTrigger><SelectValue placeholder="Изберете тема" /></SelectTrigger>
+              <SelectContent>
+                {(allThemes ?? []).filter((t) => t.id !== themeId).map((t) => (
+                  <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setMoveOpen(false)}>Отказ</Button>
+              <Button onClick={bulkMove} disabled={!moveTarget || bulkBusy}>Премести</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
 
-function ResourceListRow({ r, onEdit, onDelete }: { r: ResourceRow; onEdit: () => void; onDelete: () => void }) {
+function ResourceListRow({ r, onEdit, onDelete, checked, onCheck }: { r: ResourceRow; onEdit: () => void; onDelete: () => void; checked: boolean; onCheck: () => void }) {
   const { url } = useResourceUrl({ url: r.url, file_path: r.file_path });
   const testUrl = r.type === "test" ? `${typeof window !== "undefined" ? window.location.origin : ""}/test/${r.id}` : null;
   return (
     <div className="p-3 flex items-center gap-3 flex-wrap">
+      <input type="checkbox" checked={checked} onChange={onCheck} aria-label={`Избери ${r.title}`} className="shrink-0" />
       <div className="text-xs uppercase tracking-wider rounded bg-muted px-2 py-1 w-28 text-center font-medium shrink-0">{TYPES.find((t) => t.value === r.type)?.label}</div>
       <div className="flex-1 min-w-[200px]">
         <div className="font-medium truncate">{r.title}</div>

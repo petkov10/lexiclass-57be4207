@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import ReactMarkdown from "react-markdown";
+import { QrCodeButton } from "@/components/QrCodeButton";
 
 export const Route = createFileRoute("/theme/$themeId")({
   component: ThemePage,
@@ -74,8 +75,19 @@ function ThemePage() {
           <span className="text-foreground">{theme?.name}</span>
         </div>
 
-        <h1 className="text-2xl font-semibold tracking-tight">{theme?.name}</h1>
-        {theme?.description && <p className="mt-2 text-muted-foreground">{theme.description}</p>}
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h1 className="text-2xl font-semibold tracking-tight">{theme?.name}</h1>
+            {theme?.description && <p className="mt-2 text-muted-foreground">{theme.description}</p>}
+          </div>
+          {typeof window !== "undefined" && (
+            <QrCodeButton
+              url={`${window.location.origin}/theme/${themeId}`}
+              label="Сподели"
+              title={`QR за темата: ${theme?.name ?? ""}`}
+            />
+          )}
+        </div>
 
         <div className="mt-8 space-y-8">
           {isLoading ? (

@@ -6,6 +6,8 @@ import { useAuth, useRole } from "@/hooks/useAuth";
 import { useLogoUrl } from "@/hooks/useLogoUrl";
 import { Button } from "@/components/ui/button";
 import { LogIn, Settings as SettingsIcon, Home } from "lucide-react";
+import { ThemeModeToggle } from "@/components/ThemeModeToggle";
+import { A11yToolbar } from "@/components/A11yToolbar";
 
 export function PublicShell({ children }: { children: ReactNode }) {
   const { data: settings } = useQuery(settingsQuery);
@@ -35,6 +37,7 @@ export function PublicShell({ children }: { children: ReactNode }) {
                 <Link to="/"><Home /> Начало</Link>
               </Button>
             )}
+            <ThemeModeToggle />
             {canEdit ? (
               <Button asChild variant="outline" size="sm">
                 <Link to="/admin"><SettingsIcon /> Админ</Link>
@@ -48,6 +51,7 @@ export function PublicShell({ children }: { children: ReactNode }) {
         </div>
       </header>
       <main className="flex-1">{children}</main>
+      <A11yToolbar />
     </div>
   );
 }

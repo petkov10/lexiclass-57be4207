@@ -469,34 +469,40 @@ export type Database = {
       themes: {
         Row: {
           class_id: string
+          color: string | null
           created_at: string
           description: string | null
           id: string
           name: string
           order_index: number
           subject_id: string
+          tags: string[]
           updated_at: string
           week_number: number | null
         }
         Insert: {
           class_id: string
+          color?: string | null
           created_at?: string
           description?: string | null
           id?: string
           name: string
           order_index?: number
           subject_id: string
+          tags?: string[]
           updated_at?: string
           week_number?: number | null
         }
         Update: {
           class_id?: string
+          color?: string | null
           created_at?: string
           description?: string | null
           id?: string
           name?: string
           order_index?: number
           subject_id?: string
+          tags?: string[]
           updated_at?: string
           week_number?: number | null
         }
