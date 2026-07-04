@@ -75,14 +75,10 @@ function SubjectPage() {
                 style={t.color ? { borderLeft: `4px solid ${t.color}` } : undefined}
               >
                 <div
-                  className="h-9 w-9 rounded-md grid place-items-center text-sm font-medium shrink-0"
-                  style={t.color
-                    ? { background: `${t.color}22`, color: t.color }
-                    : undefined}
+                  className={`h-9 w-9 rounded-md grid place-items-center text-sm font-medium shrink-0 ${t.color ? "" : "bg-primary/10 text-primary"}`}
+                  style={t.color ? { background: `${t.color}22`, color: t.color } : undefined}
                 >
-                  <span className={t.color ? "" : "text-primary"} style={t.color ? undefined : { background: undefined }}>
-                    {t.week_number ?? i + 1}
-                  </span>
+                  {t.week_number ?? i + 1}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="font-medium truncate">{t.name}</div>
