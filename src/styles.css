@@ -226,3 +226,44 @@
   100% { transform: scale(1); opacity: 1; }
 }
 .animate-pop { animation: pop .35s ease-out both; }
+
+/* Accessibility: user-configurable font scale */
+html[data-font-scale="sm"] { font-size: 14px; }
+html[data-font-scale="md"] { font-size: 16px; }
+html[data-font-scale="lg"] { font-size: 18px; }
+html[data-font-scale="xl"] { font-size: 20px; }
+
+/* Accessibility: high-contrast override (works in both light/dark) */
+html.high-contrast {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0 0 0);
+  --muted: oklch(0.95 0 0);
+  --muted-foreground: oklch(0.2 0 0);
+  --border: oklch(0 0 0);
+  --input: oklch(0 0 0);
+  --ring: oklch(0 0 0);
+  --primary: oklch(0.2 0.15 260);
+  --primary-foreground: oklch(1 0 0);
+}
+html.high-contrast.dark {
+  --background: oklch(0 0 0);
+  --foreground: oklch(1 0 0);
+  --card: oklch(0.08 0 0);
+  --card-foreground: oklch(1 0 0);
+  --popover: oklch(0.08 0 0);
+  --popover-foreground: oklch(1 0 0);
+  --muted: oklch(0.15 0 0);
+  --muted-foreground: oklch(0.9 0 0);
+  --border: oklch(1 0 0);
+  --input: oklch(1 0 0);
+  --ring: oklch(1 0 0);
+  --primary: oklch(0.85 0.18 90);
+  --primary-foreground: oklch(0 0 0);
+}
+html.high-contrast * { text-shadow: none !important; }
+html.high-contrast a { text-decoration: underline; }
+html.high-contrast button, html.high-contrast [role="button"] { outline: 2px solid var(--border); }
