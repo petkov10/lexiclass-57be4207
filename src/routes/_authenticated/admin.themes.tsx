@@ -211,7 +211,7 @@ function ThemesAdmin() {
                       isEditing={editId === t.id}
                       editValues={editValues}
                       setEditValues={setEditValues}
-                      onStartEdit={() => { setEditId(t.id); setEditValues({ name: t.name, description: t.description ?? "", week: t.week_number?.toString() ?? "" }); }}
+                      onStartEdit={() => { setEditId(t.id); setEditValues({ name: t.name, description: t.description ?? "", week: t.week_number?.toString() ?? "", color: (t as any).color ?? "", tags: ((t as any).tags ?? []).join(", ") }); }}
                       onCancelEdit={() => setEditId(null)}
                       onSave={save}
                       onRemove={() => remove(t.id)}
