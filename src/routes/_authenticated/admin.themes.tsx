@@ -270,13 +270,30 @@ function SortableThemeRow({ t, isEditing, editValues, setEditValues, onStartEdit
             <Button size="sm" onClick={onSave}><Save /></Button>
             <Button size="sm" variant="ghost" onClick={onCancelEdit}><X /></Button>
           </div>
+          <div className="md:col-span-4 flex items-center gap-2">
+            <input type="color" value={editValues.color || "#3b82f6"} onChange={(e) => setEditValues((v: any) => ({ ...v, color: e.target.value }))} className="h-8 w-8 rounded border cursor-pointer" aria-label="Цвят" />
+            {editValues.color && <Button variant="ghost" size="sm" onClick={() => setEditValues((v: any) => ({ ...v, color: "" }))}>Без цвят</Button>}
+            <Input className="flex-1" value={editValues.tags} onChange={(e) => setEditValues((v: any) => ({ ...v, tags: e.target.value }))} placeholder="Тагове (a, b, c)" />
+          </div>
         </div>
       ) : (
         <>
-          <div className="h-8 w-8 rounded-md bg-primary/10 text-primary grid place-items-center text-xs font-medium shrink-0">{t.week_number ?? "—"}</div>
+          <div
+            className="h-8 w-8 rounded-md grid place-items-center text-xs font-medium shrink-0"
+            style={t.color ? { background: `${t.color}22`, color: t.color, boxShadow: `inset 0 0 0 1px ${t.color}55` } : undefined}
+          >
+            <span className={t.color ? "" : "text-primary"}>{t.week_number ?? "—"}</span>
+          </div>
           <div className="flex-1 min-w-0">
             <div className="font-medium truncate">{t.name}</div>
             {t.description && <div className="text-xs text-muted-foreground truncate">{t.description}</div>}
+            {(t.tags?.length ?? 0) > 0 && (
+              <div className="mt-1 flex flex-wrap gap-1">
+                {t.tags.map((tag: string) => (
+                  <span key={tag} className="text-[10px] rounded-full bg-muted px-2 py-0.5">{tag}</span>
+                ))}
+              </div>
+            )}
           </div>
           {hasNotes && <span title="Има лични бележки" className="text-amber-500"><StickyNote className="h-3.5 w-3.5" /></span>}
           <Button size="sm" variant="ghost" onClick={onHomework} title="Домашни"><BookCheck className="h-4 w-4" /></Button>
