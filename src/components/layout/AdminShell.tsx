@@ -22,6 +22,8 @@ import {
   FolderUp,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ThemeModeToggle } from "@/components/ThemeModeToggle";
+import { A11yToolbar } from "@/components/A11yToolbar";
 
 type NavItem = { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean; adminOnly?: boolean };
 const nav: NavItem[] = [
@@ -96,8 +98,12 @@ export function AdminShell({ children }: { children: ReactNode }) {
         </div>
       </aside>
       <main className="flex-1 min-w-0">
-        <div className="max-w-6xl mx-auto px-6 py-8">{children}</div>
+        <div className="flex justify-end gap-2 px-6 pt-4">
+          <ThemeModeToggle />
+        </div>
+        <div className="max-w-6xl mx-auto px-6 pb-8 pt-2">{children}</div>
       </main>
+      <A11yToolbar />
     </div>
   );
 }
