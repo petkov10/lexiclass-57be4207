@@ -8,8 +8,11 @@ import type { ResourceRow, ResourceType, Flashcard } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import ReactMarkdown from "react-markdown";
+import { Markdown } from "@/components/Markdown";
 import { QrCodeButton } from "@/components/QrCodeButton";
+import { ThemeAIChat } from "@/components/ThemeAIChat";
+import { Share2 } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/theme/$themeId")({
   component: ThemePage,
@@ -81,11 +84,26 @@ function ThemePage() {
             {theme?.description && <p className="mt-2 text-muted-foreground">{theme.description}</p>}
           </div>
           {typeof window !== "undefined" && (
-            <QrCodeButton
-              url={`${window.location.origin}/theme/${themeId}`}
-              label="Сподели"
-              title={`QR за темата: ${theme?.name ?? ""}`}
-            />
+            <div className="flex items-center gap-2 shrink-0">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={async () => {
+                  const url = `${window.location.origin}/theme/${themeId}`;
+                  try {
+                    if (navigator.share) await navigator.share({ title: theme?.name, url });
+                    else { await navigator.clipboard.writeText(url); toast.success("Линкът е копиран"); }
+                  } catch { /* cancelled */ }
+                }}
+              >
+                <Share2 className="h-4 w-4" /> Копирай линк
+              </Button>
+              <QrCodeButton
+                url={`${window.location.origin}/theme/${themeId}`}
+                label="QR"
+                title={`QR за темата: ${theme?.name ?? ""}`}
+              />
+            </div>
           )}
         </div>
 
@@ -139,6 +157,13 @@ function ThemePage() {
           )}
         </DialogContent>
       </Dialog>
+      {theme && (
+        <ThemeAIChat
+          themeName={theme.name}
+          themeDescription={theme.description}
+          resources={(resources ?? []) as ResourceRow[]}
+        />
+      )}
     </PublicShell>
   );
 }
@@ -214,8 +239,8 @@ function ResourceViewer({ r, fullscreen }: { r: ResourceRow; fullscreen: boolean
     return (
       <div className="space-y-4 text-sm">
         {r.description && <p className="text-muted-foreground">{r.description}</p>}
-        {c.statement && <Section title="Условие"><Markdown text={c.statement} /></Section>}
-        {c.hints && <Section title="Насоки"><Markdown text={c.hints} /></Section>}
+        {c.statement && <Section title="Условие"><div className="prose prose-sm max-w-none dark:prose-invert"><Markdown>{c.statement}</Markdown></div></Section>}
+        {c.hints && <Section title="Насоки"><div className="prose prose-sm max-w-none dark:prose-invert"><Markdown>{c.hints}</Markdown></div></Section>}
         {(c.sample_input || c.sample_output) && (
           <div className="grid sm:grid-cols-2 gap-3">
             {c.sample_input && <Section title="Примерен вход"><pre className="bg-muted rounded p-3 text-xs overflow-auto">{c.sample_input}</pre></Section>}
@@ -239,7 +264,7 @@ function ResourceViewer({ r, fullscreen }: { r: ResourceRow; fullscreen: boolean
   }
   if (r.type === "lesson_plan") {
     const c = (r.content ?? {}) as Record<string, string>;
-    return <div className="prose prose-sm max-w-none dark:prose-invert"><ReactMarkdown>{c.text || r.description || ""}</ReactMarkdown></div>;
+    return <div className="prose prose-sm max-w-none dark:prose-invert"><Markdown>{c.text || r.description || ""}</Markdown></div>;
   }
   if (r.type === "code") {
     const c = (r.content ?? {}) as Record<string, string>;
@@ -247,7 +272,7 @@ function ResourceViewer({ r, fullscreen }: { r: ResourceRow; fullscreen: boolean
   }
   if (r.type === "note") {
     const c = (r.content ?? {}) as Record<string, string>;
-    return <div className="prose prose-sm max-w-none dark:prose-invert"><ReactMarkdown>{c.text || r.description || ""}</ReactMarkdown></div>;
+    return <div className="prose prose-sm max-w-none dark:prose-invert"><Markdown>{c.text || r.description || ""}</Markdown></div>;
   }
   if (r.type === "flashcards") {
     const cards = (((r.content ?? {}) as { flashcards?: Flashcard[] }).flashcards ?? []).filter((c) => c?.front);
@@ -308,9 +333,6 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
-function Markdown({ text }: { text: string }) {
-  return <div className="prose prose-sm max-w-none dark:prose-invert"><ReactMarkdown>{text}</ReactMarkdown></div>;
-}
 
 function FlashcardsViewer({ cards, fullscreen }: { cards: Flashcard[]; fullscreen?: boolean }) {
   const [order, setOrder] = useState<number[]>(() => cards.map((_, i) => i));
