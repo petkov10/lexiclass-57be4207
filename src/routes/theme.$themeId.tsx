@@ -10,6 +10,9 @@ import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Markdown } from "@/components/Markdown";
 import { QrCodeButton } from "@/components/QrCodeButton";
+import { ThemeAIChat } from "@/components/ThemeAIChat";
+import { Share2 } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/theme/$themeId")({
   component: ThemePage,
