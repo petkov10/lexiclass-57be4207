@@ -84,11 +84,26 @@ function ThemePage() {
             {theme?.description && <p className="mt-2 text-muted-foreground">{theme.description}</p>}
           </div>
           {typeof window !== "undefined" && (
-            <QrCodeButton
-              url={`${window.location.origin}/theme/${themeId}`}
-              label="Сподели"
-              title={`QR за темата: ${theme?.name ?? ""}`}
-            />
+            <div className="flex items-center gap-2 shrink-0">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={async () => {
+                  const url = `${window.location.origin}/theme/${themeId}`;
+                  try {
+                    if (navigator.share) await navigator.share({ title: theme?.name, url });
+                    else { await navigator.clipboard.writeText(url); toast.success("Линкът е копиран"); }
+                  } catch { /* cancelled */ }
+                }}
+              >
+                <Share2 className="h-4 w-4" /> Копирай линк
+              </Button>
+              <QrCodeButton
+                url={`${window.location.origin}/theme/${themeId}`}
+                label="QR"
+                title={`QR за темата: ${theme?.name ?? ""}`}
+              />
+            </div>
           )}
         </div>
 
