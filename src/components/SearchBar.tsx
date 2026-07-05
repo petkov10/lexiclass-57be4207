@@ -101,7 +101,7 @@ export function SearchBar({ autoFocus = false }: { autoFocus?: boolean }) {
       </div>
 
       {open && q && (
-        <div className="absolute z-40 left-0 right-0 mt-2 rounded-xl border bg-popover shadow-xl max-h-[60vh] overflow-auto animate-pop">
+        <div className="absolute z-[70] left-0 right-0 mt-2 rounded-xl border bg-popover shadow-2xl max-h-[70vh] overflow-auto animate-pop">
           {hits.length === 0 ? (
             <div className="p-4 text-sm text-muted-foreground text-center">Няма съвпадения за „{q}"</div>
           ) : (
