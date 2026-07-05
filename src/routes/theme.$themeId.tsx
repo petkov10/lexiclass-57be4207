@@ -157,6 +157,13 @@ function ThemePage() {
           )}
         </DialogContent>
       </Dialog>
+      {theme && (
+        <ThemeAIChat
+          themeName={theme.name}
+          themeDescription={theme.description}
+          resources={(resources ?? []) as ResourceRow[]}
+        />
+      )}
     </PublicShell>
   );
 }
