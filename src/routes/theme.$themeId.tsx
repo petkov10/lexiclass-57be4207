@@ -308,9 +308,6 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
-function Markdown({ text }: { text: string }) {
-  return <div className="prose prose-sm max-w-none dark:prose-invert"><Markdown>{text}</Markdown></div>;
-}
 
 function FlashcardsViewer({ cards, fullscreen }: { cards: Flashcard[]; fullscreen?: boolean }) {
   const [order, setOrder] = useState<number[]>(() => cards.map((_, i) => i));
