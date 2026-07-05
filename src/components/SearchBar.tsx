@@ -75,7 +75,7 @@ export function SearchBar({ autoFocus = false }: { autoFocus?: boolean }) {
   };
 
   return (
-    <div ref={wrapRef} className="relative w-full max-w-2xl mx-auto">
+    <div ref={wrapRef} className="relative z-[60] w-full max-w-2xl mx-auto">
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
         <input
