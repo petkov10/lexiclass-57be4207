@@ -214,8 +214,8 @@ function ResourceViewer({ r, fullscreen }: { r: ResourceRow; fullscreen: boolean
     return (
       <div className="space-y-4 text-sm">
         {r.description && <p className="text-muted-foreground">{r.description}</p>}
-        {c.statement && <Section title="Условие"><Markdown text={c.statement} /></Section>}
-        {c.hints && <Section title="Насоки"><Markdown text={c.hints} /></Section>}
+        {c.statement && <Section title="Условие"><div className="prose prose-sm max-w-none dark:prose-invert"><Markdown>{c.statement}</Markdown></div></Section>}
+        {c.hints && <Section title="Насоки"><div className="prose prose-sm max-w-none dark:prose-invert"><Markdown>{c.hints}</Markdown></div></Section>}
         {(c.sample_input || c.sample_output) && (
           <div className="grid sm:grid-cols-2 gap-3">
             {c.sample_input && <Section title="Примерен вход"><pre className="bg-muted rounded p-3 text-xs overflow-auto">{c.sample_input}</pre></Section>}
