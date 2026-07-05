@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Sparkles, Send, User, Bot, ClipboardList, BookOpen, Code2, Copy, Save, GraduationCap, Eye, Pencil } from "lucide-react";
 import { toast } from "sonner";
-import ReactMarkdown from "react-markdown";
+import { Markdown } from "@/components/Markdown";
 import { useQuery } from "@tanstack/react-query";
 import { allThemesQuery } from "@/lib/queries";
 import { supabase } from "@/integrations/supabase/client";
@@ -108,7 +108,7 @@ function Message({ m }: { m: Msg }) {
       </div>
       <div className={`rounded-lg px-4 py-2.5 max-w-[80%] ${isUser ? "bg-primary text-primary-foreground" : "bg-muted"}`}>
         <div className="prose prose-sm max-w-none dark:prose-invert prose-pre:bg-background prose-pre:text-foreground">
-          <ReactMarkdown>{m.content}</ReactMarkdown>
+          <Markdown>{m.content}</Markdown>
         </div>
       </div>
     </div>
@@ -477,7 +477,7 @@ function EditableMarkdown({ value, onChange, label }: { value: string; onChange:
       </div>
       {mode === "preview" ? (
         <div className="p-4 max-h-[60vh] overflow-auto">
-          <div className="prose prose-sm max-w-none dark:prose-invert"><ReactMarkdown>{value}</ReactMarkdown></div>
+          <div className="prose prose-sm max-w-none dark:prose-invert"><Markdown>{value}</Markdown></div>
         </div>
       ) : (
         <Textarea

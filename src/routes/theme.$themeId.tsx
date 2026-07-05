@@ -8,7 +8,7 @@ import type { ResourceRow, ResourceType, Flashcard } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import ReactMarkdown from "react-markdown";
+import { Markdown } from "@/components/Markdown";
 import { QrCodeButton } from "@/components/QrCodeButton";
 
 export const Route = createFileRoute("/theme/$themeId")({
@@ -239,7 +239,7 @@ function ResourceViewer({ r, fullscreen }: { r: ResourceRow; fullscreen: boolean
   }
   if (r.type === "lesson_plan") {
     const c = (r.content ?? {}) as Record<string, string>;
-    return <div className="prose prose-sm max-w-none dark:prose-invert"><ReactMarkdown>{c.text || r.description || ""}</ReactMarkdown></div>;
+    return <div className="prose prose-sm max-w-none dark:prose-invert"><Markdown>{c.text || r.description || ""}</Markdown></div>;
   }
   if (r.type === "code") {
     const c = (r.content ?? {}) as Record<string, string>;
@@ -247,7 +247,7 @@ function ResourceViewer({ r, fullscreen }: { r: ResourceRow; fullscreen: boolean
   }
   if (r.type === "note") {
     const c = (r.content ?? {}) as Record<string, string>;
-    return <div className="prose prose-sm max-w-none dark:prose-invert"><ReactMarkdown>{c.text || r.description || ""}</ReactMarkdown></div>;
+    return <div className="prose prose-sm max-w-none dark:prose-invert"><Markdown>{c.text || r.description || ""}</Markdown></div>;
   }
   if (r.type === "flashcards") {
     const cards = (((r.content ?? {}) as { flashcards?: Flashcard[] }).flashcards ?? []).filter((c) => c?.front);
@@ -309,7 +309,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 function Markdown({ text }: { text: string }) {
-  return <div className="prose prose-sm max-w-none dark:prose-invert"><ReactMarkdown>{text}</ReactMarkdown></div>;
+  return <div className="prose prose-sm max-w-none dark:prose-invert"><Markdown>{text}</Markdown></div>;
 }
 
 function FlashcardsViewer({ cards, fullscreen }: { cards: Flashcard[]; fullscreen?: boolean }) {
