@@ -103,6 +103,7 @@ function AppInner() {
       router.invalidate();
       if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
     });
+    import("@/lib/pwa").then((m) => m.registerServiceWorker()).catch(() => undefined);
     return () => sub.subscription.unsubscribe();
   }, [router, queryClient]);
   return (
