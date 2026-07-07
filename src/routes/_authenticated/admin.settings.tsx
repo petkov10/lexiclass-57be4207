@@ -190,9 +190,11 @@ function SettingsPage() {
 
       <Card className="p-6 space-y-4">
         <div>
-          <h2 className="font-semibold">Достъп до сайта</h2>
+          <h2 className="font-semibold">Достъп до публичната част</h2>
           <p className="text-xs text-muted-foreground mt-1">
-            Изберете кой може да отваря публичните страници. Администратори и редактори винаги имат достъп.
+            Тези настройки касаят <strong>само публичните страници</strong> (класове, теми, ресурси).
+            Администраторският панел <strong>винаги</strong> изисква вход с имейл/парола (или Google) —
+            независимо от избора тук.
           </p>
         </div>
         <div className="grid sm:grid-cols-3 gap-2">

@@ -62,8 +62,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/88ee3775-ed67-4aad-afb7-e7bbabd86272" },
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:type", content: "website" },
+      { name: "theme-color", content: "#3b82f6" },
     ],
-    links: [{ rel: "stylesheet", href: appCss }],
+    links: [
+      { rel: "stylesheet", href: appCss },
+      { rel: "manifest", href: "/manifest.webmanifest" },
+    ],
   }),
   shellComponent: RootShell,
   component: RootComponent,
@@ -99,6 +103,7 @@ function AppInner() {
       router.invalidate();
       if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
     });
+    import("@/lib/pwa").then((m) => m.registerServiceWorker()).catch(() => undefined);
     return () => sub.subscription.unsubscribe();
   }, [router, queryClient]);
   return (
