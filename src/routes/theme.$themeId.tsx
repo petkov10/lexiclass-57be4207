@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { resourcesForThemeQuery, themeByIdQuery, homeworkForThemeQuery } from "@/lib/queries";
 import { useResourceUrl } from "@/hooks/useResourceUrl";
 import { PublicShell } from "@/components/layout/PublicShell";
-import { ChevronRight, FileText, Link as LinkIcon, Video, FileCheck, Code, Image as ImgIcon, StickyNote, Presentation, Pencil, ExternalLink, BookOpen, Layers, RotateCw, Maximize2, Minimize2, ClipboardList, ChevronLeft, BookCheck } from "lucide-react";
+import { ChevronRight, FileText, Link as LinkIcon, Video, FileCheck, Code, Image as ImgIcon, StickyNote, Presentation, Pencil, ExternalLink, BookOpen, Layers, RotateCw, Maximize2, Minimize2, ClipboardList, ChevronLeft, BookCheck, Download } from "lucide-react";
 import type { ResourceRow, ResourceType, Flashcard } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
@@ -285,17 +285,67 @@ function ResourceViewer({ r, fullscreen }: { r: ResourceRow; fullscreen: boolean
     return <div className="p-6 text-sm text-destructive">Грешка при достъп до файла. Опитай да опресниш страницата или качи ресурса отново.</div>;
   }
   if (url) {
-    return (
-      <div className="space-y-3 h-full">
-        {r.description && !fullscreen && <p className="text-sm text-muted-foreground">{r.description}</p>}
-        <iframe src={url} className={fullscreen ? "w-full h-[calc(100vh-7rem)] rounded border" : "w-full h-[70vh] rounded border"} />
-        <div className="text-xs text-muted-foreground">
-          Ако прегледът не се зарежда, <a href={url} target="_blank" rel="noreferrer" className="text-primary underline">отвори в нов таб</a>.
+    return <FilePreview url={url} fileName={r.file_path ?? r.title} description={r.description} fullscreen={fullscreen} />;
+  }
+  return <p className="p-4 text-sm text-muted-foreground">Няма съдържание за преглед.</p>;
+}
+
+function FilePreview({ url, fileName, description, fullscreen }: { url: string; fileName?: string | null; description?: string | null; fullscreen: boolean }) {
+  const ext = (fileName?.split(".").pop() ?? "").toLowerCase().split("?")[0];
+  const isImage = ["png", "jpg", "jpeg", "gif", "webp", "svg", "avif", "bmp"].includes(ext);
+  const isPdf = ext === "pdf";
+  const isVideo = ["mp4", "webm", "mov", "m4v", "ogv"].includes(ext);
+  const isAudio = ["mp3", "wav", "ogg", "m4a", "aac", "flac"].includes(ext);
+  const isOffice = ["doc", "docx", "xls", "xlsx", "ppt", "pptx", "odt", "ods", "odp"].includes(ext);
+  const isText = ["txt", "md", "csv", "json", "log", "xml", "html", "css", "js", "ts", "tsx", "jsx", "py", "java", "cpp", "c", "cs", "rb", "go", "rs", "php", "sql", "yml", "yaml"].includes(ext);
+
+  const frameCls = fullscreen ? "w-full h-[calc(100vh-9rem)] rounded border" : "w-full h-[70vh] rounded border";
+  const shortName = fileName?.split("/").pop() ?? fileName ?? "";
+
+  const bar = (
+    <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
+      <span className="truncate">{shortName}</span>
+      <div className="flex items-center gap-2 shrink-0">
+        <a href={url} target="_blank" rel="noreferrer" className="text-primary underline">Нов таб</a>
+        <a href={url} download={shortName || true} className="inline-flex items-center gap-1 rounded-md border px-2 py-1 hover:bg-accent">
+          <Download className="h-3.5 w-3.5" /> Свали
+        </a>
+      </div>
+    </div>
+  );
+
+  let body: React.ReactNode;
+  if (isImage) {
+    body = <div className={`${frameCls} overflow-auto bg-muted/30 grid place-items-center`}><img src={url} alt={shortName} className="max-w-full max-h-full object-contain" /></div>;
+  } else if (isVideo) {
+    body = <video src={url} controls className={frameCls} />;
+  } else if (isAudio) {
+    body = <div className={`${frameCls} grid place-items-center bg-muted/30 p-6`}><audio src={url} controls className="w-full max-w-xl" /></div>;
+  } else if (isOffice) {
+    const viewer = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(url)}`;
+    body = <iframe src={viewer} className={frameCls} title={shortName} />;
+  } else if (isPdf || isText || !ext) {
+    body = <iframe src={url} className={frameCls} title={shortName} />;
+  } else {
+    body = (
+      <div className={`${frameCls} grid place-items-center bg-muted/30 text-center p-6`}>
+        <div className="space-y-3">
+          <p className="text-sm text-muted-foreground">Този тип файл не може да се визуализира директно в браузъра.</p>
+          <a href={url} download={shortName || true} className="inline-flex items-center gap-2 rounded-md bg-primary text-primary-foreground px-3 py-2 text-sm">
+            <Download className="h-4 w-4" /> Свали файла
+          </a>
         </div>
       </div>
     );
   }
-  return <p className="p-4 text-sm text-muted-foreground">Няма съдържание за преглед.</p>;
+
+  return (
+    <div className="space-y-3 h-full">
+      {description && !fullscreen && <p className="text-sm text-muted-foreground">{description}</p>}
+      {body}
+      {bar}
+    </div>
+  );
 }
 
 function TestViewer({ content }: { content: any }) {
