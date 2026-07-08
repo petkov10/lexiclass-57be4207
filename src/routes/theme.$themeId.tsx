@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { resourcesForThemeQuery, themeByIdQuery, homeworkForThemeQuery } from "@/lib/queries";
 import { useResourceUrl } from "@/hooks/useResourceUrl";
 import { PublicShell } from "@/components/layout/PublicShell";
-import { ChevronRight, FileText, Link as LinkIcon, Video, FileCheck, Code, Image as ImgIcon, StickyNote, Presentation, Pencil, ExternalLink, BookOpen, Layers, RotateCw, Maximize2, Minimize2, ClipboardList, ChevronLeft, BookCheck } from "lucide-react";
+import { ChevronRight, FileText, Link as LinkIcon, Video, FileCheck, Code, Image as ImgIcon, StickyNote, Presentation, Pencil, ExternalLink, BookOpen, Layers, RotateCw, Maximize2, Minimize2, ClipboardList, ChevronLeft, BookCheck, Download } from "lucide-react";
 import type { ResourceRow, ResourceType, Flashcard } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
