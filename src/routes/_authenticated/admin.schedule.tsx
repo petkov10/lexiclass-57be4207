@@ -120,32 +120,137 @@ function ScheduleAdmin() {
         </div>
       </Card>
 
-      <div className="grid gap-3">
-        {DAYS.map((d, i) => {
-          const items = byDay[i] ?? [];
-          if (items.length === 0) return null;
-          return (
-            <Card key={i}>
-              <div className="px-4 py-2 border-b font-medium text-sm">{d}</div>
-              <div className="divide-y">
-                {items.map((s: any) => (
-                  <div key={s.id} className="p-3 flex items-center gap-3">
-                    <div className="font-mono text-sm w-28 text-muted-foreground">{s.start_time.slice(0, 5)} – {s.end_time.slice(0, 5)}</div>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium truncate">{s.class?.name} · {s.subject?.name}</div>
-                      {s.theme && <div className="text-xs text-muted-foreground truncate">→ {s.theme.name}</div>}
+      {view === "list" ? (
+        <div className="grid gap-3">
+          {DAYS.map((d, i) => {
+            const items = byDay[i] ?? [];
+            if (items.length === 0) return null;
+            return (
+              <Card key={i}>
+                <div className="px-4 py-2 border-b font-medium text-sm">{d}</div>
+                <div className="divide-y">
+                  {items.map((s: any) => (
+                    <div key={s.id} className="p-3 flex items-center gap-3">
+                      <div className="font-mono text-sm w-28 text-muted-foreground">{s.start_time.slice(0, 5)} – {s.end_time.slice(0, 5)}</div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium truncate">{s.class?.name} · {s.subject?.name}</div>
+                        {s.theme && <div className="text-xs text-muted-foreground truncate">→ {s.theme.name}</div>}
+                      </div>
+                      <Button size="sm" variant="ghost" onClick={() => remove(s.id)}><Trash2 className="text-destructive" /></Button>
                     </div>
-                    <Button size="sm" variant="ghost" onClick={() => remove(s.id)}><Trash2 className="text-destructive" /></Button>
-                  </div>
-                ))}
-              </div>
-            </Card>
-          );
-        })}
-        {(schedule?.length ?? 0) === 0 && (
-          <div className="text-center py-12 text-muted-foreground text-sm">Още няма часове в разписанието.</div>
-        )}
-      </div>
+                  ))}
+                </div>
+              </Card>
+            );
+          })}
+          {(schedule?.length ?? 0) === 0 && (
+            <div className="text-center py-12 text-muted-foreground text-sm">Още няма часове в разписанието.</div>
+          )}
+        </div>
+      ) : (
+        <WeekGrid schedule={schedule ?? []} onRemove={remove} onRefresh={refresh} />
+      )}
     </div>
   );
 }
+
+// ------------ Week grid with drag & drop ------------
+
+import { DndContext, useDraggable, useDroppable, PointerSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
+
+const HOURS = Array.from({ length: 12 }, (_, i) => 7 + i); // 07:00 – 18:00
+const HOUR_H = 56; // px per hour
+
+function toMinutes(t: string) { const [h, m] = t.split(":").map(Number); return h * 60 + m; }
+function fromMinutes(mins: number) { const h = Math.floor(mins / 60); const m = mins % 60; return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:00`; }
+
+function WeekGrid({ schedule, onRemove, onRefresh }: { schedule: any[]; onRemove: (id: string) => void; onRefresh: () => void }) {
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
+
+  const onDragEnd = async (e: DragEndEvent) => {
+    if (!e.over) return;
+    const id = String(e.active.id);
+    const [targetDay, targetHour] = String(e.over.id).split(":").map(Number);
+    const item = schedule.find((s) => s.id === id);
+    if (!item) return;
+    const originalStart = toMinutes(item.start_time);
+    const duration = toMinutes(item.end_time) - originalStart;
+    // Snap to 5-min grid using vertical delta from hour-row containers.
+    const rawOffset = Math.round(e.delta.y / (HOUR_H / 12)) * 5; // 5-min steps
+    const newStart = Math.max(0, targetHour * 60 + (originalStart % 60) + rawOffset);
+    const newEnd = newStart + duration;
+    if (item.day_of_week === targetDay && newStart === originalStart) return;
+    const { error } = await supabase
+      .from("schedules")
+      .update({ day_of_week: targetDay, start_time: fromMinutes(newStart), end_time: fromMinutes(newEnd) })
+      .eq("id", id);
+    if (error) toast.error(error.message);
+    else { toast.success("Часът е преместен"); onRefresh(); }
+  };
+
+  const dayIndices = [1, 2, 3, 4, 5, 6, 0]; // Mon..Sun
+  return (
+    <DndContext sensors={sensors} onDragEnd={onDragEnd}>
+      <Card className="overflow-auto">
+        <div className="min-w-[720px]">
+          <div className="grid" style={{ gridTemplateColumns: `56px repeat(${dayIndices.length}, 1fr)` }}>
+            <div className="border-b border-r p-2 text-xs text-muted-foreground bg-muted/40">Час</div>
+            {dayIndices.map((di) => (
+              <div key={di} className="border-b p-2 text-xs font-medium bg-muted/40 text-center">{DAYS[di].slice(0, 3)}</div>
+            ))}
+            {HOURS.map((h) => (
+              <div key={h} className="contents">
+                <div className="border-r border-b p-1 text-[10px] text-muted-foreground text-right pr-2" style={{ height: HOUR_H }}>{String(h).padStart(2, "0")}:00</div>
+                {dayIndices.map((di) => (
+                  <DropCell key={`${di}:${h}`} id={`${di}:${h}`}>
+                    {schedule
+                      .filter((s) => s.day_of_week === di && Math.floor(toMinutes(s.start_time) / 60) === h)
+                      .map((s) => (
+                        <DraggableEvent key={s.id} item={s} onRemove={onRemove} />
+                      ))}
+                  </DropCell>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+      </Card>
+    </DndContext>
+  );
+}
+
+function DropCell({ id, children }: { id: string; children: React.ReactNode }) {
+  const { setNodeRef, isOver } = useDroppable({ id });
+  return (
+    <div ref={setNodeRef} className={`relative border-b border-r ${isOver ? "bg-primary/10" : ""}`} style={{ height: HOUR_H }}>
+      {children}
+    </div>
+  );
+}
+
+function DraggableEvent({ item, onRemove }: { item: any; onRemove: (id: string) => void }) {
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id: item.id });
+  const startMins = toMinutes(item.start_time);
+  const endMins = toMinutes(item.end_time);
+  const offsetTop = (startMins % 60) * (HOUR_H / 60);
+  const height = Math.max(20, (endMins - startMins) * (HOUR_H / 60));
+  const style: React.CSSProperties = {
+    position: "absolute", left: 2, right: 2, top: offsetTop, height,
+    transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
+    opacity: isDragging ? 0.7 : 1, zIndex: isDragging ? 50 : 10,
+  };
+  return (
+    <div ref={setNodeRef} style={style} {...listeners} {...attributes}
+      className="rounded-md bg-primary/15 border border-primary/40 text-primary text-[11px] leading-tight p-1 overflow-hidden cursor-grab active:cursor-grabbing shadow-sm">
+      <div className="flex items-center justify-between gap-1">
+        <span className="font-mono">{item.start_time.slice(0, 5)}</span>
+        <button onClick={(e) => { e.stopPropagation(); onRemove(item.id); }} className="opacity-60 hover:opacity-100" title="Изтрий">
+          <Trash2 className="h-3 w-3" />
+        </button>
+      </div>
+      <div className="font-medium truncate">{item.class?.name} · {item.subject?.name}</div>
+      {item.theme && <div className="truncate opacity-80">→ {item.theme.name}</div>}
+    </div>
+  );
+}
+
