@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      activity_log: {
+        Row: {
+          action: string
+          actor_id: string | null
+          actor_name: string | null
+          created_at: string
+          details: Json | null
+          entity_id: string | null
+          entity_label: string | null
+          entity_type: string | null
+          id: string
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          actor_name?: string | null
+          created_at?: string
+          details?: Json | null
+          entity_id?: string | null
+          entity_label?: string | null
+          entity_type?: string | null
+          id?: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          actor_name?: string | null
+          created_at?: string
+          details?: Json | null
+          entity_id?: string | null
+          entity_label?: string | null
+          entity_type?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
       app_settings: {
         Row: {
           access_mode: string
@@ -591,6 +627,16 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      log_activity: {
+        Args: {
+          _action: string
+          _details?: Json
+          _entity_id?: string
+          _entity_label?: string
+          _entity_type?: string
+        }
+        Returns: undefined
       }
       verify_access_pin: {
         Args: { _pin: string }
