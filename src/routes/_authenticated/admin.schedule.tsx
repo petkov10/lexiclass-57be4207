@@ -65,14 +65,23 @@ function ScheduleAdmin() {
     (byDay[s.day_of_week] ??= [] as any).push(s);
   });
 
+  const [view, setView] = useState<"list" | "week">("week");
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Моето разписание</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Добавете часовете си. На началния екран ще виждате „Днес в час" с директни линкове.
-        </p>
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">Моето разписание</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Добавете часовете си. Плъзнете час, за да го преместите между дни или часове.
+          </p>
+        </div>
+        <div className="inline-flex rounded-md border p-0.5 text-sm shrink-0">
+          <button onClick={() => setView("week")} className={`px-3 py-1.5 rounded ${view === "week" ? "bg-primary text-primary-foreground" : ""}`}>Седмица</button>
+          <button onClick={() => setView("list")} className={`px-3 py-1.5 rounded ${view === "list" ? "bg-primary text-primary-foreground" : ""}`}>Списък</button>
+        </div>
       </div>
+
 
       <Card className="p-4 space-y-3">
         <h2 className="font-semibold">Добави час</h2>
