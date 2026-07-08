@@ -175,3 +175,36 @@ export const fileUrl = (path: string | null) => {
   const { data } = supabase.storage.from("resources").getPublicUrl(path);
   return data.publicUrl;
 };
+
+// Activity log (admin only)
+export const activityLogQuery = (limit = 200) =>
+  queryOptions({
+    queryKey: ["activity_log", limit],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("activity_log" as never)
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(limit);
+      if (error) throw error;
+      return (data ?? []) as Array<{
+        id: string; actor_id: string | null; actor_name: string | null;
+        action: string; entity_type: string | null; entity_id: string | null;
+        entity_label: string | null; details: Record<string, unknown> | null; created_at: string;
+      }>;
+    },
+  });
+
+export async function logActivity(action: string, opts?: {
+  entity_type?: string; entity_id?: string; entity_label?: string; details?: Record<string, unknown>;
+}) {
+  try {
+    await supabase.rpc("log_activity" as never, {
+      _action: action,
+      _entity_type: opts?.entity_type ?? null,
+      _entity_id: opts?.entity_id ?? null,
+      _entity_label: opts?.entity_label ?? null,
+      _details: (opts?.details ?? null) as never,
+    } as never);
+  } catch { /* logging must never break the UI */ }
+}
