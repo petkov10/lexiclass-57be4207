@@ -22,6 +22,7 @@ import {
   FolderUp,
   Menu,
   X,
+  Activity,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeModeToggle } from "@/components/ThemeModeToggle";
