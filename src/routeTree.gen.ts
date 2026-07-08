@@ -36,6 +36,7 @@ import { Route as AuthenticatedAdminGradesRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAdminClassesRouteImport } from './routes/_authenticated/admin.classes'
 import { Route as AuthenticatedAdminBackupRouteImport } from './routes/_authenticated/admin.backup'
 import { Route as AuthenticatedAdminAiRouteImport } from './routes/_authenticated/admin.ai'
+import { Route as AuthenticatedAdminActivityRouteImport } from './routes/_authenticated/admin.activity'
 import { Route as ClassClassIdSubjectSubjectIdRouteImport } from './routes/class.$classId.subject.$subjectId'
 
 const AuthRoute = AuthRouteImport.update({
@@ -181,6 +182,12 @@ const AuthenticatedAdminAiRoute = AuthenticatedAdminAiRouteImport.update({
   path: '/ai',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminActivityRoute =
+  AuthenticatedAdminActivityRouteImport.update({
+    id: '/activity',
+    path: '/activity',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const ClassClassIdSubjectSubjectIdRoute =
   ClassClassIdSubjectSubjectIdRouteImport.update({
     id: '/subject/$subjectId',
@@ -201,6 +208,7 @@ export interface FileRoutesByFullPath {
   '/class/$classId': typeof ClassClassIdRouteWithChildren
   '/test/$resourceId': typeof TestResourceIdRouteWithChildren
   '/theme/$themeId': typeof ThemeThemeIdRoute
+  '/admin/activity': typeof AuthenticatedAdminActivityRoute
   '/admin/ai': typeof AuthenticatedAdminAiRoute
   '/admin/backup': typeof AuthenticatedAdminBackupRoute
   '/admin/classes': typeof AuthenticatedAdminClassesRoute
@@ -228,6 +236,7 @@ export interface FileRoutesByTo {
   '/api/ai-test': typeof ApiAiTestRoute
   '/test/$resourceId': typeof TestResourceIdRouteWithChildren
   '/theme/$themeId': typeof ThemeThemeIdRoute
+  '/admin/activity': typeof AuthenticatedAdminActivityRoute
   '/admin/ai': typeof AuthenticatedAdminAiRoute
   '/admin/backup': typeof AuthenticatedAdminBackupRoute
   '/admin/classes': typeof AuthenticatedAdminClassesRoute
@@ -259,6 +268,7 @@ export interface FileRoutesById {
   '/class/$classId': typeof ClassClassIdRouteWithChildren
   '/test/$resourceId': typeof TestResourceIdRouteWithChildren
   '/theme/$themeId': typeof ThemeThemeIdRoute
+  '/_authenticated/admin/activity': typeof AuthenticatedAdminActivityRoute
   '/_authenticated/admin/ai': typeof AuthenticatedAdminAiRoute
   '/_authenticated/admin/backup': typeof AuthenticatedAdminBackupRoute
   '/_authenticated/admin/classes': typeof AuthenticatedAdminClassesRoute
@@ -290,6 +300,7 @@ export interface FileRouteTypes {
     | '/class/$classId'
     | '/test/$resourceId'
     | '/theme/$themeId'
+    | '/admin/activity'
     | '/admin/ai'
     | '/admin/backup'
     | '/admin/classes'
@@ -317,6 +328,7 @@ export interface FileRouteTypes {
     | '/api/ai-test'
     | '/test/$resourceId'
     | '/theme/$themeId'
+    | '/admin/activity'
     | '/admin/ai'
     | '/admin/backup'
     | '/admin/classes'
@@ -347,6 +359,7 @@ export interface FileRouteTypes {
     | '/class/$classId'
     | '/test/$resourceId'
     | '/theme/$themeId'
+    | '/_authenticated/admin/activity'
     | '/_authenticated/admin/ai'
     | '/_authenticated/admin/backup'
     | '/_authenticated/admin/classes'
@@ -570,6 +583,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminAiRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/activity': {
+      id: '/_authenticated/admin/activity'
+      path: '/activity'
+      fullPath: '/admin/activity'
+      preLoaderRoute: typeof AuthenticatedAdminActivityRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/class/$classId/subject/$subjectId': {
       id: '/class/$classId/subject/$subjectId'
       path: '/subject/$subjectId'
@@ -581,6 +601,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminActivityRoute: typeof AuthenticatedAdminActivityRoute
   AuthenticatedAdminAiRoute: typeof AuthenticatedAdminAiRoute
   AuthenticatedAdminBackupRoute: typeof AuthenticatedAdminBackupRoute
   AuthenticatedAdminClassesRoute: typeof AuthenticatedAdminClassesRoute
@@ -596,6 +617,7 @@ interface AuthenticatedAdminRouteChildren {
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminActivityRoute: AuthenticatedAdminActivityRoute,
   AuthenticatedAdminAiRoute: AuthenticatedAdminAiRoute,
   AuthenticatedAdminBackupRoute: AuthenticatedAdminBackupRoute,
   AuthenticatedAdminClassesRoute: AuthenticatedAdminClassesRoute,
