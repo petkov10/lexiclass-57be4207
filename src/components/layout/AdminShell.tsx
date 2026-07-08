@@ -40,6 +40,7 @@ const nav: NavItem[] = [
   { to: "/admin/ai", label: "AI Асистент", icon: Sparkles },
   { to: "/admin/users", label: "Потребители", icon: Users, adminOnly: true },
   { to: "/admin/settings", label: "Настройки", icon: SettingsIcon, adminOnly: true },
+  { to: "/admin/activity", label: "Дневник", icon: Activity, adminOnly: true },
   { to: "/admin/backup", label: "Бекъп", icon: DatabaseBackup, adminOnly: true },
 ];
 
