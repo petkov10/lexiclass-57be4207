@@ -32,6 +32,8 @@ const TYPES: { value: ResourceType; label: string }[] = [
   { value: "note", label: "Бележка" },
   { value: "notebooklm", label: "NotebookLM" },
   { value: "flashcards", label: "Флаш карти" },
+  { value: "lesson_plan", label: "Педагогически материал" },
+  { value: "code_exercise", label: "Код упражнение" },
   { value: "other", label: "Друго" },
 ];
 
