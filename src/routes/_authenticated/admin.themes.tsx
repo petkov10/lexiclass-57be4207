@@ -116,30 +116,78 @@ function ThemesAdmin() {
     toast.success("Бележките са запазени");
   };
 
+  const [cloudUrl, setCloudUrl] = useState("");
+  const [cloudLoading, setCloudLoading] = useState(false);
+  const [cloudOpen, setCloudOpen] = useState(false);
+
+  const importFromBuffer = async (buf: ArrayBuffer) => {
+    if (!classId || !subjectId) { toast.error("Първо изберете клас и предмет"); return; }
+    const wb = XLSX.read(buf);
+    const ws = wb.Sheets[wb.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json<Record<string, any>>(ws, { defval: "" });
+    const baseOrder = themes?.length ?? 0;
+    const inserts = rows.map((r, i) => {
+      const name = r["Тема"] || r["Theme"] || r["Name"] || r["Урок"] || r["Заглавие"] || Object.values(r)[0];
+      const desc = r["Описание"] || r["Description"] || r["Бележки"] || null;
+      const wk = r["Седмица"] || r["Week"] || r["№"] || r["No"] || null;
+      return { class_id: classId, subject_id: subjectId, name: String(name || "").trim(), description: desc ? String(desc) : null, week_number: wk ? parseInt(String(wk)) || null : null, order_index: baseOrder + i + 1 };
+    }).filter((r) => r.name);
+    if (!inserts.length) { toast.error("Не са открити теми в таблицата"); return; }
+    const { error } = await supabase.from("themes").insert(inserts);
+    if (error) throw error;
+    toast.success(`Импортирани ${inserts.length} теми`);
+    refresh();
+  };
+
   const onImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file || !classId || !subjectId) { toast.error("Първо изберете клас и предмет"); return; }
+    if (!file) return;
     try {
       const buf = await file.arrayBuffer();
-      const wb = XLSX.read(buf);
-      const ws = wb.Sheets[wb.SheetNames[0]];
-      const rows = XLSX.utils.sheet_to_json<Record<string, any>>(ws, { defval: "" });
-      const baseOrder = themes?.length ?? 0;
-      const inserts = rows.map((r, i) => {
-        const name = r["Тема"] || r["Theme"] || r["Name"] || r["Урок"] || r["Заглавие"] || Object.values(r)[0];
-        const desc = r["Описание"] || r["Description"] || r["Бележки"] || null;
-        const wk = r["Седмица"] || r["Week"] || r["№"] || r["No"] || null;
-        return { class_id: classId, subject_id: subjectId, name: String(name || "").trim(), description: desc ? String(desc) : null, week_number: wk ? parseInt(String(wk)) || null : null, order_index: baseOrder + i + 1 };
-      }).filter((r) => r.name);
-      if (!inserts.length) { toast.error("Не са открити теми"); return; }
-      const { error } = await supabase.from("themes").insert(inserts);
-      if (error) throw error;
-      toast.success(`Импортирани ${inserts.length} теми`);
-      refresh();
+      await importFromBuffer(buf);
     } catch (err: any) {
       toast.error(err.message || "Грешка при импорта");
     } finally { if (fileRef.current) fileRef.current.value = ""; }
   };
+
+  // Convert Google Drive / Google Sheets / OneDrive share URL to a direct downloadable xlsx URL
+  const resolveCloudUrl = (raw: string): string | null => {
+    const s = raw.trim();
+    if (!s) return null;
+    // Google Sheets
+    let m = s.match(/docs\.google\.com\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/);
+    if (m) return `https://docs.google.com/spreadsheets/d/${m[1]}/export?format=xlsx`;
+    // Google Drive file
+    m = s.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
+    if (m) return `https://drive.google.com/uc?export=download&id=${m[1]}`;
+    m = s.match(/drive\.google\.com\/open\?id=([a-zA-Z0-9_-]+)/);
+    if (m) return `https://drive.google.com/uc?export=download&id=${m[1]}`;
+    // OneDrive short link or full: use shares API with base64url encoding
+    if (/1drv\.ms|onedrive\.live\.com|sharepoint\.com/i.test(s)) {
+      const b64 = btoa(s).replace(/=+$/, "").replace(/\//g, "_").replace(/\+/g, "-");
+      return `https://api.onedrive.com/v1.0/shares/u!${b64}/root/content`;
+    }
+    return null;
+  };
+
+  const importFromCloud = async () => {
+    const url = resolveCloudUrl(cloudUrl);
+    if (!url) { toast.error("Неразпознат линк. Използвай Google Sheets/Drive или OneDrive линк за споделяне."); return; }
+    setCloudLoading(true);
+    try {
+      const res = await fetch(url, { redirect: "follow" });
+      if (!res.ok) throw new Error(`Неуспешно сваляне (${res.status}). Провери правата за достъп — линкът трябва да е публичен или „всеки с линка"`);
+      const buf = await res.arrayBuffer();
+      await importFromBuffer(buf);
+      setCloudUrl("");
+      setCloudOpen(false);
+    } catch (err: any) {
+      toast.error(err.message || "Грешка при импорта от облак");
+    } finally {
+      setCloudLoading(false);
+    }
+  };
+
 
   const onDragEnd = async (e: DragEndEvent) => {
     const { active, over } = e;
