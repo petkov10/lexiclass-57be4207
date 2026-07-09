@@ -300,6 +300,35 @@ function ThemesAdmin() {
           {homeworkFor && <HomeworkManager themeId={homeworkFor.id} userId={user?.id} />}
         </DialogContent>
       </Dialog>
+
+      <Dialog open={cloudOpen} onOpenChange={setCloudOpen}>
+        <DialogContent>
+          <DialogHeader><DialogTitle className="flex items-center gap-2"><Upload className="h-4 w-4" /> Импорт от Google Drive / OneDrive</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <p className="text-sm text-muted-foreground">
+              Постави линк за <strong>споделяне</strong> към Google Sheets, Google Drive файл (.xlsx) или OneDrive/SharePoint файл. Файлът трябва да е достъпен през „всеки с линка".
+            </p>
+            <Input
+              placeholder="https://docs.google.com/spreadsheets/... или https://1drv.ms/..."
+              value={cloudUrl}
+              onChange={(e) => setCloudUrl(e.target.value)}
+              disabled={cloudLoading}
+            />
+            <div className="text-xs text-muted-foreground space-y-1">
+              <div>• <strong>Google Sheets:</strong> Сподели → „Всеки с линка може да преглежда"</div>
+              <div>• <strong>Google Drive (.xlsx):</strong> Сподели → копирай линка към файла</div>
+              <div>• <strong>OneDrive:</strong> Сподели → Копирай линк (1drv.ms или onedrive.live.com)</div>
+              <div className="pt-1">Първият ред трябва да съдържа колони като: <em>Тема, Описание, Седмица</em>.</div>
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="ghost" onClick={() => setCloudOpen(false)} disabled={cloudLoading}>Отказ</Button>
+              <Button onClick={importFromCloud} disabled={cloudLoading || !cloudUrl.trim() || !classId || !subjectId}>
+                {cloudLoading ? "Импортиране..." : "Импортирай"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
