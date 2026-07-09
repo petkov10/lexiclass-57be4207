@@ -288,7 +288,7 @@ function ResourceForm({ themeId, existing, orderHint, onDone }: { themeId: strin
         content:
           type === "flashcards"
             ? { flashcards: cards.filter((c) => c.front.trim() || c.back.trim()) }
-            : ["task", "code", "note"].includes(type)
+            : ["task", "code", "note", "lesson_plan", "code_exercise"].includes(type)
             ? content
             : null,
         order_index: existing?.order_index ?? orderHint,
