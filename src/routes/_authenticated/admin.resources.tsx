@@ -378,8 +378,19 @@ function ResourceForm({ themeId, existing, orderHint, onDone }: { themeId: strin
         </div>
       )}
 
-      {type === "note" && (
-        <div><Label>Текст (Markdown)</Label><Textarea rows={8} value={content.text || ""} onChange={(e) => setC("text", e.target.value)} /></div>
+      {(type === "note" || type === "lesson_plan") && (
+        <div>
+          <Label>{type === "lesson_plan" ? "Разработка на урока (Markdown)" : "Текст (Markdown)"}</Label>
+          <EditableMarkdown value={content.text || ""} onChange={(v) => setC("text", v)} rows={12} />
+        </div>
+      )}
+
+      {type === "code_exercise" && (
+        <div className="space-y-3">
+          <div><Label>Условие</Label><Textarea rows={3} value={content.statement || ""} onChange={(e) => setC("statement", e.target.value)} /></div>
+          <div><Label>Стартов код</Label><Textarea rows={6} className="font-mono text-xs" value={content.starter_code || ""} onChange={(e) => setC("starter_code", e.target.value)} /></div>
+          <div><Label>Решение</Label><Textarea rows={6} className="font-mono text-xs" value={content.solution || ""} onChange={(e) => setC("solution", e.target.value)} /></div>
+        </div>
       )}
 
       {type === "notebooklm" && (
