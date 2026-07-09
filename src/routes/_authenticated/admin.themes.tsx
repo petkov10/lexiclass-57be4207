@@ -229,9 +229,10 @@ function ThemesAdmin() {
           <Card className="p-4 space-y-3">
             <div className="flex items-center justify-between">
               <h2 className="font-semibold">Нова тема</h2>
-              <div>
+              <div className="flex gap-2 flex-wrap">
                 <input ref={fileRef} type="file" accept=".xlsx,.xls,.csv" onChange={onImport} className="hidden" />
                 <Button variant="outline" size="sm" onClick={() => fileRef.current?.click()}><Upload /> Импорт от Excel</Button>
+                <Button variant="outline" size="sm" onClick={() => setCloudOpen(true)}><Upload /> От Google Drive / OneDrive</Button>
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-[80px_1fr] gap-2">
