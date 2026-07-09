@@ -17,6 +17,7 @@ import type { ResourceRow, ResourceType, Flashcard } from "@/lib/types";
 import { sanitizeFileName } from "@/lib/storage";
 import { Sparkles, BookOpen, Layers as LayersIcon, X } from "lucide-react";
 import { QrCodeButton } from "@/components/QrCodeButton";
+import { EditableMarkdown } from "@/components/EditableMarkdown";
 
 const CODE_LANGUAGES = ["csharp", "html", "css", "sql", "javascript", "typescript", "python", "cpp", "java", "json", "bash"];
 
