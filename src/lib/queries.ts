@@ -4,7 +4,7 @@ import { queryOptions } from "@tanstack/react-query";
 export const settingsQuery = queryOptions({
   queryKey: ["app_settings"],
   queryFn: async () => {
-    const { data, error } = await supabase.from("app_settings").select("*").eq("id", 1).maybeSingle();
+    const { data, error } = await supabase.from("app_settings").select("id, site_name, logo_text, logo_url, color_scheme, theme_mode, extra, updated_at, grading_scale, access_mode").eq("id", 1).maybeSingle();
     if (error) throw error;
     return data;
   },
@@ -123,7 +123,7 @@ export const usersWithRolesQuery = queryOptions({
   queryKey: ["users-roles"],
   queryFn: async () => {
     const [{ data: profiles }, { data: roles }, { data: invites }] = await Promise.all([
-      supabase.from("profiles").select("*"),
+      supabase.from("profiles").select("id, display_name, avatar_url, created_at, is_paused, is_approved, last_login_at"),
       supabase.from("user_roles").select("*"),
       supabase.from("pending_invites").select("*").order("created_at", { ascending: false }),
     ]);
