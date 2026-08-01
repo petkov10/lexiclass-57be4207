@@ -614,6 +614,7 @@ export type Database = {
       admin_delete_class: { Args: { _id: string }; Returns: undefined }
       admin_delete_subject: { Args: { _id: string }; Returns: undefined }
       admin_delete_theme: { Args: { _id: string }; Returns: undefined }
+      admin_get_global_pin: { Args: never; Returns: string }
       admin_list_user_pins: {
         Args: never
         Returns: {
