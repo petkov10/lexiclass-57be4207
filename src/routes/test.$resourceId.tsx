@@ -128,34 +128,32 @@ function TestRunner() {
     if (!resource) return;
     setSubmitting(true);
     try {
-      const details = shuffled.map((q, i) => {
-        const given = answers[i] ?? "";
-        const correct = (given.trim().toLowerCase() === (q.answer || "").trim().toLowerCase());
-        return { q: q.q, type: q.type, given, expected: q.answer, correct, explanation: q.explanation };
+      // Rebuild answers in the ORIGINAL question order for server-side grading.
+      const given: string[] = new Array(questions.length).fill("");
+      shuffled.forEach((q, i) => {
+        const orig = (q as any)._origIndex ?? i;
+        given[orig] = answers[i] ?? "";
       });
-      const autoScored = details.filter((d) => d.type === "mc");
-      const max = autoScored.length || details.length;
-      const score = autoScored.filter((d) => d.correct).length;
-      // If only open questions, score is left for teacher; record 0/0 to avoid misleading grade
-      const percent = max > 0 ? Math.round((score / max) * 10000) / 100 : 0;
-      const grade = max > 0 ? percentToGrade(percent, scale) : 0;
       const cls = classes?.find((c) => c.id === classId);
 
-      const { error } = await supabase.from("test_attempts").insert({
-        resource_id: resource.id,
-        theme_id: resource.theme_id,
-        class_id: classId || null,
-        student_name: studentName.trim(),
-        student_number: studentNumber.trim() || null,
-        student_class: cls?.name || null,
-        answers: details as any,
-        score, max_score: max, percent, grade,
-        started_at: new Date(startedRef.current).toISOString(),
-        submitted_at: new Date().toISOString(),
-        duration_seconds: Math.max(1, Math.round((Date.now() - startedRef.current) / 1000)),
+      const { data, error } = await supabase.rpc("submit_test_attempt", {
+        _resource_id: resource.id,
+        _student_name: studentName.trim(),
+        _student_number: studentNumber.trim() || null,
+        _student_class: cls?.name || null,
+        _class_id: classId || null,
+        _given: given as any,
+        _duration_seconds: Math.max(1, Math.round((Date.now() - startedRef.current) / 1000)),
       });
       if (error) throw error;
-      setResult({ score, max, percent, grade, details });
+      const r = data as any;
+      setResult({
+        score: r?.score ?? 0,
+        max: r?.max_score ?? 0,
+        percent: Number(r?.percent ?? 0),
+        grade: Number(r?.grade ?? 0),
+        details: Array.isArray(r?.details) ? r.details : [],
+      });
       localStorage.removeItem(STORAGE_KEY(attemptId));
       setPhase("done");
     } catch (e: any) {
@@ -164,6 +162,7 @@ function TestRunner() {
       setSubmitting(false);
     }
   };
+
 
   if (isLoading) {
     return <PublicShell><div className="max-w-2xl mx-auto p-10"><div className="h-40 bg-muted animate-pulse rounded" /></div></PublicShell>;
