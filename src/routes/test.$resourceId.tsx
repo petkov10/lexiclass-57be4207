@@ -139,9 +139,10 @@ function TestRunner() {
       const { data, error } = await supabase.rpc("submit_test_attempt", {
         _resource_id: resource.id,
         _student_name: studentName.trim(),
-        _student_number: studentNumber.trim() || null,
-        _student_class: cls?.name || null,
-        _class_id: classId || null,
+        _student_number: (studentNumber.trim() || null) as any,
+        _student_class: (cls?.name || null) as any,
+        _class_id: (classId || null) as any,
+
         _given: given as any,
         _duration_seconds: Math.max(1, Math.round((Date.now() - startedRef.current) / 1000)),
       });
