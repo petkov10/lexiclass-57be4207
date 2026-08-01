@@ -19,6 +19,7 @@ import { Route as ApiAiTestRouteImport } from './routes/api/ai-test'
 import { Route as ApiAiPedagogyRouteImport } from './routes/api/ai-pedagogy'
 import { Route as ApiAiLessonPlanRouteImport } from './routes/api/ai-lesson-plan'
 import { Route as ApiAiFlashcardsRouteImport } from './routes/api/ai-flashcards'
+import { Route as ApiAiDocumentRouteImport } from './routes/api/ai-document'
 import { Route as ApiAiCodeExerciseRouteImport } from './routes/api/ai-code-exercise'
 import { Route as ApiAiRouteImport } from './routes/api/ai'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
@@ -86,6 +87,11 @@ const ApiAiLessonPlanRoute = ApiAiLessonPlanRouteImport.update({
 const ApiAiFlashcardsRoute = ApiAiFlashcardsRouteImport.update({
   id: '/api/ai-flashcards',
   path: '/api/ai-flashcards',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAiDocumentRoute = ApiAiDocumentRouteImport.update({
+  id: '/api/ai-document',
+  path: '/api/ai-document',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAiCodeExerciseRoute = ApiAiCodeExerciseRouteImport.update({
@@ -201,6 +207,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/api/ai': typeof ApiAiRoute
   '/api/ai-code-exercise': typeof ApiAiCodeExerciseRoute
+  '/api/ai-document': typeof ApiAiDocumentRoute
   '/api/ai-flashcards': typeof ApiAiFlashcardsRoute
   '/api/ai-lesson-plan': typeof ApiAiLessonPlanRoute
   '/api/ai-pedagogy': typeof ApiAiPedagogyRoute
@@ -230,6 +237,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/api/ai': typeof ApiAiRoute
   '/api/ai-code-exercise': typeof ApiAiCodeExerciseRoute
+  '/api/ai-document': typeof ApiAiDocumentRoute
   '/api/ai-flashcards': typeof ApiAiFlashcardsRoute
   '/api/ai-lesson-plan': typeof ApiAiLessonPlanRoute
   '/api/ai-pedagogy': typeof ApiAiPedagogyRoute
@@ -261,6 +269,7 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/api/ai': typeof ApiAiRoute
   '/api/ai-code-exercise': typeof ApiAiCodeExerciseRoute
+  '/api/ai-document': typeof ApiAiDocumentRoute
   '/api/ai-flashcards': typeof ApiAiFlashcardsRoute
   '/api/ai-lesson-plan': typeof ApiAiLessonPlanRoute
   '/api/ai-pedagogy': typeof ApiAiPedagogyRoute
@@ -293,6 +302,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/api/ai'
     | '/api/ai-code-exercise'
+    | '/api/ai-document'
     | '/api/ai-flashcards'
     | '/api/ai-lesson-plan'
     | '/api/ai-pedagogy'
@@ -322,6 +332,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/api/ai'
     | '/api/ai-code-exercise'
+    | '/api/ai-document'
     | '/api/ai-flashcards'
     | '/api/ai-lesson-plan'
     | '/api/ai-pedagogy'
@@ -352,6 +363,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/api/ai'
     | '/api/ai-code-exercise'
+    | '/api/ai-document'
     | '/api/ai-flashcards'
     | '/api/ai-lesson-plan'
     | '/api/ai-pedagogy'
@@ -383,6 +395,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   ApiAiRoute: typeof ApiAiRoute
   ApiAiCodeExerciseRoute: typeof ApiAiCodeExerciseRoute
+  ApiAiDocumentRoute: typeof ApiAiDocumentRoute
   ApiAiFlashcardsRoute: typeof ApiAiFlashcardsRoute
   ApiAiLessonPlanRoute: typeof ApiAiLessonPlanRoute
   ApiAiPedagogyRoute: typeof ApiAiPedagogyRoute
@@ -462,6 +475,13 @@ declare module '@tanstack/react-router' {
       path: '/api/ai-flashcards'
       fullPath: '/api/ai-flashcards'
       preLoaderRoute: typeof ApiAiFlashcardsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/ai-document': {
+      id: '/api/ai-document'
+      path: '/api/ai-document'
+      fullPath: '/api/ai-document'
+      preLoaderRoute: typeof ApiAiDocumentRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/ai-code-exercise': {
@@ -678,6 +698,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   ApiAiRoute: ApiAiRoute,
   ApiAiCodeExerciseRoute: ApiAiCodeExerciseRoute,
+  ApiAiDocumentRoute: ApiAiDocumentRoute,
   ApiAiFlashcardsRoute: ApiAiFlashcardsRoute,
   ApiAiLessonPlanRoute: ApiAiLessonPlanRoute,
   ApiAiPedagogyRoute: ApiAiPedagogyRoute,
