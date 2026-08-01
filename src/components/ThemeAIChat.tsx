@@ -7,6 +7,7 @@ import { Markdown } from "@/components/Markdown";
 import { toast } from "sonner";
 import { aiFetch } from "@/lib/ai-client";
 import type { ResourceRow } from "@/lib/types";
+import { useAuth, useRole } from "@/hooks/useAuth";
 
 type Msg = { role: "user" | "assistant" | "system"; content: string };
 
@@ -68,6 +69,8 @@ export function ThemeAIChat({
       setLoading(false);
     }
   };
+
+  if (!canUseAI) return null;
 
   if (!open) {
     return (
