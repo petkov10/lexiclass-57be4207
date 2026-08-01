@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Sparkles, Send, User, Bot, ClipboardList, BookOpen, Code2, Copy, Save, GraduationCap, Eye, Pencil } from "lucide-react";
 import { toast } from "sonner";
+import { aiFetch } from "@/lib/ai-client";
 import { Markdown } from "@/components/Markdown";
 import { useQuery } from "@tanstack/react-query";
 import { allThemesQuery } from "@/lib/queries";
@@ -65,7 +66,7 @@ function Chat() {
     const next = [...messages, { role: "user" as const, content }];
     setMessages(next); setInput(""); setLoading(true);
     try {
-      const res = await fetch("/api/ai", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ messages: next }) });
+      const res = await aiFetch("/api/ai", { messages: next });
       if (!res.ok) throw new Error(await res.text());
       const data = await res.json();
       setMessages((m) => [...m, { role: "assistant", content: data.message || "(няма отговор)" }]);
@@ -141,7 +142,7 @@ function TestGen() {
     setLoading(true);
     setSavedId("");
     try {
-      const res = await fetch("/api/ai-test", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ topic, count, kind }) });
+      const res = await aiFetch("/api/ai-test", { topic, count, kind });
       if (!res.ok) throw new Error(await res.text());
       const j = await res.json();
       setTest(j.test);
@@ -153,12 +154,16 @@ function TestGen() {
     const { data, error } = await supabase.from("resources").insert({
       theme_id: themeId, type: "test", title: test.title || topic,
       description: `${test.questions?.length ?? 0} въпроса`,
-      content: test as any, order_index: 999,
+      content: null, order_index: 999,
     }).select("id").single();
     if (error) return toast.error(error.message);
+    // Answer keys go to the editor-only table, never the public resources row.
+    const { error: tcErr } = await supabase.from("test_content").insert({ resource_id: data.id, content: test as any });
+    if (tcErr) return toast.error(tcErr.message);
     setSavedId(data.id);
     toast.success("Тестът е запазен — можете да го споделите с QR код");
   };
+
 
   return (
     <Card className="p-4 space-y-4">
@@ -257,10 +262,7 @@ function PlanGen() {
   const gen = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/ai-lesson-plan", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ topic, subject, duration, grade, lesson_type: lessonType, methods }),
-      });
+      const res = await aiFetch("/api/ai-lesson-plan", { topic, subject, duration, grade, lesson_type: lessonType, methods });
       if (!res.ok) throw new Error(await res.text());
       const j = await res.json();
       setPlan(j.plan);
@@ -336,10 +338,7 @@ function PedagogyGen() {
   const gen = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/ai-pedagogy", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ topic, kind, grade, duration, context }),
-      });
+      const res = await aiFetch("/api/ai-pedagogy", { topic, kind, grade, duration, context });
       if (!res.ok) throw new Error(await res.text());
       const j = await res.json();
       setText(j.text); setGenTitle(j.title);
@@ -399,7 +398,7 @@ function CodeGen() {
   const gen = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/ai-code-exercise", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ topic, language, level }) });
+      const res = await aiFetch("/api/ai-code-exercise", { topic, language, level });
       if (!res.ok) throw new Error(await res.text());
       const j = await res.json();
       setEx(j.exercise);

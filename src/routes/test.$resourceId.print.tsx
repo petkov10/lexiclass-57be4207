@@ -10,21 +10,32 @@ export const Route = createFileRoute("/test/$resourceId/print")({
 
 function PrintTest() {
   const { resourceId } = Route.useParams();
-  const { data: resource, isLoading } = useQuery({
+  const { data: resource, isLoading, error } = useQuery({
     queryKey: ["resource-print", resourceId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("resources")
-        .select("id, title, description, type, content, theme:themes(name, class:classes(name), subject:subjects(name))")
+        .select("id, title, description, type, theme:themes(name, class:classes(name), subject:subjects(name))")
         .eq("id", resourceId)
         .maybeSingle();
       if (error) throw error;
-      return data;
+      if (!data) return null;
+      // Answer keys live in an editor-only table (RLS enforced).
+      const { data: tc, error: tcErr } = await supabase
+        .from("test_content")
+        .select("content")
+        .eq("resource_id", resourceId)
+        .maybeSingle();
+      if (tcErr) throw tcErr;
+      if (!tc) throw new Error("Нямате достъп до отговорите на този тест.");
+      return { ...data, content: tc.content as any };
     },
   });
 
   if (isLoading) return <div className="p-10">Зареждане...</div>;
+  if (error) return <div className="p-10">Нямате достъп до този тест.</div>;
   if (!resource || resource.type !== "test") return <div className="p-10">Тестът не е намерен.</div>;
+
   const c = resource.content as any;
   const questions: any[] = c?.questions ?? [];
   const t = (resource as any).theme;

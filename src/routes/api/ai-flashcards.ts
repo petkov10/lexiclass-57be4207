@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { requireEditor } from "@/lib/api-auth.server";
 
 type Body = { topic?: string; count?: number; context?: string };
 
@@ -6,6 +7,8 @@ export const Route = createFileRoute("/api/ai-flashcards")({
   server: {
     handlers: {
       POST: async ({ request }) => {
+        const auth = await requireEditor(request);
+        if (!auth.ok) return auth.response;
         const apiKey = process.env.LOVABLE_API_KEY;
         if (!apiKey) return new Response("Missing LOVABLE_API_KEY", { status: 500 });
 

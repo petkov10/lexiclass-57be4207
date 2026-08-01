@@ -5,7 +5,9 @@ import { Card } from "@/components/ui/card";
 import { Sparkles, Send, Bot, User, X } from "lucide-react";
 import { Markdown } from "@/components/Markdown";
 import { toast } from "sonner";
+import { aiFetch } from "@/lib/ai-client";
 import type { ResourceRow } from "@/lib/types";
+import { useAuth, useRole } from "@/hooks/useAuth";
 
 type Msg = { role: "user" | "assistant" | "system"; content: string };
 
@@ -18,7 +20,13 @@ export function ThemeAIChat({
   themeDescription?: string | null;
   resources: ResourceRow[];
 }) {
+  // AI usage costs credits, so the assistant is available to signed-in
+  // teachers (admin/editor) only.
+  const { user } = useAuth();
+  const { role } = useRole(user?.id);
+  const canUseAI = role === "admin" || role === "editor";
   const [open, setOpen] = useState(false);
+
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -51,11 +59,7 @@ export function ThemeAIChat({
     setLoading(true);
     try {
       const payload: Msg[] = [{ role: "system", content: systemPrompt() }, ...next];
-      const res = await fetch("/api/ai", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: payload }),
-      });
+      const res = await aiFetch("/api/ai", { messages: payload });
       if (!res.ok) throw new Error(await res.text());
       const data = await res.json();
       setMessages((m) => [...m, { role: "assistant", content: data.message || "(няма отговор)" }]);
@@ -65,6 +69,8 @@ export function ThemeAIChat({
       setLoading(false);
     }
   };
+
+  if (!canUseAI) return null;
 
   if (!open) {
     return (

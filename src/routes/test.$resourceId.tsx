@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { percentToGrade, gradeLabel, seededShuffle, DEFAULT_SCALE, type GradingScale } from "@/lib/grading";
+import { gradeLabel, seededShuffle } from "@/lib/grading";
 import { ClipboardList, CheckCircle2, XCircle, ArrowLeft, ArrowRight, Send, RefreshCw } from "lucide-react";
 
 export const Route = createFileRoute("/test/$resourceId")({
@@ -26,28 +26,34 @@ export const Route = createFileRoute("/test/$resourceId")({
   ),
 });
 
-type Q = { q: string; type: "mc" | "open"; options?: string[]; answer: string; explanation?: string };
+type Q = { q: string; type: "mc" | "open"; options?: string[] };
 
 const STORAGE_KEY = (id: string) => `izvor:test:${id}`;
 
 function TestRunner() {
   const { resourceId } = Route.useParams();
   const { data: classes } = useQuery(classesQuery);
-  const { data: settings } = useQuery(settingsQuery);
-  const scale: GradingScale = ((settings as any)?.grading_scale as GradingScale) ?? DEFAULT_SCALE;
+  useQuery(settingsQuery);
 
   const { data: resource, isLoading } = useQuery({
     queryKey: ["resource-test", resourceId],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("resources")
-        .select("id, title, description, type, content, theme_id, theme:themes(id, name, class_id, subject_id, class:classes(name), subject:subjects(name))")
-        .eq("id", resourceId)
-        .maybeSingle();
-      if (error) throw error;
-      return data;
+      const [meta, payload] = await Promise.all([
+        supabase
+          .from("resources")
+          .select("id, title, description, type, theme_id, theme:themes(id, name, class_id, subject_id, class:classes(name), subject:subjects(name))")
+          .eq("id", resourceId)
+          .maybeSingle(),
+        // Answer keys never leave the server: this returns questions only.
+        supabase.rpc("get_test_public", { _resource_id: resourceId }),
+      ]);
+      if (meta.error) throw meta.error;
+      if (payload.error) throw payload.error;
+      if (!meta.data) return null;
+      return { ...meta.data, test: (payload.data as any) || {} };
     },
   });
+
 
   const [phase, setPhase] = useState<"intro" | "running" | "done">("intro");
   const [studentName, setStudentName] = useState("");
@@ -67,8 +73,9 @@ function TestRunner() {
     } catch { /* */ }
   }, []);
 
-  const content = (resource?.content as any) || {};
+  const content = ((resource as any)?.test as any) || {};
   const questions: Q[] = Array.isArray(content?.questions) ? content.questions : [];
+
 
   // Shuffled order (stable per attempt)
   const shuffled = useMemo(() => {
@@ -121,34 +128,33 @@ function TestRunner() {
     if (!resource) return;
     setSubmitting(true);
     try {
-      const details = shuffled.map((q, i) => {
-        const given = answers[i] ?? "";
-        const correct = (given.trim().toLowerCase() === (q.answer || "").trim().toLowerCase());
-        return { q: q.q, type: q.type, given, expected: q.answer, correct, explanation: q.explanation };
+      // Rebuild answers in the ORIGINAL question order for server-side grading.
+      const given: string[] = new Array(questions.length).fill("");
+      shuffled.forEach((q, i) => {
+        const orig = (q as any)._origIndex ?? i;
+        given[orig] = answers[i] ?? "";
       });
-      const autoScored = details.filter((d) => d.type === "mc");
-      const max = autoScored.length || details.length;
-      const score = autoScored.filter((d) => d.correct).length;
-      // If only open questions, score is left for teacher; record 0/0 to avoid misleading grade
-      const percent = max > 0 ? Math.round((score / max) * 10000) / 100 : 0;
-      const grade = max > 0 ? percentToGrade(percent, scale) : 0;
       const cls = classes?.find((c) => c.id === classId);
 
-      const { error } = await supabase.from("test_attempts").insert({
-        resource_id: resource.id,
-        theme_id: resource.theme_id,
-        class_id: classId || null,
-        student_name: studentName.trim(),
-        student_number: studentNumber.trim() || null,
-        student_class: cls?.name || null,
-        answers: details as any,
-        score, max_score: max, percent, grade,
-        started_at: new Date(startedRef.current).toISOString(),
-        submitted_at: new Date().toISOString(),
-        duration_seconds: Math.max(1, Math.round((Date.now() - startedRef.current) / 1000)),
+      const { data, error } = await supabase.rpc("submit_test_attempt", {
+        _resource_id: resource.id,
+        _student_name: studentName.trim(),
+        _student_number: (studentNumber.trim() || null) as any,
+        _student_class: (cls?.name || null) as any,
+        _class_id: (classId || null) as any,
+
+        _given: given as any,
+        _duration_seconds: Math.max(1, Math.round((Date.now() - startedRef.current) / 1000)),
       });
       if (error) throw error;
-      setResult({ score, max, percent, grade, details });
+      const r = data as any;
+      setResult({
+        score: r?.score ?? 0,
+        max: r?.max_score ?? 0,
+        percent: Number(r?.percent ?? 0),
+        grade: Number(r?.grade ?? 0),
+        details: Array.isArray(r?.details) ? r.details : [],
+      });
       localStorage.removeItem(STORAGE_KEY(attemptId));
       setPhase("done");
     } catch (e: any) {
@@ -157,6 +163,7 @@ function TestRunner() {
       setSubmitting(false);
     }
   };
+
 
   if (isLoading) {
     return <PublicShell><div className="max-w-2xl mx-auto p-10"><div className="h-40 bg-muted animate-pulse rounded" /></div></PublicShell>;

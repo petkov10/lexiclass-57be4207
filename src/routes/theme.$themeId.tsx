@@ -260,8 +260,9 @@ function ResourceViewer({ r, fullscreen }: { r: ResourceRow; fullscreen: boolean
     );
   }
   if (r.type === "test") {
-    return <TestViewer content={r.content as any} />;
+    return <TestViewer resourceId={r.id} title={r.title} />;
   }
+
   if (r.type === "lesson_plan") {
     const c = (r.content ?? {}) as Record<string, string>;
     return <div className="prose prose-sm max-w-none dark:prose-invert"><Markdown>{c.text || r.description || ""}</Markdown></div>;
@@ -348,31 +349,22 @@ function FilePreview({ url, fileName, description, fullscreen }: { url: string; 
   );
 }
 
-function TestViewer({ content }: { content: any }) {
-  const [showAnswers, setShowAnswers] = useState(false);
-  if (!content?.questions) return <p>Тестът е празен.</p>;
+function TestViewer({ resourceId, title }: { resourceId: string; title: string }) {
+  // Questions and answer keys are never embedded here — the test runner fetches
+  // an answer-free payload from the server and grading happens server-side.
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h3 className="font-semibold flex items-center gap-2"><ClipboardList className="h-4 w-4" /> {content.title}</h3>
-        <Button size="sm" variant="outline" onClick={() => setShowAnswers((s) => !s)}>{showAnswers ? "Скрий отговорите" : "Покажи отговорите"}</Button>
-      </div>
-      <ol className="space-y-4 list-decimal pl-5">
-        {content.questions.map((q: any, i: number) => (
-          <li key={i} className="space-y-1">
-            <div className="font-medium">{q.q}</div>
-            {q.type === "mc" && (
-              <ul className="text-sm space-y-0.5">{(q.options ?? []).map((o: string, j: number) => (
-                <li key={j} className={showAnswers && o === q.answer ? "text-primary font-medium" : ""}>○ {o}</li>
-              ))}</ul>
-            )}
-            {showAnswers && <div className="text-xs text-muted-foreground"><strong>Отговор:</strong> {q.answer}{q.explanation ? ` — ${q.explanation}` : ""}</div>}
-          </li>
-        ))}
-      </ol>
+      <h3 className="font-semibold flex items-center gap-2"><ClipboardList className="h-4 w-4" /> {title}</h3>
+      <p className="text-sm text-muted-foreground">
+        Отвори теста, за да го решиш. Резултатът се изчислява автоматично след предаване.
+      </p>
+      <Button asChild size="sm">
+        <a href={`/test/${resourceId}`}>Започни теста</a>
+      </Button>
     </div>
   );
 }
+
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
