@@ -58,7 +58,9 @@ function SettingsPage() {
       const gs = (data as any).grading_scale;
       if (Array.isArray(gs) && gs.length > 0) setScale(gs);
       setAccessMode(((data as any).access_mode as any) || "free");
-      setGlobalPin((data as any).global_pin || "");
+      // The PIN is not readable from the settings row anymore (admin-only RPC).
+      supabase.rpc("admin_get_global_pin").then(({ data: pin }) => setGlobalPin((pin as string) || ""));
+
     }
   }, [data]);
 
