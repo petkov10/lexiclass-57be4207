@@ -26,28 +26,34 @@ export const Route = createFileRoute("/test/$resourceId")({
   ),
 });
 
-type Q = { q: string; type: "mc" | "open"; options?: string[]; answer: string; explanation?: string };
+type Q = { q: string; type: "mc" | "open"; options?: string[] };
 
 const STORAGE_KEY = (id: string) => `izvor:test:${id}`;
 
 function TestRunner() {
   const { resourceId } = Route.useParams();
   const { data: classes } = useQuery(classesQuery);
-  const { data: settings } = useQuery(settingsQuery);
-  const scale: GradingScale = ((settings as any)?.grading_scale as GradingScale) ?? DEFAULT_SCALE;
+  useQuery(settingsQuery);
 
   const { data: resource, isLoading } = useQuery({
     queryKey: ["resource-test", resourceId],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("resources")
-        .select("id, title, description, type, content, theme_id, theme:themes(id, name, class_id, subject_id, class:classes(name), subject:subjects(name))")
-        .eq("id", resourceId)
-        .maybeSingle();
-      if (error) throw error;
-      return data;
+      const [meta, payload] = await Promise.all([
+        supabase
+          .from("resources")
+          .select("id, title, description, type, theme_id, theme:themes(id, name, class_id, subject_id, class:classes(name), subject:subjects(name))")
+          .eq("id", resourceId)
+          .maybeSingle(),
+        // Answer keys never leave the server: this returns questions only.
+        supabase.rpc("get_test_public", { _resource_id: resourceId }),
+      ]);
+      if (meta.error) throw meta.error;
+      if (payload.error) throw payload.error;
+      if (!meta.data) return null;
+      return { ...meta.data, test: (payload.data as any) || {} };
     },
   });
+
 
   const [phase, setPhase] = useState<"intro" | "running" | "done">("intro");
   const [studentName, setStudentName] = useState("");
