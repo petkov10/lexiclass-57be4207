@@ -19,7 +19,13 @@ export function ThemeAIChat({
   themeDescription?: string | null;
   resources: ResourceRow[];
 }) {
+  // AI usage costs credits, so the assistant is available to signed-in
+  // teachers (admin/editor) only.
+  const { user } = useAuth();
+  const { role } = useRole(user?.id);
+  const canUseAI = role === "admin" || role === "editor";
   const [open, setOpen] = useState(false);
+
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
