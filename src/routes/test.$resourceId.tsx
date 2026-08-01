@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { percentToGrade, gradeLabel, seededShuffle, DEFAULT_SCALE, type GradingScale } from "@/lib/grading";
+import { gradeLabel, seededShuffle } from "@/lib/grading";
 import { ClipboardList, CheckCircle2, XCircle, ArrowLeft, ArrowRight, Send, RefreshCw } from "lucide-react";
 
 export const Route = createFileRoute("/test/$resourceId")({
