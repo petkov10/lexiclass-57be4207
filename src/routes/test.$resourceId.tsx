@@ -73,8 +73,9 @@ function TestRunner() {
     } catch { /* */ }
   }, []);
 
-  const content = (resource?.content as any) || {};
+  const content = ((resource as any)?.test as any) || {};
   const questions: Q[] = Array.isArray(content?.questions) ? content.questions : [];
+
 
   // Shuffled order (stable per attempt)
   const shuffled = useMemo(() => {
