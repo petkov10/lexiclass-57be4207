@@ -467,3 +467,93 @@ function Section({ title, children }: { title: string; children: React.ReactNode
     </div>
   );
 }
+
+function DocGen() {
+  const [kind, setKind] = useState<string>(DOC_TEMPLATES[0].id);
+  const [fields, setFields] = useState<Record<string, string>>({});
+  const [extra, setExtra] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [text, setText] = useState("");
+  const [themeId, setThemeId] = useState("");
+  const tpl = getTemplate(kind)!;
+
+  const set = (k: string, v: string) => setFields((f) => ({ ...f, [k]: v }));
+  const missing = tpl.fields.filter((f) => f.required && !(fields[f.key] || "").trim());
+
+  const gen = async () => {
+    setLoading(true);
+    try {
+      const res = await aiFetch("/api/ai-document", { kind, fields, extra });
+      if (!res.ok) throw new Error(await res.text());
+      const j = await res.json();
+      setText(j.text);
+    } catch (e: any) { toast.error(e.message); } finally { setLoading(false); }
+  };
+
+  const save = async () => {
+    if (!themeId || !text) return;
+    const { error } = await supabase.from("resources").insert({
+      theme_id: themeId, type: "document", title: `${tpl.label}${fields.subject ? ` — ${fields.subject}` : ""}`,
+      description: tpl.description, content: { text, doc_kind: kind } as any, order_index: 999,
+    });
+    if (error) return toast.error(error.message);
+    toast.success("Документът е запазен като ресурс");
+  };
+
+  return (
+    <Card className="p-4 space-y-4">
+      <div>
+        <Label>Вид документ</Label>
+        <Select value={kind} onValueChange={(v) => { setKind(v); setText(""); }}>
+          <SelectTrigger><SelectValue /></SelectTrigger>
+          <SelectContent>
+            {DOC_GROUPS.map((g) => (
+              <div key={g}>
+                <div className="px-2 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{g}</div>
+                {DOC_TEMPLATES.filter((t) => t.group === g).map((t) => (
+                  <SelectItem key={t.id} value={t.id}>{t.label}</SelectItem>
+                ))}
+              </div>
+            ))}
+          </SelectContent>
+        </Select>
+        <p className="text-xs text-muted-foreground mt-1">{tpl.description}</p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        {tpl.fields.map((f) => (
+          <div key={f.key} className={f.type === "textarea" ? "md:col-span-2" : ""}>
+            <Label>{f.label}{f.required && <span className="text-destructive"> *</span>}</Label>
+            {f.type === "textarea" ? (
+              <Textarea rows={3} value={fields[f.key] || ""} onChange={(e) => set(f.key, e.target.value)} placeholder={f.placeholder} />
+            ) : (
+              <Input type={f.type === "number" ? "number" : f.type === "date" ? "date" : "text"}
+                value={fields[f.key] || ""} onChange={(e) => set(f.key, e.target.value)} placeholder={f.placeholder} />
+            )}
+          </div>
+        ))}
+        <div className="md:col-span-2">
+          <Label>Допълнителни указания към AI (по желание)</Label>
+          <Textarea rows={2} value={extra} onChange={(e) => setExtra(e.target.value)} placeholder="напр. по-кратък вариант, добави раздел за..." />
+        </div>
+      </div>
+
+      {missing.length > 0 && (
+        <p className="text-xs text-amber-600">Попълнете: {missing.map((m) => m.label).join(", ")}</p>
+      )}
+      <Button onClick={gen} disabled={loading || missing.length > 0}>
+        <Sparkles /> {loading ? "Изготвяне..." : "Изготви документа"}
+      </Button>
+
+      {text && (
+        <>
+          <EditableMarkdown value={text} onChange={setText} label={`${tpl.label} (редактируем)`} title={tpl.label} />
+          <div className="flex gap-2 items-end flex-wrap">
+            <div className="flex-1 min-w-[200px]"><ThemePicker themeId={themeId} setThemeId={setThemeId} /></div>
+            <Button onClick={save} disabled={!themeId}><Save /> Запази към темата</Button>
+          </div>
+        </>
+      )}
+    </Card>
+  );
+}
