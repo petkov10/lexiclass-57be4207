@@ -153,12 +153,16 @@ function TestGen() {
     const { data, error } = await supabase.from("resources").insert({
       theme_id: themeId, type: "test", title: test.title || topic,
       description: `${test.questions?.length ?? 0} въпроса`,
-      content: test as any, order_index: 999,
+      content: null, order_index: 999,
     }).select("id").single();
     if (error) return toast.error(error.message);
+    // Answer keys go to the editor-only table, never the public resources row.
+    const { error: tcErr } = await supabase.from("test_content").insert({ resource_id: data.id, content: test as any });
+    if (tcErr) return toast.error(tcErr.message);
     setSavedId(data.id);
     toast.success("Тестът е запазен — можете да го споделите с QR код");
   };
+
 
   return (
     <Card className="p-4 space-y-4">
