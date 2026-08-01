@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Sparkles, Send, Bot, User, X } from "lucide-react";
 import { Markdown } from "@/components/Markdown";
 import { toast } from "sonner";
+import { aiFetch } from "@/lib/ai-client";
 import type { ResourceRow } from "@/lib/types";
 
 type Msg = { role: "user" | "assistant" | "system"; content: string };
@@ -51,11 +52,7 @@ export function ThemeAIChat({
     setLoading(true);
     try {
       const payload: Msg[] = [{ role: "system", content: systemPrompt() }, ...next];
-      const res = await fetch("/api/ai", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: payload }),
-      });
+      const res = await aiFetch("/api/ai", { messages: payload });
       if (!res.ok) throw new Error(await res.text());
       const data = await res.json();
       setMessages((m) => [...m, { role: "assistant", content: data.message || "(няма отговор)" }]);

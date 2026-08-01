@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Plus, Trash2, Edit, ExternalLink, Upload } from "lucide-react";
 import { toast } from "sonner";
+import { aiFetch } from "@/lib/ai-client";
 import type { ResourceRow, ResourceType, Flashcard } from "@/lib/types";
 import { sanitizeFileName } from "@/lib/storage";
 import { Sparkles, BookOpen, Layers as LayersIcon, X } from "lucide-react";
@@ -418,11 +419,7 @@ function ResourceForm({ themeId, existing, orderHint, onDone }: { themeId: strin
                 onClick={async () => {
                   setAiLoading(true);
                   try {
-                    const res = await fetch("/api/ai-flashcards", {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ topic: aiTopic, count: aiCount, context: description }),
-                    });
+                    const res = await aiFetch("/api/ai-flashcards", { topic: aiTopic, count: aiCount, context: description });
                     if (!res.ok) throw new Error(await res.text());
                     const j = (await res.json()) as { flashcards: Flashcard[] };
                     setCards((p) => [...p, ...j.flashcards]);
