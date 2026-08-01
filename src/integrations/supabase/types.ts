@@ -476,6 +476,32 @@ export type Database = {
           },
         ]
       }
+      test_content: {
+        Row: {
+          content: Json
+          resource_id: string
+          updated_at: string
+        }
+        Insert: {
+          content?: Json
+          resource_id: string
+          updated_at?: string
+        }
+        Update: {
+          content?: Json
+          resource_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "test_content_resource_id_fkey"
+            columns: ["resource_id"]
+            isOneToOne: true
+            referencedRelation: "resources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       theme_private_notes: {
         Row: {
           notes: string | null
@@ -621,6 +647,7 @@ export type Database = {
       }
       can_edit: { Args: { _user_id: string }; Returns: boolean }
       get_access_mode: { Args: never; Returns: string }
+      get_test_public: { Args: { _resource_id: string }; Returns: Json }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -637,6 +664,18 @@ export type Database = {
           _entity_type?: string
         }
         Returns: undefined
+      }
+      submit_test_attempt: {
+        Args: {
+          _class_id: string
+          _duration_seconds: number
+          _given: Json
+          _resource_id: string
+          _student_class: string
+          _student_name: string
+          _student_number: string
+        }
+        Returns: Json
       }
       verify_access_pin: {
         Args: { _pin: string }
