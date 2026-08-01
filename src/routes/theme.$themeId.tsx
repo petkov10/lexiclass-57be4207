@@ -260,8 +260,9 @@ function ResourceViewer({ r, fullscreen }: { r: ResourceRow; fullscreen: boolean
     );
   }
   if (r.type === "test") {
-    return <TestViewer content={r.content as any} />;
+    return <TestViewer resourceId={r.id} title={r.title} />;
   }
+
   if (r.type === "lesson_plan") {
     const c = (r.content ?? {}) as Record<string, string>;
     return <div className="prose prose-sm max-w-none dark:prose-invert"><Markdown>{c.text || r.description || ""}</Markdown></div>;
