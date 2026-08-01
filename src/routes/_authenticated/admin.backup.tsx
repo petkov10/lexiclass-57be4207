@@ -256,7 +256,7 @@ function BackupPage() {
       <Card className="p-6 space-y-3">
         <h2 className="font-semibold flex items-center gap-2"><HardDrive className="h-4 w-4 text-primary" /> 4. Заето пространство</h2>
         <p className="text-sm">
-          Използвани <b>{formatBytes(used)}</b>{stats?.fileCount ? ` в ${stats.fileCount} файла` : ""}.
+          Използвани <b>{formatBytes(used)}</b>{stats?.totalFiles ? ` в ${stats.totalFiles} файла` : ""}.
         </p>
         <div className="rounded-lg border p-3 text-sm text-muted-foreground space-y-1">
           <div className="flex items-center gap-2 font-medium text-foreground"><Cloud className="h-4 w-4" /> Как да пестите място</div>
