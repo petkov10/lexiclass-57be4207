@@ -26,7 +26,7 @@ export const Route = createFileRoute("/api/ai-test")({
           method: "POST",
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
           body: JSON.stringify({
-            model: "google/gemini-3-flash-preview",
+            model: "google/gemini-3.6-flash",
             messages: [{ role: "system", content: sys }, { role: "user", content: usr }],
             response_format: { type: "json_object" },
           }),

@@ -15,6 +15,9 @@ import { useQuery } from "@tanstack/react-query";
 import { allThemesQuery } from "@/lib/queries";
 import { supabase } from "@/integrations/supabase/client";
 import { QrCodeButton } from "@/components/QrCodeButton";
+import { EditableMarkdown } from "@/components/EditableMarkdown";
+import { DOC_TEMPLATES, DOC_GROUPS, getTemplate } from "@/lib/doc-templates";
+import { FileSignature } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/ai")({
   component: AIPage,
@@ -25,7 +28,7 @@ function AIPage() {
     <div className="space-y-4 max-w-5xl mx-auto">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight flex items-center gap-2"><Sparkles className="text-primary" /> AI Асистент</h1>
-        <p className="text-sm text-muted-foreground mt-1">Чат, генериране на тестове, планове за урок и код упражнения.</p>
+        <p className="text-sm text-muted-foreground mt-1">Чат, тестове, методически разработки, училищни документи и код упражнения.</p>
       </div>
       <Tabs defaultValue="chat">
         <TabsList className="flex-wrap h-auto">
@@ -33,12 +36,14 @@ function AIPage() {
           <TabsTrigger value="test"><ClipboardList className="h-4 w-4" /> Тестове</TabsTrigger>
           <TabsTrigger value="plan"><BookOpen className="h-4 w-4" /> План за урок</TabsTrigger>
           <TabsTrigger value="pedagogy"><GraduationCap className="h-4 w-4" /> Педагогически</TabsTrigger>
+          <TabsTrigger value="docs"><FileSignature className="h-4 w-4" /> Документи</TabsTrigger>
           <TabsTrigger value="code"><Code2 className="h-4 w-4" /> Код упражнение</TabsTrigger>
         </TabsList>
         <TabsContent value="chat" className="mt-4"><Chat /></TabsContent>
         <TabsContent value="test" className="mt-4"><TestGen /></TabsContent>
         <TabsContent value="plan" className="mt-4"><PlanGen /></TabsContent>
         <TabsContent value="pedagogy" className="mt-4"><PedagogyGen /></TabsContent>
+        <TabsContent value="docs" className="mt-4"><DocGen /></TabsContent>
         <TabsContent value="code" className="mt-4"><CodeGen /></TabsContent>
       </Tabs>
     </div>
@@ -304,7 +309,7 @@ function PlanGen() {
       <Button onClick={gen} disabled={loading || !topic.trim()}><Sparkles /> {loading ? "Генериране..." : "Генерирай методическа разработка"}</Button>
       {plan && (
         <>
-          <EditableMarkdown value={plan} onChange={setPlan} label="Разработка на урока (редактируема)" />
+          <EditableMarkdown value={plan} onChange={setPlan} label="Разработка на урока (редактируема)" title={`Методическа разработка - ${topic}`} />
           <div className="flex gap-2 items-end flex-wrap">
             <div className="flex-1 min-w-[200px]"><ThemePicker themeId={themeId} setThemeId={setThemeId} /></div>
             <Button variant="outline" onClick={() => { navigator.clipboard.writeText(plan); toast.success("Копирано"); }}><Copy /> Копирай</Button>
@@ -375,7 +380,7 @@ function PedagogyGen() {
       <Button onClick={gen} disabled={loading || !topic.trim()}><Sparkles /> {loading ? "Генериране..." : "Генерирай"}</Button>
       {text && (
         <>
-          <EditableMarkdown value={text} onChange={setText} label={`${genTitle || "Материал"} (редактируем)`} />
+          <EditableMarkdown value={text} onChange={setText} label={`${genTitle || "Материал"} (редактируем)`} title={genTitle || topic} />
           <div className="flex gap-2 items-end flex-wrap">
             <div className="flex-1 min-w-[200px]"><ThemePicker themeId={themeId} setThemeId={setThemeId} /></div>
             <Button variant="outline" onClick={() => { navigator.clipboard.writeText(text); toast.success("Копирано"); }}><Copy /> Копирай</Button>
@@ -463,27 +468,91 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
-function EditableMarkdown({ value, onChange, label }: { value: string; onChange: (v: string) => void; label?: string }) {
-  const [mode, setMode] = useState<"preview" | "edit">("preview");
+function DocGen() {
+  const [kind, setKind] = useState<string>(DOC_TEMPLATES[0].id);
+  const [fields, setFields] = useState<Record<string, string>>({});
+  const [extra, setExtra] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [text, setText] = useState("");
+  const [themeId, setThemeId] = useState("");
+  const tpl = getTemplate(kind)!;
+
+  const set = (k: string, v: string) => setFields((f) => ({ ...f, [k]: v }));
+  const missing = tpl.fields.filter((f) => f.required && !(fields[f.key] || "").trim());
+
+  const gen = async () => {
+    setLoading(true);
+    try {
+      const res = await aiFetch("/api/ai-document", { kind, fields, extra });
+      if (!res.ok) throw new Error(await res.text());
+      const j = await res.json();
+      setText(j.text);
+    } catch (e: any) { toast.error(e.message); } finally { setLoading(false); }
+  };
+
+  const save = async () => {
+    if (!themeId || !text) return;
+    const { error } = await supabase.from("resources").insert({
+      theme_id: themeId, type: "document", title: `${tpl.label}${fields.subject ? ` — ${fields.subject}` : ""}`,
+      description: tpl.description, content: { text, doc_kind: kind } as any, order_index: 999,
+    });
+    if (error) return toast.error(error.message);
+    toast.success("Документът е запазен като ресурс");
+  };
+
   return (
-    <Card className="overflow-hidden">
-      <div className="flex items-center justify-between border-b bg-muted/40 px-3 py-2">
-        <div className="text-xs font-medium text-muted-foreground truncate">{label ?? "Съдържание"}</div>
-        <div className="flex gap-1">
-          <Button size="sm" variant={mode === "preview" ? "default" : "ghost"} onClick={() => setMode("preview")}><Eye className="h-3.5 w-3.5" /> Преглед</Button>
-          <Button size="sm" variant={mode === "edit" ? "default" : "ghost"} onClick={() => setMode("edit")}><Pencil className="h-3.5 w-3.5" /> Редакция</Button>
+    <Card className="p-4 space-y-4">
+      <div>
+        <Label>Вид документ</Label>
+        <Select value={kind} onValueChange={(v) => { setKind(v); setText(""); }}>
+          <SelectTrigger><SelectValue /></SelectTrigger>
+          <SelectContent>
+            {DOC_GROUPS.map((g) => (
+              <div key={g}>
+                <div className="px-2 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{g}</div>
+                {DOC_TEMPLATES.filter((t) => t.group === g).map((t) => (
+                  <SelectItem key={t.id} value={t.id}>{t.label}</SelectItem>
+                ))}
+              </div>
+            ))}
+          </SelectContent>
+        </Select>
+        <p className="text-xs text-muted-foreground mt-1">{tpl.description}</p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        {tpl.fields.map((f) => (
+          <div key={f.key} className={f.type === "textarea" ? "md:col-span-2" : ""}>
+            <Label>{f.label}{f.required && <span className="text-destructive"> *</span>}</Label>
+            {f.type === "textarea" ? (
+              <Textarea rows={3} value={fields[f.key] || ""} onChange={(e) => set(f.key, e.target.value)} placeholder={f.placeholder} />
+            ) : (
+              <Input type={f.type === "number" ? "number" : f.type === "date" ? "date" : "text"}
+                value={fields[f.key] || ""} onChange={(e) => set(f.key, e.target.value)} placeholder={f.placeholder} />
+            )}
+          </div>
+        ))}
+        <div className="md:col-span-2">
+          <Label>Допълнителни указания към AI (по желание)</Label>
+          <Textarea rows={2} value={extra} onChange={(e) => setExtra(e.target.value)} placeholder="напр. по-кратък вариант, добави раздел за..." />
         </div>
       </div>
-      {mode === "preview" ? (
-        <div className="p-4 max-h-[60vh] overflow-auto">
-          <div className="prose prose-sm max-w-none dark:prose-invert"><Markdown>{value}</Markdown></div>
-        </div>
-      ) : (
-        <Textarea
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className="font-mono text-xs min-h-[60vh] rounded-none border-0 focus-visible:ring-0"
-        />
+
+      {missing.length > 0 && (
+        <p className="text-xs text-amber-600">Попълнете: {missing.map((m) => m.label).join(", ")}</p>
+      )}
+      <Button onClick={gen} disabled={loading || missing.length > 0}>
+        <Sparkles /> {loading ? "Изготвяне..." : "Изготви документа"}
+      </Button>
+
+      {text && (
+        <>
+          <EditableMarkdown value={text} onChange={setText} label={`${tpl.label} (редактируем)`} title={tpl.label} />
+          <div className="flex gap-2 items-end flex-wrap">
+            <div className="flex-1 min-w-[200px]"><ThemePicker themeId={themeId} setThemeId={setThemeId} /></div>
+            <Button onClick={save} disabled={!themeId}><Save /> Запази към темата</Button>
+          </div>
+        </>
       )}
     </Card>
   );

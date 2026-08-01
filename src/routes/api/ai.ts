@@ -32,7 +32,7 @@ export const Route = createFileRoute("/api/ai")({
             "Authorization": `Bearer ${apiKey}`,
           },
           body: JSON.stringify({
-            model: "google/gemini-3-flash-preview",
+            model: "google/gemini-3.6-flash",
             messages: [systemPrompt, ...body.messages],
           }),
         });
