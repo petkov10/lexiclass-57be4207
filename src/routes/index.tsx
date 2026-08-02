@@ -2,11 +2,12 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { classesQuery, settingsQuery, mySchedulesQuery } from "@/lib/queries";
 import { PublicShell } from "@/components/layout/PublicShell";
-import { GraduationCap, Clock, ArrowRight, History, Sparkles } from "lucide-react";
+import { GraduationCap, Clock, ArrowRight, History, Sparkles, Star, X } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect, useState } from "react";
 import { tintStyle } from "@/lib/colors";
 import { SearchBar } from "@/components/SearchBar";
+import { getFavorites, removeFavorite, type FavTheme } from "@/lib/favorites";
 
 const DAY_NAMES = ["Неделя", "Понеделник", "Вторник", "Сряда", "Четвъртък", "Петък", "Събота"];
 
@@ -22,13 +23,19 @@ function Index() {
   const { user } = useAuth();
   const { data: schedule } = useQuery(mySchedulesQuery(user?.id));
   const [last, setLast] = useState<LastVisit | null>(null);
+  const [favs, setFavs] = useState<FavTheme[]>([]);
 
   useEffect(() => {
     try {
       const raw = localStorage.getItem("lexiclass:last-theme") || localStorage.getItem("izvor:last-theme");
       if (raw) setLast(JSON.parse(raw));
     } catch { /* */ }
+    setFavs(getFavorites());
+    const onChange = () => setFavs(getFavorites());
+    window.addEventListener("lexiclass:favorites-changed", onChange);
+    return () => window.removeEventListener("lexiclass:favorites-changed", onChange);
   }, []);
+
 
   const today = new Date().getDay();
   const todayItems = (schedule ?? []).filter((s: any) => s.day_of_week === today);
@@ -113,6 +120,37 @@ function Index() {
             Все още няма добавени класове. Влезте като администратор, за да започнете.
           </div>
         )}
+
+        {/* Favorites / pinned themes */}
+        {favs.length > 0 && (
+          <div>
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-3 flex items-center gap-2">
+              <Star className="h-4 w-4 text-amber-500" /> Любими теми
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+              {favs.map((f) => (
+                <div key={f.themeId} className="relative">
+                  <Link
+                    to="/theme/$themeId"
+                    params={{ themeId: f.themeId }}
+                    className="hover-lift flex items-center gap-3 rounded-xl border bg-card p-3 pr-10"
+                  >
+                    <Star className="h-4 w-4 text-amber-500 shrink-0 fill-amber-400" />
+                    <span className="font-medium truncate">{f.themeName}</span>
+                  </Link>
+                  <button
+                    onClick={() => removeFavorite(f.themeId)}
+                    aria-label={`Премахни ${f.themeName} от любими`}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1.5 text-muted-foreground hover:bg-muted"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
 
         {/* Last visited — moved BELOW classes */}
         {last && (

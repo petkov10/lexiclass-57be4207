@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { classesQuery, subjectsQuery, allThemesQuery } from "@/lib/queries";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
-import { GraduationCap, BookOpen, ListTree, FileStack, ArrowRight, HardDrive } from "lucide-react";
+import { GraduationCap, BookOpen, ListTree, FileStack, ArrowRight, HardDrive, ShieldAlert } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getStorageStats } from "@/lib/storage-stats.functions";
 
@@ -31,9 +31,15 @@ function Dashboard() {
     staleTime: 5 * 60 * 1000,
   });
 
+  const [backupAge, setBackupAge] = useState<number | null>(null);
+
   useEffect(() => {
     supabase.from("resources").select("*", { count: "exact", head: true }).then(({ count }) => setResCount(count ?? 0));
+    const raw = localStorage.getItem("lexiclass:last-backup");
+    const ts = raw ? Number(raw) : 0;
+    setBackupAge(ts ? Math.floor((Date.now() - ts) / 86400000) : -1);
   }, []);
+
 
   const stats = [
     { label: "Класове", value: classes?.length ?? 0, icon: GraduationCap, to: "/admin/classes" as const },
@@ -48,6 +54,22 @@ function Dashboard() {
         <h1 className="text-2xl font-semibold tracking-tight">Табло</h1>
         <p className="text-sm text-muted-foreground mt-1">Обзор на учебното съдържание</p>
       </div>
+
+      {backupAge !== null && (backupAge < 0 || backupAge >= 7) && (
+        <Link to="/admin/backup" className="block">
+          <Card className="p-4 border-amber-500/40 bg-amber-500/10 flex items-center gap-3 hover-lift">
+            <ShieldAlert className="h-5 w-5 text-amber-600 shrink-0" />
+            <div className="flex-1 text-sm">
+              <div className="font-medium">
+                {backupAge < 0 ? "Още не е правен архив" : `Последният архив е отпреди ${backupAge} дни`}
+              </div>
+              <div className="text-muted-foreground">Направете „Пълен архив“ и го качете в Google Drive/OneDrive.</div>
+            </div>
+            <ArrowRight className="h-4 w-4 text-muted-foreground" />
+          </Card>
+        </Link>
+      )}
+
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((s) => (

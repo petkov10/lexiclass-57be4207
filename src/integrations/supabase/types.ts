@@ -260,6 +260,7 @@ export type Database = {
           description: string | null
           file_path: string | null
           id: string
+          is_hidden: boolean
           order_index: number
           theme_id: string
           title: string
@@ -273,6 +274,7 @@ export type Database = {
           description?: string | null
           file_path?: string | null
           id?: string
+          is_hidden?: boolean
           order_index?: number
           theme_id: string
           title: string
@@ -286,6 +288,7 @@ export type Database = {
           description?: string | null
           file_path?: string | null
           id?: string
+          is_hidden?: boolean
           order_index?: number
           theme_id?: string
           title?: string

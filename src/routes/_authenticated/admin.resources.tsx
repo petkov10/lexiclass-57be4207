@@ -11,7 +11,7 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Trash2, Edit, ExternalLink, Upload } from "lucide-react";
+import { Plus, Trash2, Edit, ExternalLink, Upload, ChevronUp, ChevronDown, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { aiFetch } from "@/lib/ai-client";
 import type { ResourceRow, ResourceType, Flashcard } from "@/lib/types";
@@ -191,12 +191,35 @@ function ResourcesAdmin() {
           )}
 
           <Card className="divide-y">
-            {(resources ?? []).map((r) => (
+            {(resources ?? []).map((r, idx) => (
               <ResourceListRow
                 key={r.id}
                 r={r as ResourceRow}
                 checked={selected.has(r.id)}
                 onCheck={() => toggle(r.id)}
+                isFirst={idx === 0}
+                isLast={idx === (resources?.length ?? 0) - 1}
+                onMove={async (dir) => {
+                  const list = [...(resources ?? [])];
+                  const target = idx + dir;
+                  if (target < 0 || target >= list.length) return;
+                  const tmp = list[idx];
+                  list[idx] = list[target];
+                  list[target] = tmp;
+                  await Promise.all(
+                    list.map((item, i) =>
+                      supabase.from("resources").update({ order_index: i }).eq("id", item.id)
+                    )
+                  );
+                  refresh();
+                }}
+                onToggleHidden={async () => {
+                  const next = !(r as any).is_hidden;
+                  const { error } = await supabase.from("resources").update({ is_hidden: next } as never).eq("id", r.id);
+                  if (error) toast.error(error.message);
+                  else toast.success(next ? "Скрит от учениците" : "Видим за учениците");
+                  refresh();
+                }}
                 onEdit={() => { setEditing(r as ResourceRow); setOpen(true); }}
                 onDelete={async () => {
                   if (!confirm("Изтрий ресурса?")) return;
@@ -234,25 +257,40 @@ function ResourcesAdmin() {
   );
 }
 
-function ResourceListRow({ r, onEdit, onDelete, checked, onCheck }: { r: ResourceRow; onEdit: () => void; onDelete: () => void; checked: boolean; onCheck: () => void }) {
+function ResourceListRow({ r, onEdit, onDelete, checked, onCheck, onMove, onToggleHidden, isFirst, isLast }: {
+  r: ResourceRow; onEdit: () => void; onDelete: () => void; checked: boolean; onCheck: () => void;
+  onMove: (dir: number) => void; onToggleHidden: () => void; isFirst: boolean; isLast: boolean;
+}) {
   const { url } = useResourceUrl({ url: r.url, file_path: r.file_path });
   const testUrl = r.type === "test" ? `${typeof window !== "undefined" ? window.location.origin : ""}/test/${r.id}` : null;
+  const hidden = !!(r as any).is_hidden;
   return (
-    <div className="p-3 flex items-center gap-3 flex-wrap">
+    <div className={`p-3 flex items-center gap-3 flex-wrap ${hidden ? "opacity-60" : ""}`}>
       <input type="checkbox" checked={checked} onChange={onCheck} aria-label={`Избери ${r.title}`} className="shrink-0" />
+      <div className="flex flex-col shrink-0">
+        <button onClick={() => onMove(-1)} disabled={isFirst} aria-label="Нагоре" className="disabled:opacity-30 hover:text-primary"><ChevronUp className="h-4 w-4" /></button>
+        <button onClick={() => onMove(1)} disabled={isLast} aria-label="Надолу" className="disabled:opacity-30 hover:text-primary"><ChevronDown className="h-4 w-4" /></button>
+      </div>
       <div className="text-xs uppercase tracking-wider rounded bg-muted px-2 py-1 w-28 text-center font-medium shrink-0">{TYPES.find((t) => t.value === r.type)?.label}</div>
       <div className="flex-1 min-w-[200px]">
-        <div className="font-medium truncate">{r.title}</div>
+        <div className="font-medium truncate flex items-center gap-2">
+          {r.title}
+          {hidden && <span className="text-[10px] uppercase rounded bg-muted px-1.5 py-0.5 text-muted-foreground">чернова</span>}
+        </div>
         {r.description && <div className="text-xs text-muted-foreground truncate">{r.description}</div>}
       </div>
       {testUrl && <QrCodeButton url={testUrl} label="QR" title={`QR за ${r.title}`} />}
       {r.type === "test" && <Button asChild variant="outline" size="sm"><a href={`/test/${r.id}/print`} target="_blank" rel="noreferrer">Печат</a></Button>}
       {url && <Button asChild variant="ghost" size="sm"><a href={url} target="_blank" rel="noreferrer"><ExternalLink /></a></Button>}
+      <Button variant="ghost" size="sm" onClick={onToggleHidden} title={hidden ? "Покажи на учениците" : "Скрий от учениците"}>
+        {hidden ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+      </Button>
       <Button variant="ghost" size="sm" onClick={onEdit}><Edit /></Button>
       <Button variant="ghost" size="sm" onClick={onDelete}><Trash2 className="text-destructive" /></Button>
     </div>
   );
 }
+
 
 function ResourceForm({ themeId, existing, orderHint, onDone }: { themeId: string; existing: ResourceRow | null; orderHint: number; onDone: () => void }) {
   const [type, setType] = useState<ResourceType>(existing?.type ?? "presentation");
