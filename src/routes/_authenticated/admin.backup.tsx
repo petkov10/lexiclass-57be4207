@@ -106,6 +106,7 @@ function BackupPage() {
       a.download = `lexiclass-${withFiles ? "full" : "data"}-${new Date().toISOString().slice(0, 10)}.zip`;
       a.click();
       URL.revokeObjectURL(url);
+      localStorage.setItem("lexiclass:last-backup", String(Date.now()));
       toast.success("Архивът е свален. Качете го в Google Drive/OneDrive за съхранение.");
     } catch (e: any) {
       toast.error(e.message);
