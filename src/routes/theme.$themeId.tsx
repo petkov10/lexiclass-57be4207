@@ -36,6 +36,13 @@ function ThemePage() {
   const { data: homework } = useQuery(homeworkForThemeQuery(themeId));
   const [openIdx, setOpenIdx] = useState<number | null>(null);
   const [fullscreen, setFullscreen] = useState(false);
+  const [fav, setFav] = useState(false);
+  const [projector, setProj] = useState(false);
+
+  useEffect(() => {
+    setFav(isFavorite(themeId));
+    setProj(getProjector());
+  }, [themeId]);
 
   // Save last visited theme
   useEffect(() => {
@@ -45,6 +52,7 @@ function ThemePage() {
       }));
     }
   }, [theme, themeId]);
+
 
   // Keyboard navigation in fullscreen viewer
   useEffect(() => {
