@@ -57,6 +57,7 @@ export type ResourceRow = {
   file_path: string | null;
   content: Record<string, unknown> | null;
   order_index: number;
+  is_hidden?: boolean;
   created_at: string;
 };
 
