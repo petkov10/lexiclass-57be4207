@@ -267,3 +267,23 @@ html.high-contrast.dark {
 html.high-contrast * { text-shadow: none !important; }
 html.high-contrast a { text-decoration: underline; }
 html.high-contrast button, html.high-contrast [role="button"] { outline: 2px solid var(--border); }
+
+/* Projector mode: oversized, high-legibility text for showing in class */
+html.projector {
+  font-size: 20px;
+}
+html.projector p,
+html.projector li,
+html.projector td,
+html.projector th {
+  line-height: 1.7;
+  letter-spacing: 0.01em;
+}
+html.projector h1 { font-size: 2.4rem; }
+html.projector h2 { font-size: 1.9rem; }
+html.projector h3 { font-size: 1.5rem; }
+html.projector .text-xs { font-size: 0.9rem; }
+html.projector .text-sm { font-size: 1rem; }
+@media print {
+  html.projector { font-size: 16px; }
+}
