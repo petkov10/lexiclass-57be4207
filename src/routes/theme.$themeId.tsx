@@ -11,7 +11,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Markdown } from "@/components/Markdown";
 import { QrCodeButton } from "@/components/QrCodeButton";
 import { ThemeAIChat } from "@/components/ThemeAIChat";
-import { Share2 } from "lucide-react";
+import { Share2, Star, MonitorPlay } from "lucide-react";
+import { isFavorite, toggleFavorite } from "@/lib/favorites";
+import { getProjector, setProjector } from "@/lib/a11y";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/theme/$themeId")({
