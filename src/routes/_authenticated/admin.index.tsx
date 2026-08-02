@@ -31,9 +31,15 @@ function Dashboard() {
     staleTime: 5 * 60 * 1000,
   });
 
+  const [backupAge, setBackupAge] = useState<number | null>(null);
+
   useEffect(() => {
     supabase.from("resources").select("*", { count: "exact", head: true }).then(({ count }) => setResCount(count ?? 0));
+    const raw = localStorage.getItem("lexiclass:last-backup");
+    const ts = raw ? Number(raw) : 0;
+    setBackupAge(ts ? Math.floor((Date.now() - ts) / 86400000) : -1);
   }, []);
+
 
   const stats = [
     { label: "Класове", value: classes?.length ?? 0, icon: GraduationCap, to: "/admin/classes" as const },
