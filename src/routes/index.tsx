@@ -2,11 +2,12 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { classesQuery, settingsQuery, mySchedulesQuery } from "@/lib/queries";
 import { PublicShell } from "@/components/layout/PublicShell";
-import { GraduationCap, Clock, ArrowRight, History, Sparkles } from "lucide-react";
+import { GraduationCap, Clock, ArrowRight, History, Sparkles, Star, X } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect, useState } from "react";
 import { tintStyle } from "@/lib/colors";
 import { SearchBar } from "@/components/SearchBar";
+import { getFavorites, removeFavorite, type FavTheme } from "@/lib/favorites";
 
 const DAY_NAMES = ["Неделя", "Понеделник", "Вторник", "Сряда", "Четвъртък", "Петък", "Събота"];
 
@@ -22,13 +23,19 @@ function Index() {
   const { user } = useAuth();
   const { data: schedule } = useQuery(mySchedulesQuery(user?.id));
   const [last, setLast] = useState<LastVisit | null>(null);
+  const [favs, setFavs] = useState<FavTheme[]>([]);
 
   useEffect(() => {
     try {
       const raw = localStorage.getItem("lexiclass:last-theme") || localStorage.getItem("izvor:last-theme");
       if (raw) setLast(JSON.parse(raw));
     } catch { /* */ }
+    setFavs(getFavorites());
+    const onChange = () => setFavs(getFavorites());
+    window.addEventListener("lexiclass:favorites-changed", onChange);
+    return () => window.removeEventListener("lexiclass:favorites-changed", onChange);
   }, []);
+
 
   const today = new Date().getDay();
   const todayItems = (schedule ?? []).filter((s: any) => s.day_of_week === today);
