@@ -94,7 +94,35 @@ function ThemePage() {
             {theme?.description && <p className="mt-2 text-muted-foreground">{theme.description}</p>}
           </div>
           {typeof window !== "undefined" && (
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+              <Button
+                variant={fav ? "default" : "outline"}
+                size="sm"
+                aria-pressed={fav}
+                title="Добави в любими"
+                onClick={() => {
+                  const now = toggleFavorite({
+                    themeId,
+                    themeName: theme?.name ?? "Тема",
+                    classId: theme?.class_id ?? null,
+                    subjectId: theme?.subject_id ?? null,
+                  });
+                  setFav(now);
+                  toast.success(now ? "Добавено в любими" : "Премахнато от любими");
+                }}
+              >
+                <Star className={`h-4 w-4 ${fav ? "fill-current" : ""}`} />
+              </Button>
+              <Button
+                variant={projector ? "default" : "outline"}
+                size="sm"
+                aria-pressed={projector}
+                title="Режим „Проектор“ — едър шрифт за класната стая"
+                onClick={() => { const n = !projector; setProjector(n); setProj(n); }}
+              >
+                <MonitorPlay className="h-4 w-4" /> Проектор
+              </Button>
+
               <Button
                 variant="outline"
                 size="sm"
