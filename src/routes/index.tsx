@@ -121,6 +121,37 @@ function Index() {
           </div>
         )}
 
+        {/* Favorites / pinned themes */}
+        {favs.length > 0 && (
+          <div>
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-3 flex items-center gap-2">
+              <Star className="h-4 w-4 text-amber-500" /> Любими теми
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+              {favs.map((f) => (
+                <div key={f.themeId} className="relative">
+                  <Link
+                    to="/theme/$themeId"
+                    params={{ themeId: f.themeId }}
+                    className="hover-lift flex items-center gap-3 rounded-xl border bg-card p-3 pr-10"
+                  >
+                    <Star className="h-4 w-4 text-amber-500 shrink-0 fill-amber-400" />
+                    <span className="font-medium truncate">{f.themeName}</span>
+                  </Link>
+                  <button
+                    onClick={() => removeFavorite(f.themeId)}
+                    aria-label={`Премахни ${f.themeName} от любими`}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1.5 text-muted-foreground hover:bg-muted"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+
         {/* Last visited — moved BELOW classes */}
         {last && (
           <Link
