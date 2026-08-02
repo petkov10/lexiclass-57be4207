@@ -55,6 +55,22 @@ function Dashboard() {
         <p className="text-sm text-muted-foreground mt-1">Обзор на учебното съдържание</p>
       </div>
 
+      {backupAge !== null && (backupAge < 0 || backupAge >= 7) && (
+        <Link to="/admin/backup" className="block">
+          <Card className="p-4 border-amber-500/40 bg-amber-500/10 flex items-center gap-3 hover-lift">
+            <ShieldAlert className="h-5 w-5 text-amber-600 shrink-0" />
+            <div className="flex-1 text-sm">
+              <div className="font-medium">
+                {backupAge < 0 ? "Още не е правен архив" : `Последният архив е отпреди ${backupAge} дни`}
+              </div>
+              <div className="text-muted-foreground">Направете „Пълен архив“ и го качете в Google Drive/OneDrive.</div>
+            </div>
+            <ArrowRight className="h-4 w-4 text-muted-foreground" />
+          </Card>
+        </Link>
+      )}
+
+
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((s) => (
           <Link key={s.label} to={s.to} className="hover-lift">
