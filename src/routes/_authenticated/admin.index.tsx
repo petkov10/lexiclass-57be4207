@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { classesQuery, subjectsQuery, allThemesQuery } from "@/lib/queries";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
-import { GraduationCap, BookOpen, ListTree, FileStack, ArrowRight, HardDrive } from "lucide-react";
+import { GraduationCap, BookOpen, ListTree, FileStack, ArrowRight, HardDrive, ShieldAlert } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getStorageStats } from "@/lib/storage-stats.functions";
 
