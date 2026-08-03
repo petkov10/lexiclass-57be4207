@@ -96,11 +96,16 @@ export function AdminShell({ children }: { children: ReactNode }) {
       <nav className="flex-1 p-2 space-y-0.5 overflow-y-auto">
         {visible.map((item) => {
           const Icon = item.icon;
-          const active = item.exact ? pathname === item.to : pathname.startsWith(item.to);
+          const active = item.tab
+            ? pathname === "/admin/ai" && (currentTab || "chat") === item.tab
+            : item.exact
+              ? pathname === item.to
+              : pathname.startsWith(item.to) && pathname !== "/admin/ai";
           return (
             <Link
-              key={item.to}
+              key={item.to + (item.tab ?? "")}
               to={item.to}
+              search={item.tab ? ({ tab: item.tab } as never) : undefined}
               className={cn(
                 "flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors",
                 active
@@ -114,6 +119,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
           );
         })}
       </nav>
+
       <div className="p-2 border-t space-y-1">
         <Button asChild variant="ghost" size="sm" className="w-full justify-start">
           <Link to="/"><ExternalLink className="h-4 w-4" /> Към сайта</Link>
