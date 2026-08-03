@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { requireEditor } from "@/lib/api-auth.server";
+import { AI_GUARDRAILS } from "@/lib/ai-guardrails";
 
 type Kind = "worksheet" | "discussion" | "case_study" | "project" | "quick_quiz";
 type Body = { topic?: string; kind?: Kind; grade?: string; duration?: number; context?: string };
@@ -176,7 +177,7 @@ export const Route = createFileRoute("/api/ai-pedagogy")({
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
           body: JSON.stringify({
             model: "google/gemini-3.6-flash",
-            messages: [{ role: "system", content: sys }, { role: "user", content: usr }],
+            messages: [{ role: "system", content: `${sys}\n\n${AI_GUARDRAILS}` }, { role: "user", content: usr }],
           }),
         });
         if (!res.ok) {
