@@ -60,6 +60,9 @@ const nav: NavItem[] = [
 export function AdminShell({ children }: { children: ReactNode }) {
   const { data: settings } = useQuery(settingsQuery);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const currentTab = useRouterState({
+    select: (s) => (s.location.search as { tab?: string })?.tab,
+  });
   const navigate = useNavigate();
   const { user } = useAuth();
   const { isAdmin, role } = useRole(user?.id);
