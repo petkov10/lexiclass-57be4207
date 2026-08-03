@@ -19,22 +19,30 @@ import { EditableMarkdown } from "@/components/EditableMarkdown";
 import { DOC_TEMPLATES, DOC_GROUPS, getTemplate } from "@/lib/doc-templates";
 import { FileSignature } from "lucide-react";
 
+const AI_TABS = ["chat", "test", "plan", "pedagogy", "docs", "code"] as const;
+type AiTab = (typeof AI_TABS)[number];
+
 export const Route = createFileRoute("/_authenticated/admin/ai")({
+  validateSearch: (search: Record<string, unknown>): { tab: AiTab } => ({
+    tab: AI_TABS.includes(search.tab as AiTab) ? (search.tab as AiTab) : "chat",
+  }),
   component: AIPage,
 });
 
 function AIPage() {
+  const { tab } = Route.useSearch();
+  const navigate = Route.useNavigate();
   return (
     <div className="space-y-4 max-w-5xl mx-auto">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight flex items-center gap-2"><Sparkles className="text-primary" /> AI Асистент</h1>
         <p className="text-sm text-muted-foreground mt-1">Чат, тестове, методически разработки, училищни документи и код упражнения.</p>
       </div>
-      <Tabs defaultValue="chat">
+      <Tabs value={tab} onValueChange={(v) => navigate({ search: { tab: v as AiTab } })}>
         <TabsList className="flex-wrap h-auto">
           <TabsTrigger value="chat"><Bot className="h-4 w-4" /> Чат</TabsTrigger>
           <TabsTrigger value="test"><ClipboardList className="h-4 w-4" /> Тестове</TabsTrigger>
-          <TabsTrigger value="plan"><BookOpen className="h-4 w-4" /> План за урок</TabsTrigger>
+          <TabsTrigger value="plan"><BookOpen className="h-4 w-4" /> Разработка на урок</TabsTrigger>
           <TabsTrigger value="pedagogy"><GraduationCap className="h-4 w-4" /> Педагогически</TabsTrigger>
           <TabsTrigger value="docs"><FileSignature className="h-4 w-4" /> Документи</TabsTrigger>
           <TabsTrigger value="code"><Code2 className="h-4 w-4" /> Код упражнение</TabsTrigger>
@@ -49,6 +57,7 @@ function AIPage() {
     </div>
   );
 }
+
 
 type Msg = { role: "user" | "assistant"; content: string };
 const QUICK_PROMPTS = [

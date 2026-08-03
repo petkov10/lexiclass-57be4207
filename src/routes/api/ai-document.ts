@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { requireEditor } from "@/lib/api-auth.server";
+import { AI_GUARDRAILS } from "@/lib/ai-guardrails";
 import { DOC_TEMPLATES } from "@/lib/doc-templates";
 
 type Body = { kind?: string; fields?: Record<string, string>; extra?: string };
@@ -60,7 +61,7 @@ ${body.extra?.trim() ? `\nДОПЪЛНИТЕЛНИ УКАЗАНИЯ ОТ УЧИ�
           body: JSON.stringify({
             model: "google/gemini-3.6-flash",
             messages: [
-              { role: "system", content: SYSTEM },
+              { role: "system", content: `${SYSTEM}\n\n${AI_GUARDRAILS}` },
               { role: "user", content: usr },
             ],
           }),

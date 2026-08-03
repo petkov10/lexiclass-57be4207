@@ -23,12 +23,21 @@ import {
   Menu,
   X,
   Activity,
+  FileSignature,
+  ClipboardList,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeModeToggle } from "@/components/ThemeModeToggle";
 import { A11yToolbar } from "@/components/A11yToolbar";
 
-type NavItem = { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean; adminOnly?: boolean };
+type NavItem = {
+  to: string;
+  label: string;
+  icon: typeof LayoutDashboard;
+  exact?: boolean;
+  adminOnly?: boolean;
+  tab?: string;
+};
 const nav: NavItem[] = [
   { to: "/admin", label: "Табло", icon: LayoutDashboard, exact: true },
   { to: "/admin/classes", label: "Класове", icon: GraduationCap },
@@ -38,7 +47,10 @@ const nav: NavItem[] = [
   { to: "/admin/import", label: "Импорт от папка", icon: FolderUp },
   { to: "/admin/grades", label: "Оценки", icon: ClipboardCheck },
   { to: "/admin/schedule", label: "Разписание", icon: CalendarDays },
-  { to: "/admin/ai", label: "AI Асистент", icon: Sparkles },
+  { to: "/admin/ai", label: "AI Асистент", icon: Sparkles, tab: "chat" },
+  { to: "/admin/ai", label: "Разработка на урок", icon: BookOpen, tab: "plan" },
+  { to: "/admin/ai", label: "Училищни документи", icon: FileSignature, tab: "docs" },
+  { to: "/admin/ai", label: "AI тестове", icon: ClipboardList, tab: "test" },
   { to: "/admin/users", label: "Потребители", icon: Users, adminOnly: true },
   { to: "/admin/settings", label: "Настройки", icon: SettingsIcon, adminOnly: true },
   { to: "/admin/activity", label: "Дневник", icon: Activity, adminOnly: true },
@@ -48,6 +60,9 @@ const nav: NavItem[] = [
 export function AdminShell({ children }: { children: ReactNode }) {
   const { data: settings } = useQuery(settingsQuery);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const currentTab = useRouterState({
+    select: (s) => (s.location.search as { tab?: string })?.tab,
+  });
   const navigate = useNavigate();
   const { user } = useAuth();
   const { isAdmin, role } = useRole(user?.id);
@@ -84,11 +99,16 @@ export function AdminShell({ children }: { children: ReactNode }) {
       <nav className="flex-1 p-2 space-y-0.5 overflow-y-auto">
         {visible.map((item) => {
           const Icon = item.icon;
-          const active = item.exact ? pathname === item.to : pathname.startsWith(item.to);
+          const active = item.tab
+            ? pathname === "/admin/ai" && (currentTab || "chat") === item.tab
+            : item.exact
+              ? pathname === item.to
+              : pathname.startsWith(item.to) && pathname !== "/admin/ai";
           return (
             <Link
-              key={item.to}
+              key={item.to + (item.tab ?? "")}
               to={item.to}
+              search={item.tab ? ({ tab: item.tab } as never) : undefined}
               className={cn(
                 "flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors",
                 active
@@ -102,6 +122,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
           );
         })}
       </nav>
+
       <div className="p-2 border-t space-y-1">
         <Button asChild variant="ghost" size="sm" className="w-full justify-start">
           <Link to="/"><ExternalLink className="h-4 w-4" /> Към сайта</Link>
