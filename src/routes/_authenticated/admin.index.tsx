@@ -121,15 +121,27 @@ function Dashboard() {
       </Card>
 
       <Card className="p-6">
-        <h2 className="font-semibold mb-2">Бързи действия</h2>
-        <ul className="text-sm space-y-1.5 text-muted-foreground">
-          <li>• Добавете или редактирайте класове и предмети.</li>
-          <li>• Създайте тематично разпределение (ръчно или от Excel).</li>
-          <li>• Качете ресурси — презентации, документи, видеа, задачи и код.</li>
-          <li>• Използвайте AI асистента, за да генерирате задачи и тестове.</li>
-          <li>• Направете бекъп преди големи промени.</li>
-        </ul>
+        <h2 className="font-semibold mb-3">AI бързи действия</h2>
+        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+          {[
+            { tab: "plan", label: "Разработка на урок", desc: "Пълна методическа разработка" },
+            { tab: "docs", label: "Училищни документи", desc: "17 готови шаблона" },
+            { tab: "test", label: "Тест с AI", desc: "Въпроси по тема" },
+            { tab: "pedagogy", label: "Педагогически материали", desc: "Работни листове и др." },
+          ].map((a) => (
+            <Link
+              key={a.tab}
+              to="/admin/ai"
+              search={{ tab: a.tab } as never}
+              className="rounded-lg border p-3 hover:bg-accent transition-colors hover-lift"
+            >
+              <div className="text-sm font-medium">{a.label}</div>
+              <div className="text-xs text-muted-foreground">{a.desc}</div>
+            </Link>
+          ))}
+        </div>
       </Card>
+
     </div>
   );
 }
