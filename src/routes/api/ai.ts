@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { requireEditor } from "@/lib/api-auth.server";
+import { AI_GUARDRAILS } from "@/lib/ai-guardrails";
 
 type Msg = { role: "system" | "user" | "assistant"; content: string };
 
@@ -22,7 +23,9 @@ export const Route = createFileRoute("/api/ai")({
 - създаване на тестове и въпроси;
 - обобщаване на учебни материали.
 Основните езици и технологии, които учителят преподава, са: C# (csharp), HTML, CSS и SQL. По подразбиране давай примерите и решенията на тези езици, освен ако потребителят изрично не поиска друго.
-Отговаряй на български език. Използвай Markdown за форматиране. Кодът обвивай в кодови блокове с правилен език (\\\`\\\`\\\`csharp, \\\`\\\`\\\`html, \\\`\\\`\\\`css, \\\`\\\`\\\`sql).`,
+Отговаряй на български език. Използвай Markdown за форматиране. Кодът обвивай в кодови блокове с правилен език (\\\`\\\`\\\`csharp, \\\`\\\`\\\`html, \\\`\\\`\\\`css, \\\`\\\`\\\`sql).
+
+${AI_GUARDRAILS}`,
         };
 
         const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
