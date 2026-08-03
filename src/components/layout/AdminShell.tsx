@@ -23,6 +23,8 @@ import {
   Menu,
   X,
   Activity,
+  FileSignature,
+  ClipboardList,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeModeToggle } from "@/components/ThemeModeToggle";
