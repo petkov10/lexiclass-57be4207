@@ -361,7 +361,45 @@ function ThemesAdmin() {
         </DialogContent>
       </Dialog>
 
+      <Dialog open={aiOpen} onOpenChange={setAiOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader><DialogTitle className="flex items-center gap-2"><Wand2 className="h-4 w-4" /> AI тематично разпределение</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <p className="text-sm text-muted-foreground">
+              Постави списък с теми (свободен текст, копиран от учебна програма) или прикачи PDF/снимка. AI ще подреди темите по номер и ще добави кратки описания.
+            </p>
+            <Textarea rows={8} value={aiText} onChange={(e) => setAiText(e.target.value)} placeholder={"1. Въведение в...\n2. ..."} />
+            <div className="flex flex-wrap items-center gap-2">
+              <input ref={aiFileRef} type="file" accept=".pdf,.png,.jpg,.jpeg,.webp,.txt,.md" className="hidden" onChange={(e) => setAiFile(e.target.files?.[0] ?? null)} />
+              <Button variant="outline" size="sm" onClick={() => aiFileRef.current?.click()}><Upload className="h-4 w-4" /> Прикачи файл</Button>
+              {aiFile && <span className="text-xs text-muted-foreground truncate max-w-[50%]">{aiFile.name}</span>}
+              <Button size="sm" onClick={aiGenerateCurriculum} disabled={aiLoading || (!aiText.trim() && !aiFile)}>
+                <Sparkles className="h-4 w-4" /> {aiLoading ? "Обработка..." : "Разпознай темите"}
+              </Button>
+            </div>
+            {aiThemes.length > 0 && (
+              <div className="max-h-[40vh] overflow-auto rounded border divide-y">
+                {aiThemes.map((t, i) => (
+                  <div key={i} className="p-2 text-sm flex gap-2">
+                    <span className="text-muted-foreground w-8 shrink-0">{t.week}.</span>
+                    <div className="min-w-0">
+                      <div className="font-medium truncate">{t.name}</div>
+                      {t.description && <div className="text-xs text-muted-foreground">{t.description}</div>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            <div className="flex justify-end gap-2">
+              <Button variant="ghost" onClick={() => setAiOpen(false)}>Отказ</Button>
+              <Button onClick={saveAiThemes} disabled={!aiThemes.length}><Save className="h-4 w-4" /> Добави {aiThemes.length || ""} теми</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={cloudOpen} onOpenChange={setCloudOpen}>
+
         <DialogContent>
           <DialogHeader><DialogTitle className="flex items-center gap-2"><Upload className="h-4 w-4" /> Импорт от Google Drive / OneDrive</DialogTitle></DialogHeader>
           <div className="space-y-3">
