@@ -522,6 +522,21 @@ function DocGen() {
     } catch (e: any) { toast.error(e.message); } finally { setLoading(false); }
   };
 
+  const [review, setReview] = useState("");
+  const [reviewing, setReviewing] = useState(false);
+
+  const doReview = async () => {
+    if (!text.trim()) return;
+    setReviewing(true);
+    setReview("");
+    try {
+      const res = await aiFetch("/api/ai-review", { text, kind: tpl.label });
+      if (!res.ok) throw new Error(await res.text());
+      const j = await res.json();
+      setReview(j.review || "");
+    } catch (e: any) { toast.error(e.message); } finally { setReviewing(false); }
+  };
+
   const save = async () => {
     if (!themeId || !text) return;
     const { error } = await supabase.from("resources").insert({
@@ -580,6 +595,17 @@ function DocGen() {
       {text && (
         <>
           <EditableMarkdown value={text} onChange={setText} label={`${tpl.label} (редактируем)`} title={tpl.label} />
+          <div>
+            <Button variant="outline" size="sm" onClick={doReview} disabled={reviewing}>
+              <ShieldCheck className="h-4 w-4" /> {reviewing ? "Проверка..." : "AI проверка на документа"}
+            </Button>
+          </div>
+          {review && (
+            <Card className="p-4 bg-muted/40">
+              <div className="text-xs font-medium text-muted-foreground mb-2">Рецензия от AI</div>
+              <div className="prose prose-sm max-w-none dark:prose-invert"><Markdown>{review}</Markdown></div>
+            </Card>
+          )}
           <div className="flex gap-2 items-end flex-wrap">
             <div className="flex-1 min-w-[200px]"><ThemePicker themeId={themeId} setThemeId={setThemeId} /></div>
             <Button onClick={save} disabled={!themeId}><Save /> Запази към темата</Button>
