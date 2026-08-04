@@ -15,6 +15,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ThemeThemeIdRouteImport } from './routes/theme.$themeId'
 import { Route as TestResourceIdRouteImport } from './routes/test.$resourceId'
 import { Route as ClassClassIdRouteImport } from './routes/class.$classId'
+import { Route as ApiAiThemeMetaRouteImport } from './routes/api/ai-theme-meta'
 import { Route as ApiAiTestRouteImport } from './routes/api/ai-test'
 import { Route as ApiAiPedagogyRouteImport } from './routes/api/ai-pedagogy'
 import { Route as ApiAiLessonPlanRouteImport } from './routes/api/ai-lesson-plan'
@@ -67,6 +68,11 @@ const TestResourceIdRoute = TestResourceIdRouteImport.update({
 const ClassClassIdRoute = ClassClassIdRouteImport.update({
   id: '/class/$classId',
   path: '/class/$classId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAiThemeMetaRoute = ApiAiThemeMetaRouteImport.update({
+  id: '/api/ai-theme-meta',
+  path: '/api/ai-theme-meta',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAiTestRoute = ApiAiTestRouteImport.update({
@@ -212,6 +218,7 @@ export interface FileRoutesByFullPath {
   '/api/ai-lesson-plan': typeof ApiAiLessonPlanRoute
   '/api/ai-pedagogy': typeof ApiAiPedagogyRoute
   '/api/ai-test': typeof ApiAiTestRoute
+  '/api/ai-theme-meta': typeof ApiAiThemeMetaRoute
   '/class/$classId': typeof ClassClassIdRouteWithChildren
   '/test/$resourceId': typeof TestResourceIdRouteWithChildren
   '/theme/$themeId': typeof ThemeThemeIdRoute
@@ -242,6 +249,7 @@ export interface FileRoutesByTo {
   '/api/ai-lesson-plan': typeof ApiAiLessonPlanRoute
   '/api/ai-pedagogy': typeof ApiAiPedagogyRoute
   '/api/ai-test': typeof ApiAiTestRoute
+  '/api/ai-theme-meta': typeof ApiAiThemeMetaRoute
   '/test/$resourceId': typeof TestResourceIdRouteWithChildren
   '/theme/$themeId': typeof ThemeThemeIdRoute
   '/admin/activity': typeof AuthenticatedAdminActivityRoute
@@ -274,6 +282,7 @@ export interface FileRoutesById {
   '/api/ai-lesson-plan': typeof ApiAiLessonPlanRoute
   '/api/ai-pedagogy': typeof ApiAiPedagogyRoute
   '/api/ai-test': typeof ApiAiTestRoute
+  '/api/ai-theme-meta': typeof ApiAiThemeMetaRoute
   '/class/$classId': typeof ClassClassIdRouteWithChildren
   '/test/$resourceId': typeof TestResourceIdRouteWithChildren
   '/theme/$themeId': typeof ThemeThemeIdRoute
@@ -307,6 +316,7 @@ export interface FileRouteTypes {
     | '/api/ai-lesson-plan'
     | '/api/ai-pedagogy'
     | '/api/ai-test'
+    | '/api/ai-theme-meta'
     | '/class/$classId'
     | '/test/$resourceId'
     | '/theme/$themeId'
@@ -337,6 +347,7 @@ export interface FileRouteTypes {
     | '/api/ai-lesson-plan'
     | '/api/ai-pedagogy'
     | '/api/ai-test'
+    | '/api/ai-theme-meta'
     | '/test/$resourceId'
     | '/theme/$themeId'
     | '/admin/activity'
@@ -368,6 +379,7 @@ export interface FileRouteTypes {
     | '/api/ai-lesson-plan'
     | '/api/ai-pedagogy'
     | '/api/ai-test'
+    | '/api/ai-theme-meta'
     | '/class/$classId'
     | '/test/$resourceId'
     | '/theme/$themeId'
@@ -400,6 +412,7 @@ export interface RootRouteChildren {
   ApiAiLessonPlanRoute: typeof ApiAiLessonPlanRoute
   ApiAiPedagogyRoute: typeof ApiAiPedagogyRoute
   ApiAiTestRoute: typeof ApiAiTestRoute
+  ApiAiThemeMetaRoute: typeof ApiAiThemeMetaRoute
   ClassClassIdRoute: typeof ClassClassIdRouteWithChildren
   TestResourceIdRoute: typeof TestResourceIdRouteWithChildren
   ThemeThemeIdRoute: typeof ThemeThemeIdRoute
@@ -447,6 +460,13 @@ declare module '@tanstack/react-router' {
       path: '/class/$classId'
       fullPath: '/class/$classId'
       preLoaderRoute: typeof ClassClassIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/ai-theme-meta': {
+      id: '/api/ai-theme-meta'
+      path: '/api/ai-theme-meta'
+      fullPath: '/api/ai-theme-meta'
+      preLoaderRoute: typeof ApiAiThemeMetaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/ai-test': {
@@ -703,6 +723,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAiLessonPlanRoute: ApiAiLessonPlanRoute,
   ApiAiPedagogyRoute: ApiAiPedagogyRoute,
   ApiAiTestRoute: ApiAiTestRoute,
+  ApiAiThemeMetaRoute: ApiAiThemeMetaRoute,
   ClassClassIdRoute: ClassClassIdRouteWithChildren,
   TestResourceIdRoute: TestResourceIdRouteWithChildren,
   ThemeThemeIdRoute: ThemeThemeIdRoute,
