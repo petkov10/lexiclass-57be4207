@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Sparkles, Send, User, Bot, ClipboardList, BookOpen, Code2, Copy, Save, GraduationCap, Eye, Pencil } from "lucide-react";
 import { toast } from "sonner";
-import { aiFetch } from "@/lib/ai-client";
+import { aiFetch, fileToAiPayload } from "@/lib/ai-client";
 import { Markdown } from "@/components/Markdown";
 import { useQuery } from "@tanstack/react-query";
 import { allThemesQuery } from "@/lib/queries";
@@ -17,7 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { QrCodeButton } from "@/components/QrCodeButton";
 import { EditableMarkdown } from "@/components/EditableMarkdown";
 import { DOC_TEMPLATES, DOC_GROUPS, getTemplate } from "@/lib/doc-templates";
-import { FileSignature } from "lucide-react";
+import { FileSignature, Upload, ShieldCheck } from "lucide-react";
 
 const AI_TABS = ["chat", "test", "plan", "pedagogy", "docs", "code"] as const;
 type AiTab = (typeof AI_TABS)[number];
@@ -193,7 +193,26 @@ function TestGen() {
           <SelectItem value="open">Отворени</SelectItem>
           <SelectItem value="mixed">Смесен</SelectItem>
         </SelectContent></Select></div>
-        <Button onClick={gen} disabled={loading || !topic.trim()}><Sparkles /> {loading ? "..." : "Генерирай"}</Button>
+        <Button onClick={gen} disabled={loading || (!topic.trim() && !srcFile)}><Sparkles /> {loading ? "..." : "Генерирай"}</Button>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2 text-sm">
+        <input
+          ref={srcRef}
+          type="file"
+          accept=".pdf,.png,.jpg,.jpeg,.webp,.txt,.md"
+          className="hidden"
+          onChange={(e) => setSrcFile(e.target.files?.[0] ?? null)}
+        />
+        <Button type="button" variant="outline" size="sm" onClick={() => srcRef.current?.click()}>
+          <Upload className="h-4 w-4" /> Тест от файл (PDF/снимка)
+        </Button>
+        {srcFile && (
+          <span className="text-muted-foreground truncate max-w-[50%]">
+            {srcFile.name}
+            <Button variant="ghost" size="sm" onClick={() => { setSrcFile(null); if (srcRef.current) srcRef.current.value = ""; }}>Премахни</Button>
+          </span>
+        )}
       </div>
 
       {test && (
