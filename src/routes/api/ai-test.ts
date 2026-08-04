@@ -2,7 +2,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import { requireEditor } from "@/lib/api-auth.server";
 import { AI_GUARDRAILS } from "@/lib/ai-guardrails";
 
-type Body = { topic?: string; count?: number; kind?: "multiple_choice" | "open" | "mixed"; context?: string };
+type Body = {
+  topic?: string;
+  count?: number;
+  kind?: "multiple_choice" | "open" | "mixed";
+  context?: string;
+  file?: { name?: string; mime?: string; data?: string };
+};
 
 export const Route = createFileRoute("/api/ai-test")({
   server: {
