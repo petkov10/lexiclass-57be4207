@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Sparkles, Send, User, Bot, ClipboardList, BookOpen, Code2, Copy, Save, GraduationCap, Eye, Pencil } from "lucide-react";
 import { toast } from "sonner";
-import { aiFetch } from "@/lib/ai-client";
+import { aiFetch, fileToAiPayload } from "@/lib/ai-client";
 import { Markdown } from "@/components/Markdown";
 import { useQuery } from "@tanstack/react-query";
 import { allThemesQuery } from "@/lib/queries";
@@ -17,7 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { QrCodeButton } from "@/components/QrCodeButton";
 import { EditableMarkdown } from "@/components/EditableMarkdown";
 import { DOC_TEMPLATES, DOC_GROUPS, getTemplate } from "@/lib/doc-templates";
-import { FileSignature } from "lucide-react";
+import { FileSignature, Upload, ShieldCheck } from "lucide-react";
 
 const AI_TABS = ["chat", "test", "plan", "pedagogy", "docs", "code"] as const;
 type AiTab = (typeof AI_TABS)[number];
@@ -151,17 +151,21 @@ function TestGen() {
   const [test, setTest] = useState<any>(null);
   const [themeId, setThemeId] = useState("");
   const [savedId, setSavedId] = useState<string>("");
+  const [srcFile, setSrcFile] = useState<File | null>(null);
+  const srcRef = useRef<HTMLInputElement>(null);
 
   const gen = async () => {
     setLoading(true);
     setSavedId("");
     try {
-      const res = await aiFetch("/api/ai-test", { topic, count, kind });
+      const file = srcFile ? await fileToAiPayload(srcFile) : undefined;
+      const res = await aiFetch("/api/ai-test", { topic, count, kind, file });
       if (!res.ok) throw new Error(await res.text());
       const j = await res.json();
       setTest(j.test);
     } catch (e: any) { toast.error(e.message); } finally { setLoading(false); }
   };
+
 
   const save = async () => {
     if (!themeId || !test) return;
@@ -189,7 +193,26 @@ function TestGen() {
           <SelectItem value="open">Отворени</SelectItem>
           <SelectItem value="mixed">Смесен</SelectItem>
         </SelectContent></Select></div>
-        <Button onClick={gen} disabled={loading || !topic.trim()}><Sparkles /> {loading ? "..." : "Генерирай"}</Button>
+        <Button onClick={gen} disabled={loading || (!topic.trim() && !srcFile)}><Sparkles /> {loading ? "..." : "Генерирай"}</Button>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2 text-sm">
+        <input
+          ref={srcRef}
+          type="file"
+          accept=".pdf,.png,.jpg,.jpeg,.webp,.txt,.md"
+          className="hidden"
+          onChange={(e) => setSrcFile(e.target.files?.[0] ?? null)}
+        />
+        <Button type="button" variant="outline" size="sm" onClick={() => srcRef.current?.click()}>
+          <Upload className="h-4 w-4" /> Тест от файл (PDF/снимка)
+        </Button>
+        {srcFile && (
+          <span className="text-muted-foreground truncate max-w-[50%]">
+            {srcFile.name}
+            <Button variant="ghost" size="sm" onClick={() => { setSrcFile(null); if (srcRef.current) srcRef.current.value = ""; }}>Премахни</Button>
+          </span>
+        )}
       </div>
 
       {test && (
@@ -499,6 +522,21 @@ function DocGen() {
     } catch (e: any) { toast.error(e.message); } finally { setLoading(false); }
   };
 
+  const [review, setReview] = useState("");
+  const [reviewing, setReviewing] = useState(false);
+
+  const doReview = async () => {
+    if (!text.trim()) return;
+    setReviewing(true);
+    setReview("");
+    try {
+      const res = await aiFetch("/api/ai-review", { text, kind: tpl.label });
+      if (!res.ok) throw new Error(await res.text());
+      const j = await res.json();
+      setReview(j.review || "");
+    } catch (e: any) { toast.error(e.message); } finally { setReviewing(false); }
+  };
+
   const save = async () => {
     if (!themeId || !text) return;
     const { error } = await supabase.from("resources").insert({
@@ -557,6 +595,17 @@ function DocGen() {
       {text && (
         <>
           <EditableMarkdown value={text} onChange={setText} label={`${tpl.label} (редактируем)`} title={tpl.label} />
+          <div>
+            <Button variant="outline" size="sm" onClick={doReview} disabled={reviewing}>
+              <ShieldCheck className="h-4 w-4" /> {reviewing ? "Проверка..." : "AI проверка на документа"}
+            </Button>
+          </div>
+          {review && (
+            <Card className="p-4 bg-muted/40">
+              <div className="text-xs font-medium text-muted-foreground mb-2">Рецензия от AI</div>
+              <div className="prose prose-sm max-w-none dark:prose-invert"><Markdown>{review}</Markdown></div>
+            </Card>
+          )}
           <div className="flex gap-2 items-end flex-wrap">
             <div className="flex-1 min-w-[200px]"><ThemePicker themeId={themeId} setThemeId={setThemeId} /></div>
             <Button onClick={save} disabled={!themeId}><Save /> Запази към темата</Button>
