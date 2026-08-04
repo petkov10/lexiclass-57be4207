@@ -151,17 +151,21 @@ function TestGen() {
   const [test, setTest] = useState<any>(null);
   const [themeId, setThemeId] = useState("");
   const [savedId, setSavedId] = useState<string>("");
+  const [srcFile, setSrcFile] = useState<File | null>(null);
+  const srcRef = useRef<HTMLInputElement>(null);
 
   const gen = async () => {
     setLoading(true);
     setSavedId("");
     try {
-      const res = await aiFetch("/api/ai-test", { topic, count, kind });
+      const file = srcFile ? await fileToAiPayload(srcFile) : undefined;
+      const res = await aiFetch("/api/ai-test", { topic, count, kind, file });
       if (!res.ok) throw new Error(await res.text());
       const j = await res.json();
       setTest(j.test);
     } catch (e: any) { toast.error(e.message); } finally { setLoading(false); }
   };
+
 
   const save = async () => {
     if (!themeId || !test) return;
