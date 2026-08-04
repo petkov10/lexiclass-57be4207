@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { requireEditor } from "@/lib/api-auth.server";
 import { AI_GUARDRAILS } from "@/lib/ai-guardrails";
+import { userContent } from "@/lib/ai-file";
 
 type Body = {
   topic?: string;

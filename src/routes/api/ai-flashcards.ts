@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { requireEditor } from "@/lib/api-auth.server";
 import { AI_GUARDRAILS } from "@/lib/ai-guardrails";
+import { userContent } from "@/lib/ai-file";
 
-type Body = { topic?: string; count?: number; context?: string };
+type Body = { topic?: string; count?: number; context?: string; file?: { name?: string; mime?: string; data?: string } };
 
 export const Route = createFileRoute("/api/ai-flashcards")({
   server: {
@@ -15,7 +16,7 @@ export const Route = createFileRoute("/api/ai-flashcards")({
 
         const body = (await request.json()) as Body;
         const topic = (body.topic || "").trim();
-        if (!topic) return new Response("Липсва тема", { status: 400 });
+        if (!topic && !body.file?.data) return new Response("Липсва тема или файл", { status: 400 });
         const count = Math.min(Math.max(body.count ?? 10, 3), 25);
 
         const sys = `Ти си учител, който създава флаш карти за ученици. Отговаряй САМО с валиден JSON по схемата { "flashcards": [ { "front": string, "back": string } ] }. Без обяснения, без markdown, без \`\`\`. Картите трябва да са на български език, кратки и ясни. Лицевата страна е въпрос или понятие, обратната — отговор или дефиниция.`;
@@ -26,7 +27,7 @@ export const Route = createFileRoute("/api/ai-flashcards")({
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
           body: JSON.stringify({
             model: "google/gemini-3.6-flash",
-            messages: [{ role: "system", content: `${sys}\n\n${AI_GUARDRAILS}` }, { role: "user", content: usr }],
+            messages: [{ role: "system", content: `${sys}\n\n${AI_GUARDRAILS}` }, { role: "user", content: userContent(usr, body.file) }],
             response_format: { type: "json_object" },
           }),
         });
