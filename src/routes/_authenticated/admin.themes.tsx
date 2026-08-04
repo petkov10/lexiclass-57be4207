@@ -17,6 +17,8 @@ import { DndContext, closestCenter, type DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, useSortable, verticalListSortingStrategy, arrayMove } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useAuth } from "@/hooks/useAuth";
+import { aiFetch, fileToAiPayload } from "@/lib/ai-client";
+import { Sparkles, Wand2 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/themes")({
   component: ThemesAdmin,
@@ -114,6 +116,58 @@ function ThemesAdmin() {
     }
     setNotesFor(null); refresh();
     toast.success("Бележките са запазени");
+  };
+
+  const [metaLoading, setMetaLoading] = useState(false);
+  const className = classes?.find((c) => c.id === classId)?.name ?? "";
+  const subjectName = subjects?.find((s) => s.id === subjectId)?.name ?? "";
+
+  const aiMeta = async () => {
+    if (!name.trim()) return toast.error("Първо въведете име на темата");
+    setMetaLoading(true);
+    try {
+      const res = await aiFetch("/api/ai-theme-meta", { name, subject: subjectName, className, current: description });
+      if (!res.ok) throw new Error(await res.text());
+      const j = await res.json();
+      if (j.description) setDescription(j.description);
+      if (Array.isArray(j.tags) && j.tags.length) setTagsInput(j.tags.join(", "));
+      toast.success("Описанието е попълнено от AI");
+    } catch (e: any) { toast.error(e.message); } finally { setMetaLoading(false); }
+  };
+
+  const [aiOpen, setAiOpen] = useState(false);
+  const [aiText, setAiText] = useState("");
+  const [aiFile, setAiFile] = useState<File | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiThemes, setAiThemes] = useState<Array<{ week: number; name: string; description: string }>>([]);
+  const aiFileRef = useRef<HTMLInputElement>(null);
+
+  const aiGenerateCurriculum = async () => {
+    setAiLoading(true);
+    setAiThemes([]);
+    try {
+      const file = aiFile ? await fileToAiPayload(aiFile) : undefined;
+      const res = await aiFetch("/api/ai-curriculum", { text: aiText, subject: subjectName, className, file });
+      if (!res.ok) throw new Error(await res.text());
+      const j = await res.json();
+      if (!j.themes?.length) throw new Error("AI не разпозна теми в източника");
+      setAiThemes(j.themes);
+    } catch (e: any) { toast.error(e.message); } finally { setAiLoading(false); }
+  };
+
+  const saveAiThemes = async () => {
+    if (!classId || !subjectId || !aiThemes.length) return;
+    const base = themes?.length ?? 0;
+    const { error } = await supabase.from("themes").insert(
+      aiThemes.map((t, i) => ({
+        class_id: classId, subject_id: subjectId, name: t.name,
+        description: t.description || null, week_number: t.week || i + 1, order_index: base + i + 1,
+      }))
+    );
+    if (error) return toast.error(error.message);
+    toast.success(`Добавени ${aiThemes.length} теми`);
+    setAiOpen(false); setAiText(""); setAiFile(null); setAiThemes([]);
+    refresh();
   };
 
   const [cloudUrl, setCloudUrl] = useState("");
@@ -233,6 +287,7 @@ function ThemesAdmin() {
                 <input ref={fileRef} type="file" accept=".xlsx,.xls,.csv" onChange={onImport} className="hidden" />
                 <Button variant="outline" size="sm" onClick={() => fileRef.current?.click()}><Upload /> Импорт от Excel</Button>
                 <Button variant="outline" size="sm" onClick={() => setCloudOpen(true)}><Upload /> От Google Drive / OneDrive</Button>
+                <Button variant="outline" size="sm" onClick={() => setAiOpen(true)}><Wand2 /> AI разпределение</Button>
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-[80px_1fr] gap-2">
@@ -247,7 +302,12 @@ function ThemesAdmin() {
               </div>
               <Input placeholder="Тагове (разделени със запетая)" value={tagsInput} onChange={(e) => setTagsInput(e.target.value)} />
             </div>
-            <Button onClick={add}><Plus /> Добави тема</Button>
+            <div className="flex flex-wrap gap-2">
+              <Button onClick={add}><Plus /> Добави тема</Button>
+              <Button variant="outline" onClick={aiMeta} disabled={metaLoading || !name.trim()}>
+                <Sparkles /> {metaLoading ? "AI..." : "AI описание и тагове"}
+              </Button>
+            </div>
           </Card>
 
           <Card>
