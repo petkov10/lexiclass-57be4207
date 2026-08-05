@@ -9,110 +9,50 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ThemeThemeIdRouteImport } from './routes/theme.$themeId'
-import { Route as ClassClassIdRouteImport } from './routes/class.$classId'
-import { Route as ApiAiThemeMetaRouteImport } from './routes/api/ai-theme-meta'
-import { Route as ApiAiTestRouteImport } from './routes/api/ai-test'
-import { Route as ApiAiReviewRouteImport } from './routes/api/ai-review'
-import { Route as ApiAiPedagogyRouteImport } from './routes/api/ai-pedagogy'
-import { Route as ApiAiLessonPlanRouteImport } from './routes/api/ai-lesson-plan'
-import { Route as ApiAiFlashcardsRouteImport } from './routes/api/ai-flashcards'
-import { Route as ApiAiDocumentRouteImport } from './routes/api/ai-document'
-import { Route as ApiAiCurriculumRouteImport } from './routes/api/ai-curriculum'
-import { Route as ApiAiCodeExerciseRouteImport } from './routes/api/ai-code-exercise'
-import { Route as ApiAiRouteImport } from './routes/api/ai'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
-import { Route as ClassClassIdIndexRouteImport } from './routes/class.$classId.index'
+import { Route as ApiAiRouteImport } from './routes/api/ai'
+import { Route as ApiAiCodeExerciseRouteImport } from './routes/api/ai-code-exercise'
+import { Route as ApiAiCurriculumRouteImport } from './routes/api/ai-curriculum'
+import { Route as ApiAiDocumentRouteImport } from './routes/api/ai-document'
+import { Route as ApiAiFlashcardsRouteImport } from './routes/api/ai-flashcards'
+import { Route as ApiAiLessonPlanRouteImport } from './routes/api/ai-lesson-plan'
+import { Route as ApiAiPedagogyRouteImport } from './routes/api/ai-pedagogy'
+import { Route as ApiAiReviewRouteImport } from './routes/api/ai-review'
+import { Route as ApiAiTestRouteImport } from './routes/api/ai-test'
+import { Route as ApiAiThemeMetaRouteImport } from './routes/api/ai-theme-meta'
+import { Route as ClassClassIdRouteImport } from './routes/class.$classId'
+import { Route as ThemeThemeIdRouteImport } from './routes/theme.$themeId'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
-import { Route as TestResourceIdPrintRouteImport } from './routes/test.$resourceId.print'
-import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
-import { Route as AuthenticatedAdminThemesRouteImport } from './routes/_authenticated/admin.themes'
-import { Route as AuthenticatedAdminSubjectsRouteImport } from './routes/_authenticated/admin.subjects'
-import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin.settings'
-import { Route as AuthenticatedAdminScheduleRouteImport } from './routes/_authenticated/admin.schedule'
-import { Route as AuthenticatedAdminResourcesRouteImport } from './routes/_authenticated/admin.resources'
-import { Route as AuthenticatedAdminImportRouteImport } from './routes/_authenticated/admin.import'
-import { Route as AuthenticatedAdminClassesRouteImport } from './routes/_authenticated/admin.classes'
-import { Route as AuthenticatedAdminBackupRouteImport } from './routes/_authenticated/admin.backup'
-import { Route as AuthenticatedAdminAiRouteImport } from './routes/_authenticated/admin.ai'
 import { Route as AuthenticatedAdminActivityRouteImport } from './routes/_authenticated/admin.activity'
+import { Route as AuthenticatedAdminAiRouteImport } from './routes/_authenticated/admin.ai'
+import { Route as AuthenticatedAdminBackupRouteImport } from './routes/_authenticated/admin.backup'
+import { Route as AuthenticatedAdminClassesRouteImport } from './routes/_authenticated/admin.classes'
+import { Route as AuthenticatedAdminImportRouteImport } from './routes/_authenticated/admin.import'
+import { Route as AuthenticatedAdminResourcesRouteImport } from './routes/_authenticated/admin.resources'
+import { Route as AuthenticatedAdminScheduleRouteImport } from './routes/_authenticated/admin.schedule'
+import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin.settings'
+import { Route as AuthenticatedAdminSubjectsRouteImport } from './routes/_authenticated/admin.subjects'
+import { Route as AuthenticatedAdminThemesRouteImport } from './routes/_authenticated/admin.themes'
+import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
+import { Route as ClassClassIdIndexRouteImport } from './routes/class.$classId.index'
+import { Route as TestResourceIdPrintRouteImport } from './routes/test.$resourceId.print'
 import { Route as ClassClassIdSubjectSubjectIdRouteImport } from './routes/class.$classId.subject.$subjectId'
 
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ThemeThemeIdRoute = ThemeThemeIdRouteImport.update({
-  id: '/theme/$themeId',
-  path: '/theme/$themeId',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ClassClassIdRoute = ClassClassIdRouteImport.update({
-  id: '/class/$classId',
-  path: '/class/$classId',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAiThemeMetaRoute = ApiAiThemeMetaRouteImport.update({
-  id: '/api/ai-theme-meta',
-  path: '/api/ai-theme-meta',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAiTestRoute = ApiAiTestRouteImport.update({
-  id: '/api/ai-test',
-  path: '/api/ai-test',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAiReviewRoute = ApiAiReviewRouteImport.update({
-  id: '/api/ai-review',
-  path: '/api/ai-review',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAiPedagogyRoute = ApiAiPedagogyRouteImport.update({
-  id: '/api/ai-pedagogy',
-  path: '/api/ai-pedagogy',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAiLessonPlanRoute = ApiAiLessonPlanRouteImport.update({
-  id: '/api/ai-lesson-plan',
-  path: '/api/ai-lesson-plan',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAiFlashcardsRoute = ApiAiFlashcardsRouteImport.update({
-  id: '/api/ai-flashcards',
-  path: '/api/ai-flashcards',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAiDocumentRoute = ApiAiDocumentRouteImport.update({
-  id: '/api/ai-document',
-  path: '/api/ai-document',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAiCurriculumRoute = ApiAiCurriculumRouteImport.update({
-  id: '/api/ai-curriculum',
-  path: '/api/ai-curriculum',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAiCodeExerciseRoute = ApiAiCodeExerciseRouteImport.update({
-  id: '/api/ai-code-exercise',
-  path: '/api/ai-code-exercise',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAiRoute = ApiAiRouteImport.update({
-  id: '/api/ai',
-  path: '/api/ai',
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
@@ -120,77 +60,69 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const ClassClassIdIndexRoute = ClassClassIdIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => ClassClassIdRoute,
+const ApiAiRoute = ApiAiRouteImport.update({
+  id: '/api/ai',
+  path: '/api/ai',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAiCodeExerciseRoute = ApiAiCodeExerciseRouteImport.update({
+  id: '/api/ai-code-exercise',
+  path: '/api/ai-code-exercise',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAiCurriculumRoute = ApiAiCurriculumRouteImport.update({
+  id: '/api/ai-curriculum',
+  path: '/api/ai-curriculum',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAiDocumentRoute = ApiAiDocumentRouteImport.update({
+  id: '/api/ai-document',
+  path: '/api/ai-document',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAiFlashcardsRoute = ApiAiFlashcardsRouteImport.update({
+  id: '/api/ai-flashcards',
+  path: '/api/ai-flashcards',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAiLessonPlanRoute = ApiAiLessonPlanRouteImport.update({
+  id: '/api/ai-lesson-plan',
+  path: '/api/ai-lesson-plan',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAiPedagogyRoute = ApiAiPedagogyRouteImport.update({
+  id: '/api/ai-pedagogy',
+  path: '/api/ai-pedagogy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAiReviewRoute = ApiAiReviewRouteImport.update({
+  id: '/api/ai-review',
+  path: '/api/ai-review',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAiTestRoute = ApiAiTestRouteImport.update({
+  id: '/api/ai-test',
+  path: '/api/ai-test',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAiThemeMetaRoute = ApiAiThemeMetaRouteImport.update({
+  id: '/api/ai-theme-meta',
+  path: '/api/ai-theme-meta',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ClassClassIdRoute = ClassClassIdRouteImport.update({
+  id: '/class/$classId',
+  path: '/class/$classId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ThemeThemeIdRoute = ThemeThemeIdRouteImport.update({
+  id: '/theme/$themeId',
+  path: '/theme/$themeId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => AuthenticatedAdminRoute,
-} as any)
-const TestResourceIdPrintRoute = TestResourceIdPrintRouteImport.update({
-  id: '/test/$resourceId/print',
-  path: '/test/$resourceId/print',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
-  id: '/users',
-  path: '/users',
-  getParentRoute: () => AuthenticatedAdminRoute,
-} as any)
-const AuthenticatedAdminThemesRoute =
-  AuthenticatedAdminThemesRouteImport.update({
-    id: '/themes',
-    path: '/themes',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
-const AuthenticatedAdminSubjectsRoute =
-  AuthenticatedAdminSubjectsRouteImport.update({
-    id: '/subjects',
-    path: '/subjects',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
-const AuthenticatedAdminSettingsRoute =
-  AuthenticatedAdminSettingsRouteImport.update({
-    id: '/settings',
-    path: '/settings',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
-const AuthenticatedAdminScheduleRoute =
-  AuthenticatedAdminScheduleRouteImport.update({
-    id: '/schedule',
-    path: '/schedule',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
-const AuthenticatedAdminResourcesRoute =
-  AuthenticatedAdminResourcesRouteImport.update({
-    id: '/resources',
-    path: '/resources',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
-const AuthenticatedAdminImportRoute =
-  AuthenticatedAdminImportRouteImport.update({
-    id: '/import',
-    path: '/import',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
-const AuthenticatedAdminClassesRoute =
-  AuthenticatedAdminClassesRouteImport.update({
-    id: '/classes',
-    path: '/classes',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
-const AuthenticatedAdminBackupRoute =
-  AuthenticatedAdminBackupRouteImport.update({
-    id: '/backup',
-    path: '/backup',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
-const AuthenticatedAdminAiRoute = AuthenticatedAdminAiRouteImport.update({
-  id: '/ai',
-  path: '/ai',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
 const AuthenticatedAdminActivityRoute =
@@ -199,6 +131,74 @@ const AuthenticatedAdminActivityRoute =
     path: '/activity',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminAiRoute = AuthenticatedAdminAiRouteImport.update({
+  id: '/ai',
+  path: '/ai',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const AuthenticatedAdminBackupRoute =
+  AuthenticatedAdminBackupRouteImport.update({
+    id: '/backup',
+    path: '/backup',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminClassesRoute =
+  AuthenticatedAdminClassesRouteImport.update({
+    id: '/classes',
+    path: '/classes',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminImportRoute =
+  AuthenticatedAdminImportRouteImport.update({
+    id: '/import',
+    path: '/import',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminResourcesRoute =
+  AuthenticatedAdminResourcesRouteImport.update({
+    id: '/resources',
+    path: '/resources',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminScheduleRoute =
+  AuthenticatedAdminScheduleRouteImport.update({
+    id: '/schedule',
+    path: '/schedule',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminSettingsRoute =
+  AuthenticatedAdminSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminSubjectsRoute =
+  AuthenticatedAdminSubjectsRouteImport.update({
+    id: '/subjects',
+    path: '/subjects',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminThemesRoute =
+  AuthenticatedAdminThemesRouteImport.update({
+    id: '/themes',
+    path: '/themes',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const ClassClassIdIndexRoute = ClassClassIdIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ClassClassIdRoute,
+} as any)
+const TestResourceIdPrintRoute = TestResourceIdPrintRouteImport.update({
+  id: '/test/$resourceId/print',
+  path: '/test/$resourceId/print',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ClassClassIdSubjectSubjectIdRoute =
   ClassClassIdSubjectSubjectIdRouteImport.update({
     id: '/subject/$subjectId',
@@ -421,11 +421,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -435,95 +435,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/theme/$themeId': {
-      id: '/theme/$themeId'
-      path: '/theme/$themeId'
-      fullPath: '/theme/$themeId'
-      preLoaderRoute: typeof ThemeThemeIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/class/$classId': {
-      id: '/class/$classId'
-      path: '/class/$classId'
-      fullPath: '/class/$classId'
-      preLoaderRoute: typeof ClassClassIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/ai-theme-meta': {
-      id: '/api/ai-theme-meta'
-      path: '/api/ai-theme-meta'
-      fullPath: '/api/ai-theme-meta'
-      preLoaderRoute: typeof ApiAiThemeMetaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/ai-test': {
-      id: '/api/ai-test'
-      path: '/api/ai-test'
-      fullPath: '/api/ai-test'
-      preLoaderRoute: typeof ApiAiTestRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/ai-review': {
-      id: '/api/ai-review'
-      path: '/api/ai-review'
-      fullPath: '/api/ai-review'
-      preLoaderRoute: typeof ApiAiReviewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/ai-pedagogy': {
-      id: '/api/ai-pedagogy'
-      path: '/api/ai-pedagogy'
-      fullPath: '/api/ai-pedagogy'
-      preLoaderRoute: typeof ApiAiPedagogyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/ai-lesson-plan': {
-      id: '/api/ai-lesson-plan'
-      path: '/api/ai-lesson-plan'
-      fullPath: '/api/ai-lesson-plan'
-      preLoaderRoute: typeof ApiAiLessonPlanRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/ai-flashcards': {
-      id: '/api/ai-flashcards'
-      path: '/api/ai-flashcards'
-      fullPath: '/api/ai-flashcards'
-      preLoaderRoute: typeof ApiAiFlashcardsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/ai-document': {
-      id: '/api/ai-document'
-      path: '/api/ai-document'
-      fullPath: '/api/ai-document'
-      preLoaderRoute: typeof ApiAiDocumentRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/ai-curriculum': {
-      id: '/api/ai-curriculum'
-      path: '/api/ai-curriculum'
-      fullPath: '/api/ai-curriculum'
-      preLoaderRoute: typeof ApiAiCurriculumRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/ai-code-exercise': {
-      id: '/api/ai-code-exercise'
-      path: '/api/ai-code-exercise'
-      fullPath: '/api/ai-code-exercise'
-      preLoaderRoute: typeof ApiAiCodeExerciseRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/ai': {
-      id: '/api/ai'
-      path: '/api/ai'
-      fullPath: '/api/ai'
-      preLoaderRoute: typeof ApiAiRouteImport
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin': {
@@ -533,12 +449,89 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/class/$classId/': {
-      id: '/class/$classId/'
-      path: '/'
-      fullPath: '/class/$classId/'
-      preLoaderRoute: typeof ClassClassIdIndexRouteImport
-      parentRoute: typeof ClassClassIdRoute
+    '/api/ai': {
+      id: '/api/ai'
+      path: '/api/ai'
+      fullPath: '/api/ai'
+      preLoaderRoute: typeof ApiAiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/ai-code-exercise': {
+      id: '/api/ai-code-exercise'
+      path: '/api/ai-code-exercise'
+      fullPath: '/api/ai-code-exercise'
+      preLoaderRoute: typeof ApiAiCodeExerciseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/ai-curriculum': {
+      id: '/api/ai-curriculum'
+      path: '/api/ai-curriculum'
+      fullPath: '/api/ai-curriculum'
+      preLoaderRoute: typeof ApiAiCurriculumRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/ai-document': {
+      id: '/api/ai-document'
+      path: '/api/ai-document'
+      fullPath: '/api/ai-document'
+      preLoaderRoute: typeof ApiAiDocumentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/ai-flashcards': {
+      id: '/api/ai-flashcards'
+      path: '/api/ai-flashcards'
+      fullPath: '/api/ai-flashcards'
+      preLoaderRoute: typeof ApiAiFlashcardsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/ai-lesson-plan': {
+      id: '/api/ai-lesson-plan'
+      path: '/api/ai-lesson-plan'
+      fullPath: '/api/ai-lesson-plan'
+      preLoaderRoute: typeof ApiAiLessonPlanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/ai-pedagogy': {
+      id: '/api/ai-pedagogy'
+      path: '/api/ai-pedagogy'
+      fullPath: '/api/ai-pedagogy'
+      preLoaderRoute: typeof ApiAiPedagogyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/ai-review': {
+      id: '/api/ai-review'
+      path: '/api/ai-review'
+      fullPath: '/api/ai-review'
+      preLoaderRoute: typeof ApiAiReviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/ai-test': {
+      id: '/api/ai-test'
+      path: '/api/ai-test'
+      fullPath: '/api/ai-test'
+      preLoaderRoute: typeof ApiAiTestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/ai-theme-meta': {
+      id: '/api/ai-theme-meta'
+      path: '/api/ai-theme-meta'
+      fullPath: '/api/ai-theme-meta'
+      preLoaderRoute: typeof ApiAiThemeMetaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/class/$classId': {
+      id: '/class/$classId'
+      path: '/class/$classId'
+      fullPath: '/class/$classId'
+      preLoaderRoute: typeof ClassClassIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/theme/$themeId': {
+      id: '/theme/$themeId'
+      path: '/theme/$themeId'
+      fullPath: '/theme/$themeId'
+      preLoaderRoute: typeof ThemeThemeIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
@@ -547,74 +540,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
-    '/test/$resourceId/print': {
-      id: '/test/$resourceId/print'
-      path: '/test/$resourceId/print'
-      fullPath: '/test/$resourceId/print'
-      preLoaderRoute: typeof TestResourceIdPrintRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/admin/users': {
-      id: '/_authenticated/admin/users'
-      path: '/users'
-      fullPath: '/admin/users'
-      preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/themes': {
-      id: '/_authenticated/admin/themes'
-      path: '/themes'
-      fullPath: '/admin/themes'
-      preLoaderRoute: typeof AuthenticatedAdminThemesRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/subjects': {
-      id: '/_authenticated/admin/subjects'
-      path: '/subjects'
-      fullPath: '/admin/subjects'
-      preLoaderRoute: typeof AuthenticatedAdminSubjectsRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/settings': {
-      id: '/_authenticated/admin/settings'
-      path: '/settings'
-      fullPath: '/admin/settings'
-      preLoaderRoute: typeof AuthenticatedAdminSettingsRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/schedule': {
-      id: '/_authenticated/admin/schedule'
-      path: '/schedule'
-      fullPath: '/admin/schedule'
-      preLoaderRoute: typeof AuthenticatedAdminScheduleRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/resources': {
-      id: '/_authenticated/admin/resources'
-      path: '/resources'
-      fullPath: '/admin/resources'
-      preLoaderRoute: typeof AuthenticatedAdminResourcesRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/import': {
-      id: '/_authenticated/admin/import'
-      path: '/import'
-      fullPath: '/admin/import'
-      preLoaderRoute: typeof AuthenticatedAdminImportRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/classes': {
-      id: '/_authenticated/admin/classes'
-      path: '/classes'
-      fullPath: '/admin/classes'
-      preLoaderRoute: typeof AuthenticatedAdminClassesRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/backup': {
-      id: '/_authenticated/admin/backup'
-      path: '/backup'
-      fullPath: '/admin/backup'
-      preLoaderRoute: typeof AuthenticatedAdminBackupRouteImport
+    '/_authenticated/admin/activity': {
+      id: '/_authenticated/admin/activity'
+      path: '/activity'
+      fullPath: '/admin/activity'
+      preLoaderRoute: typeof AuthenticatedAdminActivityRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/ai': {
@@ -624,12 +554,82 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminAiRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
-    '/_authenticated/admin/activity': {
-      id: '/_authenticated/admin/activity'
-      path: '/activity'
-      fullPath: '/admin/activity'
-      preLoaderRoute: typeof AuthenticatedAdminActivityRouteImport
+    '/_authenticated/admin/backup': {
+      id: '/_authenticated/admin/backup'
+      path: '/backup'
+      fullPath: '/admin/backup'
+      preLoaderRoute: typeof AuthenticatedAdminBackupRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/classes': {
+      id: '/_authenticated/admin/classes'
+      path: '/classes'
+      fullPath: '/admin/classes'
+      preLoaderRoute: typeof AuthenticatedAdminClassesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/import': {
+      id: '/_authenticated/admin/import'
+      path: '/import'
+      fullPath: '/admin/import'
+      preLoaderRoute: typeof AuthenticatedAdminImportRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/resources': {
+      id: '/_authenticated/admin/resources'
+      path: '/resources'
+      fullPath: '/admin/resources'
+      preLoaderRoute: typeof AuthenticatedAdminResourcesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/schedule': {
+      id: '/_authenticated/admin/schedule'
+      path: '/schedule'
+      fullPath: '/admin/schedule'
+      preLoaderRoute: typeof AuthenticatedAdminScheduleRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/settings': {
+      id: '/_authenticated/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AuthenticatedAdminSettingsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/subjects': {
+      id: '/_authenticated/admin/subjects'
+      path: '/subjects'
+      fullPath: '/admin/subjects'
+      preLoaderRoute: typeof AuthenticatedAdminSubjectsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/themes': {
+      id: '/_authenticated/admin/themes'
+      path: '/themes'
+      fullPath: '/admin/themes'
+      preLoaderRoute: typeof AuthenticatedAdminThemesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/users': {
+      id: '/_authenticated/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/class/$classId/': {
+      id: '/class/$classId/'
+      path: '/'
+      fullPath: '/class/$classId/'
+      preLoaderRoute: typeof ClassClassIdIndexRouteImport
+      parentRoute: typeof ClassClassIdRoute
+    }
+    '/test/$resourceId/print': {
+      id: '/test/$resourceId/print'
+      path: '/test/$resourceId/print'
+      fullPath: '/test/$resourceId/print'
+      preLoaderRoute: typeof TestResourceIdPrintRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/class/$classId/subject/$subjectId': {
       id: '/class/$classId/subject/$subjectId'
@@ -720,3 +720,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
