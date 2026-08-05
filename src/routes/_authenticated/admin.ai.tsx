@@ -14,7 +14,6 @@ import { Markdown } from "@/components/Markdown";
 import { useQuery } from "@tanstack/react-query";
 import { allThemesQuery } from "@/lib/queries";
 import { supabase } from "@/integrations/supabase/client";
-import { QrCodeButton } from "@/components/QrCodeButton";
 import { EditableMarkdown } from "@/components/EditableMarkdown";
 import { DOC_TEMPLATES, DOC_GROUPS, getTemplate } from "@/lib/doc-templates";
 import { FileSignature, Upload, ShieldCheck } from "lucide-react";
@@ -274,7 +273,6 @@ function TestGen() {
             <Button onClick={save} disabled={!themeId}><Save /> Запази като ресурс</Button>
             {savedId && (
               <>
-                <QrCodeButton url={`${typeof window !== "undefined" ? window.location.origin : ""}/test/${savedId}`} label="QR за теста" />
                 <Button asChild variant="outline"><a href={`/test/${savedId}/print`} target="_blank" rel="noreferrer">Печат</a></Button>
               </>
             )}

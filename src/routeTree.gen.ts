@@ -13,7 +13,6 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ThemeThemeIdRouteImport } from './routes/theme.$themeId'
-import { Route as TestResourceIdRouteImport } from './routes/test.$resourceId'
 import { Route as ClassClassIdRouteImport } from './routes/class.$classId'
 import { Route as ApiAiThemeMetaRouteImport } from './routes/api/ai-theme-meta'
 import { Route as ApiAiTestRouteImport } from './routes/api/ai-test'
@@ -36,7 +35,6 @@ import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminScheduleRouteImport } from './routes/_authenticated/admin.schedule'
 import { Route as AuthenticatedAdminResourcesRouteImport } from './routes/_authenticated/admin.resources'
 import { Route as AuthenticatedAdminImportRouteImport } from './routes/_authenticated/admin.import'
-import { Route as AuthenticatedAdminGradesRouteImport } from './routes/_authenticated/admin.grades'
 import { Route as AuthenticatedAdminClassesRouteImport } from './routes/_authenticated/admin.classes'
 import { Route as AuthenticatedAdminBackupRouteImport } from './routes/_authenticated/admin.backup'
 import { Route as AuthenticatedAdminAiRouteImport } from './routes/_authenticated/admin.ai'
@@ -60,11 +58,6 @@ const IndexRoute = IndexRouteImport.update({
 const ThemeThemeIdRoute = ThemeThemeIdRouteImport.update({
   id: '/theme/$themeId',
   path: '/theme/$themeId',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TestResourceIdRoute = TestResourceIdRouteImport.update({
-  id: '/test/$resourceId',
-  path: '/test/$resourceId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ClassClassIdRoute = ClassClassIdRouteImport.update({
@@ -138,9 +131,9 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
 const TestResourceIdPrintRoute = TestResourceIdPrintRouteImport.update({
-  id: '/print',
-  path: '/print',
-  getParentRoute: () => TestResourceIdRoute,
+  id: '/test/$resourceId/print',
+  path: '/test/$resourceId/print',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
   id: '/users',
@@ -181,12 +174,6 @@ const AuthenticatedAdminImportRoute =
   AuthenticatedAdminImportRouteImport.update({
     id: '/import',
     path: '/import',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
-const AuthenticatedAdminGradesRoute =
-  AuthenticatedAdminGradesRouteImport.update({
-    id: '/grades',
-    path: '/grades',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const AuthenticatedAdminClassesRoute =
@@ -234,13 +221,11 @@ export interface FileRoutesByFullPath {
   '/api/ai-test': typeof ApiAiTestRoute
   '/api/ai-theme-meta': typeof ApiAiThemeMetaRoute
   '/class/$classId': typeof ClassClassIdRouteWithChildren
-  '/test/$resourceId': typeof TestResourceIdRouteWithChildren
   '/theme/$themeId': typeof ThemeThemeIdRoute
   '/admin/activity': typeof AuthenticatedAdminActivityRoute
   '/admin/ai': typeof AuthenticatedAdminAiRoute
   '/admin/backup': typeof AuthenticatedAdminBackupRoute
   '/admin/classes': typeof AuthenticatedAdminClassesRoute
-  '/admin/grades': typeof AuthenticatedAdminGradesRoute
   '/admin/import': typeof AuthenticatedAdminImportRoute
   '/admin/resources': typeof AuthenticatedAdminResourcesRoute
   '/admin/schedule': typeof AuthenticatedAdminScheduleRoute
@@ -266,13 +251,11 @@ export interface FileRoutesByTo {
   '/api/ai-review': typeof ApiAiReviewRoute
   '/api/ai-test': typeof ApiAiTestRoute
   '/api/ai-theme-meta': typeof ApiAiThemeMetaRoute
-  '/test/$resourceId': typeof TestResourceIdRouteWithChildren
   '/theme/$themeId': typeof ThemeThemeIdRoute
   '/admin/activity': typeof AuthenticatedAdminActivityRoute
   '/admin/ai': typeof AuthenticatedAdminAiRoute
   '/admin/backup': typeof AuthenticatedAdminBackupRoute
   '/admin/classes': typeof AuthenticatedAdminClassesRoute
-  '/admin/grades': typeof AuthenticatedAdminGradesRoute
   '/admin/import': typeof AuthenticatedAdminImportRoute
   '/admin/resources': typeof AuthenticatedAdminResourcesRoute
   '/admin/schedule': typeof AuthenticatedAdminScheduleRoute
@@ -302,13 +285,11 @@ export interface FileRoutesById {
   '/api/ai-test': typeof ApiAiTestRoute
   '/api/ai-theme-meta': typeof ApiAiThemeMetaRoute
   '/class/$classId': typeof ClassClassIdRouteWithChildren
-  '/test/$resourceId': typeof TestResourceIdRouteWithChildren
   '/theme/$themeId': typeof ThemeThemeIdRoute
   '/_authenticated/admin/activity': typeof AuthenticatedAdminActivityRoute
   '/_authenticated/admin/ai': typeof AuthenticatedAdminAiRoute
   '/_authenticated/admin/backup': typeof AuthenticatedAdminBackupRoute
   '/_authenticated/admin/classes': typeof AuthenticatedAdminClassesRoute
-  '/_authenticated/admin/grades': typeof AuthenticatedAdminGradesRoute
   '/_authenticated/admin/import': typeof AuthenticatedAdminImportRoute
   '/_authenticated/admin/resources': typeof AuthenticatedAdminResourcesRoute
   '/_authenticated/admin/schedule': typeof AuthenticatedAdminScheduleRoute
@@ -338,13 +319,11 @@ export interface FileRouteTypes {
     | '/api/ai-test'
     | '/api/ai-theme-meta'
     | '/class/$classId'
-    | '/test/$resourceId'
     | '/theme/$themeId'
     | '/admin/activity'
     | '/admin/ai'
     | '/admin/backup'
     | '/admin/classes'
-    | '/admin/grades'
     | '/admin/import'
     | '/admin/resources'
     | '/admin/schedule'
@@ -370,13 +349,11 @@ export interface FileRouteTypes {
     | '/api/ai-review'
     | '/api/ai-test'
     | '/api/ai-theme-meta'
-    | '/test/$resourceId'
     | '/theme/$themeId'
     | '/admin/activity'
     | '/admin/ai'
     | '/admin/backup'
     | '/admin/classes'
-    | '/admin/grades'
     | '/admin/import'
     | '/admin/resources'
     | '/admin/schedule'
@@ -405,13 +382,11 @@ export interface FileRouteTypes {
     | '/api/ai-test'
     | '/api/ai-theme-meta'
     | '/class/$classId'
-    | '/test/$resourceId'
     | '/theme/$themeId'
     | '/_authenticated/admin/activity'
     | '/_authenticated/admin/ai'
     | '/_authenticated/admin/backup'
     | '/_authenticated/admin/classes'
-    | '/_authenticated/admin/grades'
     | '/_authenticated/admin/import'
     | '/_authenticated/admin/resources'
     | '/_authenticated/admin/schedule'
@@ -440,8 +415,8 @@ export interface RootRouteChildren {
   ApiAiTestRoute: typeof ApiAiTestRoute
   ApiAiThemeMetaRoute: typeof ApiAiThemeMetaRoute
   ClassClassIdRoute: typeof ClassClassIdRouteWithChildren
-  TestResourceIdRoute: typeof TestResourceIdRouteWithChildren
   ThemeThemeIdRoute: typeof ThemeThemeIdRoute
+  TestResourceIdPrintRoute: typeof TestResourceIdPrintRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -472,13 +447,6 @@ declare module '@tanstack/react-router' {
       path: '/theme/$themeId'
       fullPath: '/theme/$themeId'
       preLoaderRoute: typeof ThemeThemeIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/test/$resourceId': {
-      id: '/test/$resourceId'
-      path: '/test/$resourceId'
-      fullPath: '/test/$resourceId'
-      preLoaderRoute: typeof TestResourceIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/class/$classId': {
@@ -581,10 +549,10 @@ declare module '@tanstack/react-router' {
     }
     '/test/$resourceId/print': {
       id: '/test/$resourceId/print'
-      path: '/print'
+      path: '/test/$resourceId/print'
       fullPath: '/test/$resourceId/print'
       preLoaderRoute: typeof TestResourceIdPrintRouteImport
-      parentRoute: typeof TestResourceIdRoute
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin/users': {
       id: '/_authenticated/admin/users'
@@ -635,13 +603,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminImportRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
-    '/_authenticated/admin/grades': {
-      id: '/_authenticated/admin/grades'
-      path: '/grades'
-      fullPath: '/admin/grades'
-      preLoaderRoute: typeof AuthenticatedAdminGradesRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
     '/_authenticated/admin/classes': {
       id: '/_authenticated/admin/classes'
       path: '/classes'
@@ -685,7 +646,6 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminAiRoute: typeof AuthenticatedAdminAiRoute
   AuthenticatedAdminBackupRoute: typeof AuthenticatedAdminBackupRoute
   AuthenticatedAdminClassesRoute: typeof AuthenticatedAdminClassesRoute
-  AuthenticatedAdminGradesRoute: typeof AuthenticatedAdminGradesRoute
   AuthenticatedAdminImportRoute: typeof AuthenticatedAdminImportRoute
   AuthenticatedAdminResourcesRoute: typeof AuthenticatedAdminResourcesRoute
   AuthenticatedAdminScheduleRoute: typeof AuthenticatedAdminScheduleRoute
@@ -701,7 +661,6 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminAiRoute: AuthenticatedAdminAiRoute,
   AuthenticatedAdminBackupRoute: AuthenticatedAdminBackupRoute,
   AuthenticatedAdminClassesRoute: AuthenticatedAdminClassesRoute,
-  AuthenticatedAdminGradesRoute: AuthenticatedAdminGradesRoute,
   AuthenticatedAdminImportRoute: AuthenticatedAdminImportRoute,
   AuthenticatedAdminResourcesRoute: AuthenticatedAdminResourcesRoute,
   AuthenticatedAdminScheduleRoute: AuthenticatedAdminScheduleRoute,
@@ -740,18 +699,6 @@ const ClassClassIdRouteWithChildren = ClassClassIdRoute._addFileChildren(
   ClassClassIdRouteChildren,
 )
 
-interface TestResourceIdRouteChildren {
-  TestResourceIdPrintRoute: typeof TestResourceIdPrintRoute
-}
-
-const TestResourceIdRouteChildren: TestResourceIdRouteChildren = {
-  TestResourceIdPrintRoute: TestResourceIdPrintRoute,
-}
-
-const TestResourceIdRouteWithChildren = TestResourceIdRoute._addFileChildren(
-  TestResourceIdRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
@@ -767,8 +714,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAiTestRoute: ApiAiTestRoute,
   ApiAiThemeMetaRoute: ApiAiThemeMetaRoute,
   ClassClassIdRoute: ClassClassIdRouteWithChildren,
-  TestResourceIdRoute: TestResourceIdRouteWithChildren,
   ThemeThemeIdRoute: ThemeThemeIdRoute,
+  TestResourceIdPrintRoute: TestResourceIdPrintRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

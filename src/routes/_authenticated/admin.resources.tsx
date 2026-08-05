@@ -17,7 +17,6 @@ import { aiFetch } from "@/lib/ai-client";
 import type { ResourceRow, ResourceType, Flashcard } from "@/lib/types";
 import { sanitizeFileName } from "@/lib/storage";
 import { Sparkles, BookOpen, Layers as LayersIcon, X } from "lucide-react";
-import { QrCodeButton } from "@/components/QrCodeButton";
 import { EditableMarkdown } from "@/components/EditableMarkdown";
 
 const CODE_LANGUAGES = ["csharp", "html", "css", "sql", "javascript", "typescript", "python", "cpp", "java", "json", "bash"];
@@ -262,7 +261,6 @@ function ResourceListRow({ r, onEdit, onDelete, checked, onCheck, onMove, onTogg
   onMove: (dir: number) => void; onToggleHidden: () => void; isFirst: boolean; isLast: boolean;
 }) {
   const { url } = useResourceUrl({ url: r.url, file_path: r.file_path });
-  const testUrl = r.type === "test" ? `${typeof window !== "undefined" ? window.location.origin : ""}/test/${r.id}` : null;
   const hidden = !!(r as any).is_hidden;
   return (
     <div className={`p-3 flex items-center gap-3 flex-wrap ${hidden ? "opacity-60" : ""}`}>
@@ -279,7 +277,6 @@ function ResourceListRow({ r, onEdit, onDelete, checked, onCheck, onMove, onTogg
         </div>
         {r.description && <div className="text-xs text-muted-foreground truncate">{r.description}</div>}
       </div>
-      {testUrl && <QrCodeButton url={testUrl} label="QR" title={`QR за ${r.title}`} />}
       {r.type === "test" && <Button asChild variant="outline" size="sm"><a href={`/test/${r.id}/print`} target="_blank" rel="noreferrer">Печат</a></Button>}
       {url && <Button asChild variant="ghost" size="sm"><a href={url} target="_blank" rel="noreferrer"><ExternalLink /></a></Button>}
       <Button variant="ghost" size="sm" onClick={onToggleHidden} title={hidden ? "Покажи на учениците" : "Скрий от учениците"}>
