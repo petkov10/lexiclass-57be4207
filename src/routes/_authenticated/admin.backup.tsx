@@ -49,6 +49,20 @@ function formatBytes(b: number) {
   return `${(b / Math.pow(1024, i)).toFixed(i === 0 ? 0 : 1)} ${u[i]}`;
 }
 
+/** Име, безопасно за папка/файл във Windows, macOS и Linux. */
+function safeName(name: string) {
+  const s = (name || "")
+    .replace(/[\\/:*?"<>|]/g, "-")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 80);
+  return s || "Без име";
+}
+
+function pad(n: number) {
+  return String(n).padStart(2, "0");
+}
+
 async function listAllFiles(bucket: string, prefix = ""): Promise<string[]> {
   const out: string[] = [];
   const { data, error } = await supabase.storage.from(bucket).list(prefix, { limit: 1000 });
