@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { verifyAccessPin } from "@/lib/access-gate.functions";
 import { useAccessMode, isGatePassed, markGatePassed } from "@/hooks/useAccessGate";
 import { useAuth, useRole } from "@/hooks/useAuth";
 import { useRouterState } from "@tanstack/react-router";
