@@ -350,6 +350,19 @@ function BackupPage() {
         </div>
       </Card>
 
+      <Card className="p-6 space-y-3 border-primary/40">
+        <h2 className="font-semibold flex items-center gap-2"><FolderTree className="h-4 w-4 text-primary" /> Сваляне за флашка (папки като в сайта)</h2>
+        <p className="text-sm text-muted-foreground">
+          Сваля <b>всички документи и ресурси</b>, подредени в папки: <b>Клас → Предмет → Тема → ресурси</b>.
+          Всяка тема съдържа и файл <i>_за темата.md</i> с описанието. Външните линкове стават преки пътища (.url),
+          а AI материалите (разработки, тестове, флаш карти) се записват като .md файлове.
+          Разархивирайте .zip файла директно върху флашката.
+        </p>
+        <Button onClick={exportContentTree} disabled={!!busy}><FolderTree /> Свали цялото съдържание (папки)</Button>
+      </Card>
+
+
+
       <Card className="p-6 space-y-3">
         <h2 className="font-semibold flex items-center gap-2"><AlertTriangle className="h-4 w-4 text-amber-500" /> 2. Възстановяване / Миграция</h2>
         <p className="text-sm text-muted-foreground">
