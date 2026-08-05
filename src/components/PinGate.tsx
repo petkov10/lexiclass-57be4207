@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { verifyAccessPin } from "@/lib/access-gate.functions";
 import { useAccessMode, isGatePassed, markGatePassed } from "@/hooks/useAccessGate";
 import { useAuth, useRole } from "@/hooks/useAuth";
 import { useRouterState } from "@tanstack/react-router";
@@ -54,18 +54,22 @@ function PinScreen({ mode, onPass }: { mode: "global_pin" | "user_pin"; onPass: 
     if (pin.length !== 4 || checked.current === pin) return;
     checked.current = pin;
     setChecking(true);
-    supabase.rpc("verify_access_pin", { _pin: pin }).then(({ data, error: err }) => {
-      setChecking(false);
-      if (err) { setError(err.message); return; }
-      const row = Array.isArray(data) ? data[0] : data;
-      if (row?.ok) {
-        markGatePassed(row.user_id ? { id: row.user_id, name: row.display_name || "" } : null);
-        onPass();
-      } else {
-        setError("Грешен PIN. Опитай отново.");
+    verifyAccessPin({ data: { pin } })
+      .then((res) => {
+        setChecking(false);
+        if (res?.ok) {
+          markGatePassed(res.user);
+          onPass();
+        } else {
+          setError("Грешен PIN. Опитай отново.");
+          setTimeout(() => { setPin(""); checked.current = ""; }, 600);
+        }
+      })
+      .catch(() => {
+        setChecking(false);
+        setError("Грешка при проверката. Опитай отново.");
         setTimeout(() => { setPin(""); checked.current = ""; }, 600);
-      }
-    });
+      });
   }, [pin, onPass]);
 
   // Physical keyboard support

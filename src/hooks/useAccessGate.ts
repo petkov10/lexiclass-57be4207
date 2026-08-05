@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { getAccessMode } from "@/lib/access-gate.functions";
 
 const TOKEN_KEY = "lexiclass:access_ok";
 const USER_KEY = "lexiclass:access_user";
@@ -30,11 +30,14 @@ export function useAccessMode() {
   const [mode, setMode] = useState<"free" | "global_pin" | "user_pin" | null>(null);
   useEffect(() => {
     let cancelled = false;
-    supabase.rpc("get_access_mode").then(({ data }) => {
-      if (cancelled) return;
-      const m = (data as string) || "free";
-      setMode(m as any);
-    });
+    getAccessMode()
+      .then((res) => {
+        if (cancelled) return;
+        setMode((res?.mode as "free" | "global_pin" | "user_pin") || "free");
+      })
+      .catch(() => {
+        if (!cancelled) setMode("free");
+      });
     return () => { cancelled = true; };
   }, []);
   return mode;
