@@ -51,7 +51,7 @@ export function CommandPalette() {
               <CommandItem onSelect={() => go(() => navigate({ to: "/admin" }))}>
                 <Settings className="mr-2 h-4 w-4" /> Админ табло
               </CommandItem>
-              <CommandItem onSelect={() => go(() => navigate({ to: "/admin/ai" }))}>
+              <CommandItem onSelect={() => go(() => navigate({ to: "/admin/ai", search: { tab: "chat" } }))}>
                 <Sparkles className="mr-2 h-4 w-4" /> AI Асистент
               </CommandItem>
             </>

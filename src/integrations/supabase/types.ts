@@ -400,85 +400,6 @@ export type Database = {
         }
         Relationships: []
       }
-      test_attempts: {
-        Row: {
-          answers: Json
-          class_id: string | null
-          created_at: string
-          duration_seconds: number
-          grade: number | null
-          id: string
-          max_score: number
-          percent: number
-          resource_id: string
-          score: number
-          started_at: string
-          student_class: string | null
-          student_name: string
-          student_number: string | null
-          submitted_at: string
-          theme_id: string | null
-        }
-        Insert: {
-          answers?: Json
-          class_id?: string | null
-          created_at?: string
-          duration_seconds?: number
-          grade?: number | null
-          id?: string
-          max_score?: number
-          percent?: number
-          resource_id: string
-          score?: number
-          started_at?: string
-          student_class?: string | null
-          student_name: string
-          student_number?: string | null
-          submitted_at?: string
-          theme_id?: string | null
-        }
-        Update: {
-          answers?: Json
-          class_id?: string | null
-          created_at?: string
-          duration_seconds?: number
-          grade?: number | null
-          id?: string
-          max_score?: number
-          percent?: number
-          resource_id?: string
-          score?: number
-          started_at?: string
-          student_class?: string | null
-          student_name?: string
-          student_number?: string | null
-          submitted_at?: string
-          theme_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "test_attempts_class_id_fkey"
-            columns: ["class_id"]
-            isOneToOne: false
-            referencedRelation: "classes"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "test_attempts_resource_id_fkey"
-            columns: ["resource_id"]
-            isOneToOne: false
-            referencedRelation: "resources"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "test_attempts_theme_id_fkey"
-            columns: ["theme_id"]
-            isOneToOne: false
-            referencedRelation: "themes"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       test_content: {
         Row: {
           content: Json
@@ -651,7 +572,6 @@ export type Database = {
       }
       can_edit: { Args: { _user_id: string }; Returns: boolean }
       get_access_mode: { Args: never; Returns: string }
-      get_test_public: { Args: { _resource_id: string }; Returns: Json }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -668,18 +588,6 @@ export type Database = {
           _entity_type?: string
         }
         Returns: undefined
-      }
-      submit_test_attempt: {
-        Args: {
-          _class_id: string
-          _duration_seconds: number
-          _given: Json
-          _resource_id: string
-          _student_class: string
-          _student_name: string
-          _student_number: string
-        }
-        Returns: Json
       }
       verify_access_pin: {
         Args: { _pin: string }
