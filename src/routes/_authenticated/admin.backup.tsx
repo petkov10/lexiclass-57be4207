@@ -116,6 +116,110 @@ function BackupPage() {
     }
   };
 
+  /** Сваля цялото съдържание, подредено в папки: Клас / Предмет / Тема / ресурси. */
+  const exportContentTree = async () => {
+    setBusy("Зареждане на структурата...");
+    setPct(0);
+    try {
+      const [{ data: classes }, { data: subjects }, { data: themes }, { data: resources }] = await Promise.all([
+        supabase.from("classes").select("*").order("order_index"),
+        supabase.from("subjects").select("*").order("order_index"),
+        supabase.from("themes").select("*").order("order_index"),
+        supabase.from("resources").select("*").order("order_index"),
+      ]);
+      const subjById = new Map((subjects ?? []).map((s) => [s.id, s]));
+      const themesByClass = new Map<string, any[]>();
+      for (const t of themes ?? []) {
+        const arr = themesByClass.get(t.class_id) ?? [];
+        arr.push(t);
+        themesByClass.set(t.class_id, arr);
+      }
+      const resByTheme = new Map<string, any[]>();
+      for (const r of resources ?? []) {
+        const arr = resByTheme.get(r.theme_id) ?? [];
+        arr.push(r);
+        resByTheme.set(r.theme_id, arr);
+      }
+
+      const zip = new JSZip();
+      const links: string[] = [];
+      const fileJobs: { path: string; storagePath: string }[] = [];
+
+      (classes ?? []).forEach((cls, ci) => {
+        const clsDir = `${pad(ci + 1)} ${safeName(cls.name)}`;
+        const clsThemes = themesByClass.get(cls.id) ?? [];
+        if (!clsThemes.length) zip.folder(clsDir);
+        const bySubject = new Map<string, any[]>();
+        for (const t of clsThemes) {
+          const arr = bySubject.get(t.subject_id) ?? [];
+          arr.push(t);
+          bySubject.set(t.subject_id, arr);
+        }
+        let si = 0;
+        for (const [subjectId, list] of bySubject) {
+          si++;
+          const subject = subjById.get(subjectId);
+          const subjDir = `${clsDir}/${pad(si)} ${safeName(subject?.name ?? "Без предмет")}`;
+          list.forEach((th, ti) => {
+            const themeDir = `${subjDir}/${pad(ti + 1)} ${safeName(th.name)}`;
+            const info = [
+              `# ${th.name}`,
+              "",
+              `Клас: ${cls.name}`,
+              `Предмет: ${subject?.name ?? "—"}`,
+              th.week_number ? `Седмица: ${th.week_number}` : "",
+              th.tags?.length ? `Етикети: ${th.tags.join(", ")}` : "",
+              "",
+              th.description ?? "",
+            ].filter(Boolean).join("\n");
+            zip.file(`${themeDir}/_за темата.md`, info);
+
+            (resByTheme.get(th.id) ?? []).forEach((r, ri) => {
+              const base = `${themeDir}/${pad(ri + 1)} ${safeName(r.title)}`;
+              if (r.file_path) {
+                const ext = r.file_path.includes(".") ? `.${r.file_path.split(".").pop()}` : "";
+                fileJobs.push({ path: `${base}${ext}`, storagePath: r.file_path });
+              } else if (r.url) {
+                zip.file(`${base}.url`, `[InternetShortcut]\r\nURL=${r.url}\r\n`);
+                links.push(`- [${r.title}](${r.url}) — ${cls.name} / ${subject?.name ?? "—"} / ${th.name}`);
+              }
+              if (r.content) {
+                const c: any = r.content;
+                const text = typeof c === "string" ? c : (c.markdown ?? c.text ?? JSON.stringify(c, null, 2));
+                zip.file(`${base}.md`, `# ${r.title}\n\n${r.description ? r.description + "\n\n" : ""}${text}`);
+              }
+            });
+          });
+        }
+      });
+
+      if (links.length) zip.file("_Външни линкове.md", `# Външни линкове\n\n${links.join("\n")}\n`);
+
+      for (let i = 0; i < fileJobs.length; i++) {
+        setBusy(`Сваляне на файлове: ${i + 1}/${fileJobs.length}`);
+        setPct(Math.round(((i + 1) / fileJobs.length) * 100));
+        const { data: blob, error } = await supabase.storage.from("resources").download(fileJobs[i].storagePath);
+        if (error || !blob) continue;
+        zip.file(fileJobs[i].path, blob);
+      }
+
+      setBusy("Създаване на архива...");
+      const blob = await zip.generateAsync({ type: "blob", compression: "DEFLATE" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `lexiclass-съдържание-${new Date().toISOString().slice(0, 10)}.zip`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success("Готово — разархивирайте .zip файла върху флашката.");
+    } catch (e: any) {
+      toast.error(e.message);
+    } finally {
+      setBusy("");
+      setPct(0);
+    }
+  };
+
   const importArchive = async (file: File) => {
     if (!confirm("Възстановяването ЗАМЕНЯ всички текущи класове, предмети, теми и ресурси. Продължавате ли?")) return;
     setBusy("Прочитане на архива...");
