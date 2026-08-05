@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Download, Upload, AlertTriangle, RefreshCw, HardDrive, Cloud, FileArchive } from "lucide-react";
+import { Download, Upload, AlertTriangle, RefreshCw, HardDrive, Cloud, FileArchive, FolderTree } from "lucide-react";
 import { toast } from "sonner";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { getStorageStats } from "@/lib/storage-stats.functions";
