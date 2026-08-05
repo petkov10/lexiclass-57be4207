@@ -258,7 +258,7 @@ function ResourceCard({ r, onOpen }: { r: ResourceRow; onOpen: () => void }) {
         {r.description && <div className="text-xs text-muted-foreground truncate">{r.description}</div>}
       </div>
       {isTest ? (
-        <Button asChild size="sm"><a href={`/test/${r.id}`}>Започни</a></Button>
+        <Button asChild size="sm" variant="outline"><a href={`/test/${r.id}/print`} target="_blank" rel="noreferrer">Печат</a></Button>
       ) : isExternal && url ? (
         <Button asChild variant="outline" size="sm"><a href={url} target="_blank" rel="noreferrer">Отвори <ExternalLink /></a></Button>
       ) : (
@@ -394,10 +394,10 @@ function TestViewer({ resourceId, title }: { resourceId: string; title: string }
     <div className="space-y-4">
       <h3 className="font-semibold flex items-center gap-2"><ClipboardList className="h-4 w-4" /> {title}</h3>
       <p className="text-sm text-muted-foreground">
-        Отвори теста, за да го решиш. Резултатът се изчислява автоматично след предаване.
+        Тестът е за печат на хартия. Отвори изгледа за принтиране — включва и лист с отговори за учителя.
       </p>
-      <Button asChild size="sm">
-        <a href={`/test/${resourceId}`}>Започни теста</a>
+      <Button asChild size="sm" variant="outline">
+        <a href={`/test/${resourceId}/print`} target="_blank" rel="noreferrer">Отвори за печат</a>
       </Button>
     </div>
   );
