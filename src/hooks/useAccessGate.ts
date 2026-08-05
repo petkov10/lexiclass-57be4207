@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { getAccessMode } from "@/lib/access-gate.functions";
 
 const TOKEN_KEY = "lexiclass:access_ok";
 const USER_KEY = "lexiclass:access_user";
