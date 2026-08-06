@@ -24,6 +24,7 @@ import {
   Activity,
   FileSignature,
   ClipboardList,
+  LifeBuoy,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeModeToggle } from "@/components/ThemeModeToggle";
@@ -45,10 +46,11 @@ const nav: NavItem[] = [
   { to: "/admin/resources", label: "Ресурси", icon: FileStack },
   { to: "/admin/import", label: "Импорт от папка", icon: FolderUp },
   { to: "/admin/schedule", label: "Разписание", icon: CalendarDays },
-  { to: "/admin/ai", label: "AI Асистент", icon: Sparkles, tab: "chat" },
+  { to: "/admin/ai", label: "AI Асистенти", icon: Sparkles, tab: "catalog" },
   { to: "/admin/ai", label: "Разработка на урок", icon: BookOpen, tab: "plan" },
   { to: "/admin/ai", label: "Училищни документи", icon: FileSignature, tab: "docs" },
   { to: "/admin/ai", label: "AI тестове", icon: ClipboardList, tab: "test" },
+  { to: "/admin/help", label: "Помощ", icon: LifeBuoy },
   { to: "/admin/users", label: "Потребители", icon: Users, adminOnly: true },
   { to: "/admin/settings", label: "Настройки", icon: SettingsIcon, adminOnly: true },
   { to: "/admin/activity", label: "Дневник", icon: Activity, adminOnly: true },
@@ -98,7 +100,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
         {visible.map((item) => {
           const Icon = item.icon;
           const active = item.tab
-            ? pathname === "/admin/ai" && (currentTab || "chat") === item.tab
+            ? pathname === "/admin/ai" && (currentTab || "catalog") === item.tab
             : item.exact
               ? pathname === item.to
               : pathname.startsWith(item.to) && pathname !== "/admin/ai";
