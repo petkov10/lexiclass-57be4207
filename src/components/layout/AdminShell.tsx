@@ -100,7 +100,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
         {visible.map((item) => {
           const Icon = item.icon;
           const active = item.tab
-            ? pathname === "/admin/ai" && (currentTab || "chat") === item.tab
+            ? pathname === "/admin/ai" && (currentTab || "catalog") === item.tab
             : item.exact
               ? pathname === item.to
               : pathname.startsWith(item.to) && pathname !== "/admin/ai";
