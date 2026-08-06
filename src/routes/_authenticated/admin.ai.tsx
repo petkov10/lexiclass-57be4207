@@ -18,12 +18,72 @@ import { EditableMarkdown } from "@/components/EditableMarkdown";
 import { DOC_TEMPLATES, DOC_GROUPS, getTemplate } from "@/lib/doc-templates";
 import { FileSignature, Upload, ShieldCheck } from "lucide-react";
 
-const AI_TABS = ["chat", "test", "plan", "pedagogy", "docs", "code"] as const;
+const AI_TABS = ["catalog", "chat", "test", "plan", "pedagogy", "docs", "code"] as const;
 type AiTab = (typeof AI_TABS)[number];
+
+type Assistant = {
+  tab: Exclude<AiTab, "catalog">;
+  title: string;
+  category: string;
+  desc: string;
+  features: string[];
+  icon: typeof Bot;
+};
+
+const ASSISTANTS: Assistant[] = [
+  {
+    tab: "plan",
+    title: "Разработка на урок",
+    category: "Методика",
+    desc: "Пълна методическа разработка по стандартите на МОН — цели, компетентности, ход на урока, рефлексия.",
+    features: ["Учебни цели по Блум", "Ключови компетентности", "Ход на урока по етапи", "Ръчна редакция и печат"],
+    icon: BookOpen,
+  },
+  {
+    tab: "docs",
+    title: "Училищни документи",
+    category: "Администрация",
+    desc: "Готови шаблони за най-често използваните училищни документи, съобразени с нормативната уредба.",
+    features: ["17 шаблона", "Годишни планове и протоколи", "Попълваеми полета", "Експорт към Word"],
+    icon: FileSignature,
+  },
+  {
+    tab: "test",
+    title: "Генератор на тестове",
+    category: "Оценяване",
+    desc: "Тестове по тема или по качен файл — за печат и раздаване на хартия.",
+    features: ["Въпроси по зададена тема", "Качване на PDF/снимка", "Разбъркване на въпросите", "Вариант за печат"],
+    icon: ClipboardList,
+  },
+  {
+    tab: "pedagogy",
+    title: "Педагогически материали",
+    category: "Методика",
+    desc: "Работни листове, дискусионни въпроси, задачи за затвърждаване и допълнителни дейности.",
+    features: ["Работни листове", "Дискусионни въпроси", "Диференцирани задачи", "Ръчна редакция"],
+    icon: GraduationCap,
+  },
+  {
+    tab: "code",
+    title: "Код упражнения",
+    category: "Информатика",
+    desc: "Практически задачи по програмиране с примерни решения и критерии за оценяване.",
+    features: ["Задачи по език и ниво", "Примерни решения", "Тестови случаи", "Обяснения за ученици"],
+    icon: Code2,
+  },
+  {
+    tab: "chat",
+    title: "Свободен AI чат",
+    category: "Универсален",
+    desc: "Отворен разговор с асистента, когато нямате нужда от конкретен шаблон.",
+    features: ["Свободни заявки", "Бързи подсказки", "Markdown отговори"],
+    icon: Bot,
+  },
+];
 
 export const Route = createFileRoute("/_authenticated/admin/ai")({
   validateSearch: (search: Record<string, unknown>): { tab: AiTab } => ({
-    tab: AI_TABS.includes(search.tab as AiTab) ? (search.tab as AiTab) : "chat",
+    tab: AI_TABS.includes(search.tab as AiTab) ? (search.tab as AiTab) : "catalog",
   }),
   component: AIPage,
 });
@@ -31,11 +91,67 @@ export const Route = createFileRoute("/_authenticated/admin/ai")({
 function AIPage() {
   const { tab } = Route.useSearch();
   const navigate = Route.useNavigate();
+
+  if (tab === "catalog") {
+    return (
+      <div className="space-y-6 max-w-5xl mx-auto">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight flex items-center gap-2">
+            <Sparkles className="text-primary" /> AI Асистенти
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Изберете асистент според задачата. Всеки материал може да се редактира ръчно преди запазване.
+          </p>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          {ASSISTANTS.map((a) => {
+            const Icon = a.icon;
+            return (
+              <Card
+                key={a.tab}
+                className="p-5 flex flex-col gap-3 hover-lift cursor-pointer"
+                role="button"
+                tabIndex={0}
+                onClick={() => navigate({ search: { tab: a.tab } })}
+                onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); navigate({ search: { tab: a.tab } }); } }}
+              >
+                <div className="flex items-start gap-3">
+                  <div className="h-10 w-10 rounded-lg bg-primary/10 text-primary grid place-items-center shrink-0">
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-xs uppercase tracking-wider text-muted-foreground">{a.category}</div>
+                    <h2 className="font-semibold leading-tight">{a.title}</h2>
+                  </div>
+                </div>
+                <p className="text-sm text-muted-foreground">{a.desc}</p>
+                <ul className="text-sm space-y-1 mt-auto">
+                  {a.features.map((f) => (
+                    <li key={f} className="flex items-center gap-2">
+                      <ShieldCheck className="h-3.5 w-3.5 text-primary shrink-0" />
+                      <span className="text-muted-foreground">{f}</span>
+                    </li>
+                  ))}
+                </ul>
+                <Button variant="secondary" size="sm" className="w-full mt-1">Отвори асистента</Button>
+              </Card>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4 max-w-5xl mx-auto">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight flex items-center gap-2"><Sparkles className="text-primary" /> AI Асистент</h1>
-        <p className="text-sm text-muted-foreground mt-1">Чат, тестове, методически разработки, училищни документи и код упражнения.</p>
+      <div className="flex items-start gap-3">
+        <Button variant="ghost" size="sm" onClick={() => navigate({ search: { tab: "catalog" } })}>
+          <ArrowLeft className="h-4 w-4" /> Асистенти
+        </Button>
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight flex items-center gap-2"><Sparkles className="text-primary" /> AI Асистент</h1>
+          <p className="text-sm text-muted-foreground mt-1">Чат, тестове, методически разработки, училищни документи и код упражнения.</p>
+        </div>
       </div>
       <Tabs value={tab} onValueChange={(v) => navigate({ search: { tab: v as AiTab } })}>
         <TabsList className="flex-wrap h-auto">
@@ -56,6 +172,7 @@ function AIPage() {
     </div>
   );
 }
+
 
 
 type Msg = { role: "user" | "assistant"; content: string };
