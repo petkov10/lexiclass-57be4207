@@ -24,6 +24,7 @@ import {
   Activity,
   FileSignature,
   ClipboardList,
+  LifeBuoy,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeModeToggle } from "@/components/ThemeModeToggle";
