@@ -23,7 +23,7 @@ export const Route = createFileRoute("/api/ai-code-exercise")({
         const usr = `Тема: ${topic}\nЕзик: ${language}\nНиво: ${level}${body.context ? `\nКонтекст: ${body.context}` : ""}`;
 
         const res = await aiChat({
-            model: "google/gemini-3.6-flash",
+            model: "google/gemini-3.7-flash",
             messages: [{ role: "system", content: `${sys}\n\n${AI_GUARDRAILS}` }, { role: "user", content: usr }],
             response_format: { type: "json_object" },
           });

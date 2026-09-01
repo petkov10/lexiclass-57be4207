@@ -172,7 +172,7 @@ export const Route = createFileRoute("/api/ai-pedagogy")({
         const usr = `Тема: ${topic}${body.grade ? `\nКлас: ${body.grade}` : ""}${body.duration ? `\nВреме: ${body.duration} мин` : ""}${body.context ? `\nДопълнителен контекст: ${body.context}` : ""}`;
 
         const res = await aiChat({
-            model: "google/gemini-3.6-flash",
+            model: "google/gemini-3.7-flash",
             messages: [{ role: "system", content: `${sys}\n\n${AI_GUARDRAILS}` }, { role: "user", content: usr }],
           });
         if (!res.ok) {

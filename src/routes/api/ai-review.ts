@@ -41,7 +41,7 @@ export const Route = createFileRoute("/api/ai-review")({
 ${text.slice(0, 60000)}`;
 
         const res = await aiChat({
-            model: "google/gemini-3.6-flash",
+            model: "google/gemini-3.7-flash",
             messages: [{ role: "system", content: sys }, { role: "user", content: usr }],
           });
         if (!res.ok) {

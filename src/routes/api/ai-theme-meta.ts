@@ -28,7 +28,7 @@ export const Route = createFileRoute("/api/ai-theme-meta")({
 Клас: ${body.className || "—"}${body.current ? `\nСъществуващо описание (подобри го): ${body.current}` : ""}`;
 
         const res = await aiChat({
-            model: "google/gemini-3.6-flash",
+            model: "google/gemini-3.7-flash",
             messages: [{ role: "system", content: sys }, { role: "user", content: usr }],
             response_format: { type: "json_object" },
           });

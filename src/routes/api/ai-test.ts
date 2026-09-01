@@ -30,7 +30,7 @@ export const Route = createFileRoute("/api/ai-test")({
         const usr = `Тема: ${topic || "(от прикачения файл)"}\nБрой въпроси: ${count}\nТип: ${kind === "open" ? "отворени въпроси" : kind === "mixed" ? "смесен (mc + open)" : "multiple choice"}${body.context ? `\nКонтекст: ${body.context}` : ""}`;
 
         const res = await aiChat({
-            model: "google/gemini-3.6-flash",
+            model: "google/gemini-3.7-flash",
             messages: [
               { role: "system", content: `${sys}\n\n${AI_GUARDRAILS}` },
               { role: "user", content: userContent(usr, body.file) },

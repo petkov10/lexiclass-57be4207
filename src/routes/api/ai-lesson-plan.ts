@@ -138,7 +138,7 @@ export const Route = createFileRoute("/api/ai-lesson-plan")({
         const usr = `Тема: ${topic}${body.subject ? `\nУчебен предмет: ${body.subject}` : ""}\nПродължителност: ${duration} минути${body.grade ? `\nКлас: ${body.grade}` : ""}${lessonTypeLabel ? `\nТип урок: ${lessonTypeLabel}` : ""}${body.methods ? `\nПредпочитани методи: ${body.methods}` : ""}${body.context ? `\nДопълнителен контекст: ${body.context}` : ""}`;
 
         const res = await aiChat({
-            model: "google/gemini-3.6-flash",
+            model: "google/gemini-3.7-flash",
             messages: [{ role: "system", content: `${sys}\n\n${AI_GUARDRAILS}` }, { role: "user", content: usr }],
           });
         if (!res.ok) {

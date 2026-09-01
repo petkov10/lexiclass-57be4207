@@ -28,7 +28,7 @@ ${AI_GUARDRAILS}`,
         };
 
         const res = await aiChat({
-            model: "google/gemini-3.6-flash",
+            model: "google/gemini-3.7-flash",
             messages: [systemPrompt, ...body.messages],
           });
 
