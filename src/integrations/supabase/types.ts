@@ -50,6 +50,30 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_settings: {
+        Row: {
+          api_key: string | null
+          id: number
+          model: string | null
+          provider: string
+          updated_at: string
+        }
+        Insert: {
+          api_key?: string | null
+          id?: number
+          model?: string | null
+          provider?: string
+          updated_at?: string
+        }
+        Update: {
+          api_key?: string | null
+          id?: number
+          model?: string | null
+          provider?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       app_settings: {
         Row: {
           access_mode: string
@@ -131,6 +155,7 @@ export type Database = {
       classes: {
         Row: {
           created_at: string
+          deleted_at: string | null
           id: string
           name: string
           order_index: number
@@ -138,6 +163,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          deleted_at?: string | null
           id?: string
           name: string
           order_index?: number
@@ -145,6 +171,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          deleted_at?: string | null
           id?: string
           name?: string
           order_index?: number
@@ -257,6 +284,7 @@ export type Database = {
         Row: {
           content: Json | null
           created_at: string
+          deleted_at: string | null
           description: string | null
           file_path: string | null
           id: string
@@ -271,6 +299,7 @@ export type Database = {
         Insert: {
           content?: Json | null
           created_at?: string
+          deleted_at?: string | null
           description?: string | null
           file_path?: string | null
           id?: string
@@ -285,6 +314,7 @@ export type Database = {
         Update: {
           content?: Json | null
           created_at?: string
+          deleted_at?: string | null
           description?: string | null
           file_path?: string | null
           id?: string
@@ -374,6 +404,7 @@ export type Database = {
         Row: {
           color: string
           created_at: string
+          deleted_at: string | null
           icon: string | null
           id: string
           name: string
@@ -383,6 +414,7 @@ export type Database = {
         Insert: {
           color?: string
           created_at?: string
+          deleted_at?: string | null
           icon?: string | null
           id?: string
           name: string
@@ -392,6 +424,7 @@ export type Database = {
         Update: {
           color?: string
           created_at?: string
+          deleted_at?: string | null
           icon?: string | null
           id?: string
           name?: string
@@ -419,6 +452,41 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "test_content_resource_id_fkey"
+            columns: ["resource_id"]
+            isOneToOne: true
+            referencedRelation: "resources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      textbook_credentials: {
+        Row: {
+          notes: string | null
+          password: string | null
+          portal_url: string | null
+          resource_id: string
+          updated_at: string
+          username: string | null
+        }
+        Insert: {
+          notes?: string | null
+          password?: string | null
+          portal_url?: string | null
+          resource_id: string
+          updated_at?: string
+          username?: string | null
+        }
+        Update: {
+          notes?: string | null
+          password?: string | null
+          portal_url?: string | null
+          resource_id?: string
+          updated_at?: string
+          username?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "textbook_credentials_resource_id_fkey"
             columns: ["resource_id"]
             isOneToOne: true
             referencedRelation: "resources"
@@ -457,6 +525,7 @@ export type Database = {
           class_id: string
           color: string | null
           created_at: string
+          deleted_at: string | null
           description: string | null
           id: string
           name: string
@@ -470,6 +539,7 @@ export type Database = {
           class_id: string
           color?: string | null
           created_at?: string
+          deleted_at?: string | null
           description?: string | null
           id?: string
           name: string
@@ -483,6 +553,7 @@ export type Database = {
           class_id?: string
           color?: string | null
           created_at?: string
+          deleted_at?: string | null
           description?: string | null
           id?: string
           name?: string
@@ -538,6 +609,14 @@ export type Database = {
       admin_delete_class: { Args: { _id: string }; Returns: undefined }
       admin_delete_subject: { Args: { _id: string }; Returns: undefined }
       admin_delete_theme: { Args: { _id: string }; Returns: undefined }
+      admin_get_ai_settings: {
+        Args: never
+        Returns: {
+          has_key: boolean
+          model: string
+          provider: string
+        }[]
+      }
       admin_get_global_pin: { Args: never; Returns: string }
       admin_list_user_pins: {
         Args: never
@@ -552,6 +631,10 @@ export type Database = {
       admin_reset_all: { Args: never; Returns: undefined }
       admin_set_access: {
         Args: { _global_pin: string; _mode: string }
+        Returns: undefined
+      }
+      admin_set_ai_settings: {
+        Args: { _api_key: string; _model: string; _provider: string }
         Returns: undefined
       }
       admin_set_user_approved: {
@@ -616,6 +699,7 @@ export type Database = {
         | "flashcards"
         | "lesson_plan"
         | "code_exercise"
+        | "textbook"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -759,6 +843,7 @@ export const Constants = {
         "flashcards",
         "lesson_plan",
         "code_exercise",
+        "textbook",
       ],
     },
   },
