@@ -40,7 +40,7 @@ export const Route = createFileRoute("/api/ai-review")({
 ДОКУМЕНТ:
 ${text.slice(0, 60000)}`;
 
-        const res = aiChat({
+        const res = await aiChat({
             model: "google/gemini-3.6-flash",
             messages: [{ role: "system", content: sys }, { role: "user", content: usr }],
           });

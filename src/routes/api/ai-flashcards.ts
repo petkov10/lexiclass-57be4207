@@ -21,7 +21,7 @@ export const Route = createFileRoute("/api/ai-flashcards")({
         const sys = `Ти си учител, който създава флаш карти за ученици. Отговаряй САМО с валиден JSON по схемата { "flashcards": [ { "front": string, "back": string } ] }. Без обяснения, без markdown, без \`\`\`. Картите трябва да са на български език, кратки и ясни. Лицевата страна е въпрос или понятие, обратната — отговор или дефиниция.`;
         const usr = `Тема: ${topic}\nБрой карти: ${count}${body.context ? `\nДопълнителен контекст: ${body.context}` : ""}`;
 
-        const res = aiChat({
+        const res = await aiChat({
             model: "google/gemini-3.6-flash",
             messages: [{ role: "system", content: `${sys}\n\n${AI_GUARDRAILS}` }, { role: "user", content: userContent(usr, body.file) }],
             response_format: { type: "json_object" },

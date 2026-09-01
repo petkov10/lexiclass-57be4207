@@ -54,7 +54,7 @@ ${body.extra?.trim() ? `\nДОПЪЛНИТЕЛНИ УКАЗАНИЯ ОТ УЧИ�
 
 Изготви пълния документ.`;
 
-        const res = aiChat({
+        const res = await aiChat({
             model: "google/gemini-3.6-flash",
             messages: [
               { role: "system", content: `${SYSTEM}\n\n${AI_GUARDRAILS}` },

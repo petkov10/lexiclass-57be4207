@@ -22,7 +22,7 @@ export const Route = createFileRoute("/api/ai-code-exercise")({
 Без markdown, без \`\`\` обвиване на целия JSON. Кодът да е чист, със смислени имена. Поне 3 тестови случая.`;
         const usr = `Тема: ${topic}\nЕзик: ${language}\nНиво: ${level}${body.context ? `\nКонтекст: ${body.context}` : ""}`;
 
-        const res = aiChat({
+        const res = await aiChat({
             model: "google/gemini-3.6-flash",
             messages: [{ role: "system", content: `${sys}\n\n${AI_GUARDRAILS}` }, { role: "user", content: usr }],
             response_format: { type: "json_object" },

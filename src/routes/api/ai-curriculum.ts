@@ -51,7 +51,7 @@ ${text || "(виж прикачения файл)"}`;
           }
         }
 
-        const res = aiChat({
+        const res = await aiChat({
             model: "google/gemini-3.6-flash",
             messages: [
               { role: "system", content: sys },

@@ -171,7 +171,7 @@ export const Route = createFileRoute("/api/ai-pedagogy")({
         const sys = `Ти си опитен български учител-методист. Спазвай ДОС (Държавните образователни стандарти), използваш таксономията на Блум и активни методи. Връщай отговора САМО в чист Markdown — без обяснения преди/след.\n\n${PROMPTS[kind]}`;
         const usr = `Тема: ${topic}${body.grade ? `\nКлас: ${body.grade}` : ""}${body.duration ? `\nВреме: ${body.duration} мин` : ""}${body.context ? `\nДопълнителен контекст: ${body.context}` : ""}`;
 
-        const res = aiChat({
+        const res = await aiChat({
             model: "google/gemini-3.6-flash",
             messages: [{ role: "system", content: `${sys}\n\n${AI_GUARDRAILS}` }, { role: "user", content: usr }],
           });

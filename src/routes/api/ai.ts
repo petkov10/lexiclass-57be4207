@@ -27,13 +27,12 @@ export const Route = createFileRoute("/api/ai")({
 ${AI_GUARDRAILS}`,
         };
 
-        const res = aiChat({
+        const res = await aiChat({
             model: "google/gemini-3.6-flash",
             messages: [systemPrompt, ...body.messages],
           });
 
         if (!res.ok) {
-          const text = await res.text();
           return aiErrorResponse(res.status, await res.text());
         }
 
