@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { aiChat, aiErrorResponse } from "@/lib/ai-call.server";
 import { requireEditor } from "@/lib/api-auth.server";
 import { AI_GUARDRAILS } from "@/lib/ai-guardrails";
 
@@ -10,8 +11,6 @@ export const Route = createFileRoute("/api/ai")({
       POST: async ({ request }) => {
         const auth = await requireEditor(request);
         if (!auth.ok) return auth.response;
-        const apiKey = process.env.LOVABLE_API_KEY;
-        if (!apiKey) return new Response("Missing LOVABLE_API_KEY", { status: 500 });
         const body = (await request.json()) as { messages?: Msg[] };
         if (!Array.isArray(body.messages)) return new Response("Bad request", { status: 400 });
 
@@ -28,23 +27,14 @@ export const Route = createFileRoute("/api/ai")({
 ${AI_GUARDRAILS}`,
         };
 
-        const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${apiKey}`,
-          },
-          body: JSON.stringify({
+        const res = aiChat({
             model: "google/gemini-3.6-flash",
             messages: [systemPrompt, ...body.messages],
-          }),
-        });
+          });
 
         if (!res.ok) {
           const text = await res.text();
-          if (res.status === 429) return new Response("Rate limit exceeded. Опитайте по-късно.", { status: 429 });
-          if (res.status === 402) return new Response("Изчерпан кредит за AI. Моля, добавете кредити в работното пространство.", { status: 402 });
-          return new Response(text || "AI error", { status: res.status });
+          return aiErrorResponse(res.status, await res.text());
         }
 
         const json = await res.json();
