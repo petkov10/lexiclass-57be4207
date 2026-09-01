@@ -44,7 +44,7 @@ function SubjectsAdmin() {
 
   const remove = async (id: string) => {
     if (!confirm("Да изтрия този предмет и всички ресурси към него?")) return;
-    const { error } = await supabase.from("subjects").delete().eq("id", id);
+    const { error } = await supabase.from("subjects").update({ deleted_at: new Date().toISOString() }).eq("id", id);
     if (error) return toast.error(error.message);
     refresh();
   };

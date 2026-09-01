@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { aiChat, aiErrorResponse } from "@/lib/ai-call.server";
 import { requireEditor } from "@/lib/api-auth.server";
 import { AI_GUARDRAILS } from "@/lib/ai-guardrails";
 
@@ -10,8 +11,6 @@ export const Route = createFileRoute("/api/ai-review")({
       POST: async ({ request }) => {
         const auth = await requireEditor(request);
         if (!auth.ok) return auth.response;
-        const apiKey = process.env.LOVABLE_API_KEY;
-        if (!apiKey) return new Response("Missing LOVABLE_API_KEY", { status: 500 });
 
         const body = (await request.json()) as Body;
         const text = (body.text || "").trim();
@@ -41,18 +40,12 @@ export const Route = createFileRoute("/api/ai-review")({
 ДОКУМЕНТ:
 ${text.slice(0, 60000)}`;
 
-        const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-          method: "POST",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-          body: JSON.stringify({
-            model: "google/gemini-3.6-flash",
+        const res = await aiChat({
+            model: "google/gemini-3.7-flash",
             messages: [{ role: "system", content: sys }, { role: "user", content: usr }],
-          }),
-        });
+          });
         if (!res.ok) {
-          if (res.status === 429) return new Response("Прекалено много заявки.", { status: 429 });
-          if (res.status === 402) return new Response("Изчерпан AI кредит.", { status: 402 });
-          return new Response(await res.text(), { status: res.status });
+          return aiErrorResponse(res.status, await res.text());
         }
         const json = await res.json();
         return Response.json({ review: json.choices?.[0]?.message?.content ?? "" });

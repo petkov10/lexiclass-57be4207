@@ -13,7 +13,7 @@ export const settingsQuery = queryOptions({
 export const classesQuery = queryOptions({
   queryKey: ["classes"],
   queryFn: async () => {
-    const { data, error } = await supabase.from("classes").select("*").order("order_index");
+    const { data, error } = await supabase.from("classes").select("*").is("deleted_at", null).order("order_index");
     if (error) throw error;
     return data ?? [];
   },
@@ -22,7 +22,7 @@ export const classesQuery = queryOptions({
 export const subjectsQuery = queryOptions({
   queryKey: ["subjects"],
   queryFn: async () => {
-    const { data, error } = await supabase.from("subjects").select("*").order("order_index");
+    const { data, error } = await supabase.from("subjects").select("*").is("deleted_at", null).order("order_index");
     if (error) throw error;
     return data ?? [];
   },
@@ -46,6 +46,7 @@ export const themesQuery = (classId: string, subjectId: string) =>
         .select("*")
         .eq("class_id", classId)
         .eq("subject_id", subjectId)
+        .is("deleted_at", null)
         .order("order_index");
       if (error) throw error;
       return data ?? [];
@@ -55,7 +56,7 @@ export const themesQuery = (classId: string, subjectId: string) =>
 export const allThemesQuery = queryOptions({
   queryKey: ["themes-all"],
   queryFn: async () => {
-    const { data, error } = await supabase.from("themes").select("*").order("order_index");
+    const { data, error } = await supabase.from("themes").select("*").is("deleted_at", null).order("order_index");
     if (error) throw error;
     return data ?? [];
   },
@@ -69,6 +70,7 @@ export const resourcesForThemeQuery = (themeId: string) =>
         .from("resources")
         .select("*")
         .eq("theme_id", themeId)
+        .is("deleted_at", null)
         .order("order_index");
       if (error) throw error;
       return data ?? [];

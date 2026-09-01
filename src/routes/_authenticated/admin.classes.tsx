@@ -32,7 +32,7 @@ function ClassesAdmin() {
 
   const remove = async (id: string) => {
     if (!confirm("Сигурни ли сте? Това ще изтрие всички теми и ресурси към този клас.")) return;
-    const { error } = await supabase.from("classes").delete().eq("id", id);
+    const { error } = await supabase.from("classes").update({ deleted_at: new Date().toISOString() }).eq("id", id);
     if (error) return toast.error(error.message);
     refresh(); toast.success("Изтрито");
   };

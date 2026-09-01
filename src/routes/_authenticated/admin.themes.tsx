@@ -87,7 +87,7 @@ function ThemesAdmin() {
 
   const remove = async (id: string) => {
     if (!confirm("Изтриване на темата и всички ресурси?")) return;
-    const { error } = await supabase.from("themes").delete().eq("id", id);
+    const { error } = await supabase.from("themes").update({ deleted_at: new Date().toISOString() }).eq("id", id);
     if (error) return toast.error(error.message);
     refresh();
   };

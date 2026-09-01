@@ -92,7 +92,7 @@ function ResourcesAdmin() {
     if (!confirm(`Изтрий ${selected.size} ресурса?`)) return;
     setBulkBusy(true);
     try {
-      const { error } = await supabase.from("resources").delete().in("id", Array.from(selected));
+      const { error } = await supabase.from("resources").update({ deleted_at: new Date().toISOString() }).in("id", Array.from(selected));
       if (error) throw error;
       toast.success(`Изтрити ${selected.size} ресурса`);
       refresh();
@@ -222,7 +222,7 @@ function ResourcesAdmin() {
                 onEdit={() => { setEditing(r as ResourceRow); setOpen(true); }}
                 onDelete={async () => {
                   if (!confirm("Изтрий ресурса?")) return;
-                  await supabase.from("resources").delete().eq("id", r.id);
+                  await supabase.from("resources").update({ deleted_at: new Date().toISOString() }).eq("id", r.id);
                   refresh();
                 }}
               />
