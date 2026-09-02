@@ -25,6 +25,7 @@ import {
   FileSignature,
   ClipboardList,
   LifeBuoy,
+  Trash2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeModeToggle } from "@/components/ThemeModeToggle";
@@ -53,6 +54,7 @@ const nav: NavItem[] = [
   { to: "/admin/help", label: "Помощ", icon: LifeBuoy },
   { to: "/admin/users", label: "Потребители", icon: Users, adminOnly: true },
   { to: "/admin/settings", label: "Настройки", icon: SettingsIcon, adminOnly: true },
+  { to: "/admin/trash", label: "Кошче", icon: Trash2, adminOnly: true },
   { to: "/admin/activity", label: "Дневник", icon: Activity, adminOnly: true },
   { to: "/admin/backup", label: "Миграция и архив", icon: DatabaseBackup, adminOnly: true },
 ];
