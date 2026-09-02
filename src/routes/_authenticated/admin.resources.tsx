@@ -35,6 +35,7 @@ const TYPES: { value: ResourceType; label: string }[] = [
   { value: "flashcards", label: "Флаш карти" },
   { value: "lesson_plan", label: "Педагогически материал" },
   { value: "code_exercise", label: "Код упражнение" },
+  { value: "textbook", label: "Учебник (електронен)" },
   { value: "other", label: "Друго" },
 ];
 

@@ -23,12 +23,12 @@ export const Route = createFileRoute("/theme/$themeId")({
 const ICONS: Record<ResourceType, typeof FileText> = {
   presentation: Presentation, document: FileText, link: LinkIcon, video: Video,
   test: FileCheck, task: Pencil, code: Code, image: ImgIcon, note: StickyNote,
-  notebooklm: BookOpen, flashcards: Layers, lesson_plan: BookOpen, code_exercise: Code, other: FileText,
+  notebooklm: BookOpen, flashcards: Layers, lesson_plan: BookOpen, code_exercise: Code, textbook: BookCheck, other: FileText,
 };
 const LABELS: Record<ResourceType, string> = {
   presentation: "Презентация", document: "Документ", link: "Линк", video: "Видео",
   test: "Тест", task: "Задача", code: "Код", image: "Изображение", note: "Бележка",
-  notebooklm: "NotebookLM", flashcards: "Флаш карти", lesson_plan: "Педагогически материал", code_exercise: "Код упражнение", other: "Друго",
+  notebooklm: "NotebookLM", flashcards: "Флаш карти", lesson_plan: "Педагогически материал", code_exercise: "Код упражнение", textbook: "Учебник", other: "Друго",
 };
 
 function ThemePage() {
@@ -207,6 +207,7 @@ function ThemePage() {
 }
 
 const GROUP_ORDER: { types: ResourceType[]; label: string }[] = [
+  { types: ["textbook"], label: "Учебници" },
   { types: ["presentation"], label: "Презентации" },
   { types: ["document"], label: "Документи" },
   { types: ["video"], label: "Видео" },
@@ -299,6 +300,9 @@ function ResourceViewer({ r, fullscreen }: { r: ResourceRow; fullscreen: boolean
   }
   if (r.type === "test") {
     return <TestViewer resourceId={r.id} title={r.title} />;
+  }
+  if (r.type === "textbook") {
+    return <TextbookViewer r={r} url={url} loading={loading} />;
   }
 
   if (r.type === "lesson_plan") {

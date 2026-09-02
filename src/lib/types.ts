@@ -43,6 +43,7 @@ export type ResourceType =
   | "flashcards"
   | "lesson_plan"
   | "code_exercise"
+  | "textbook"
   | "other";
 
 export type Flashcard = { front: string; back: string };
