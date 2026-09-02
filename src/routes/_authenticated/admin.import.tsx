@@ -20,7 +20,7 @@ const TYPE_LABELS: Record<ResourceType, string> = {
   presentation: "Презентация", document: "Документ", link: "Линк", video: "Видео",
   test: "Тест", task: "Задача", code: "Код", image: "Изображение", note: "Бележка",
   notebooklm: "NotebookLM", flashcards: "Флаш карти", lesson_plan: "Педагогически материал",
-  code_exercise: "Код упражнение", other: "Друго",
+  code_exercise: "Код упражнение", textbook: "Учебник", other: "Друго",
 };
 
 const TYPE_OPTIONS: ResourceType[] = [
