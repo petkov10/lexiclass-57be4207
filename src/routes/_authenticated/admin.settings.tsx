@@ -234,8 +234,115 @@ function SettingsPage() {
 
       <Button onClick={save} disabled={saving}>{saving ? "Запазване..." : "Запази настройките"}</Button>
 
+      <AiSettingsCard />
+
       <DangerZone />
     </div>
+  );
+}
+
+function AiSettingsCard() {
+  const [provider, setProvider] = useState<"lovable" | "gemini" | "openai">("lovable");
+  const [model, setModel] = useState("");
+  const [apiKey, setApiKey] = useState("");
+  const [hasKey, setHasKey] = useState(false);
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    supabase.rpc("admin_get_ai_settings").then(({ data }) => {
+      const row = Array.isArray(data) ? data[0] : (data as any);
+      if (!row) return;
+      setProvider((row.provider as any) || "lovable");
+      setModel(row.model || "");
+      setHasKey(!!row.has_key);
+    });
+  }, []);
+
+  const save = async () => {
+    if (provider !== "lovable" && !hasKey && !apiKey.trim()) {
+      toast.error("Въведете API ключ за избрания доставчик");
+      return;
+    }
+    setBusy(true);
+    try {
+      const { error } = await supabase.rpc("admin_set_ai_settings", {
+        _provider: provider,
+        _model: model.trim() || (null as any),
+        _api_key: apiKey.trim() ? apiKey.trim() : (null as any),
+      });
+      if (error) throw error;
+      if (apiKey.trim()) setHasKey(true);
+      setApiKey("");
+      toast.success("AI настройките са запазени");
+    } catch (e: any) { toast.error(e.message); }
+    finally { setBusy(false); }
+  };
+
+  const clearKey = async () => {
+    setBusy(true);
+    try {
+      const { error } = await supabase.rpc("admin_set_ai_settings", {
+        _provider: "lovable", _model: null as any, _api_key: "" as any,
+      });
+      if (error) throw error;
+      setProvider("lovable"); setModel(""); setApiKey(""); setHasKey(false);
+      toast.success("Върнато към вградения AI");
+    } catch (e: any) { toast.error(e.message); }
+    finally { setBusy(false); }
+  };
+
+  return (
+    <Card className="p-6 space-y-4">
+      <div>
+        <h2 className="font-semibold">AI доставчик</h2>
+        <p className="text-xs text-muted-foreground mt-1">
+          По подразбиране се използва вграденият AI. Може да добавите собствен ключ за Google Gemini или OpenAI.
+          При проблем със собствения ключ системата автоматично се връща към вградения AI.
+        </p>
+      </div>
+
+      <div className="grid sm:grid-cols-3 gap-2">
+        {[
+          { v: "lovable", label: "Вграден AI", desc: "Без ключ, готов за работа" },
+          { v: "gemini", label: "Google Gemini", desc: "Собствен ключ" },
+          { v: "openai", label: "OpenAI", desc: "Собствен ключ" },
+        ].map((opt) => {
+          const active = provider === (opt.v as any);
+          return (
+            <button key={opt.v} type="button" onClick={() => setProvider(opt.v as any)}
+              className="rounded-xl border-2 p-3 text-left hover:bg-accent transition-all"
+              style={{ borderColor: active ? "var(--ring)" : "var(--border)" }}>
+              <div className="font-medium text-sm">{opt.label}</div>
+              <div className="text-xs text-muted-foreground">{opt.desc}</div>
+            </button>
+          );
+        })}
+      </div>
+
+      {provider !== "lovable" && (
+        <div className="space-y-3">
+          <div>
+            <Label>Модел</Label>
+            <Input value={model} onChange={(e) => setModel(e.target.value)}
+              placeholder={provider === "gemini" ? "gemini-2.5-flash" : "gpt-4o-mini"} />
+            <p className="text-xs text-muted-foreground mt-1">Празно = препоръчаният модел по подразбиране.</p>
+          </div>
+          <div>
+            <Label>API ключ</Label>
+            <Input type="password" value={apiKey} onChange={(e) => setApiKey(e.target.value)}
+              placeholder={hasKey ? "•••••••• (запазен) — въведете нов, за да го смените" : "Поставете ключа тук"} />
+            <p className="text-xs text-muted-foreground mt-1">Ключът се пази само на сървъра и не се връща обратно в браузъра.</p>
+          </div>
+        </div>
+      )}
+
+      <div className="flex gap-2">
+        <Button onClick={save} disabled={busy} variant="secondary">{busy ? "Запазване…" : "Запази AI настройките"}</Button>
+        {(hasKey || provider !== "lovable") && (
+          <Button onClick={clearKey} disabled={busy} variant="ghost">Изчисти ключа</Button>
+        )}
+      </div>
+    </Card>
   );
 }
 

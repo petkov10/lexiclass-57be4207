@@ -37,6 +37,7 @@ import { Route as AuthenticatedAdminScheduleRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin.settings'
 import { Route as AuthenticatedAdminSubjectsRouteImport } from './routes/_authenticated/admin.subjects'
 import { Route as AuthenticatedAdminThemesRouteImport } from './routes/_authenticated/admin.themes'
+import { Route as AuthenticatedAdminTrashRouteImport } from './routes/_authenticated/admin.trash'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
 import { Route as ClassClassIdIndexRouteImport } from './routes/class.$classId.index'
 import { Route as TestResourceIdPrintRouteImport } from './routes/test.$resourceId.print'
@@ -190,6 +191,11 @@ const AuthenticatedAdminThemesRoute =
     path: '/themes',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminTrashRoute = AuthenticatedAdminTrashRouteImport.update({
+  id: '/trash',
+  path: '/trash',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
 const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
   id: '/users',
   path: '/users',
@@ -239,6 +245,7 @@ export interface FileRoutesByFullPath {
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/subjects': typeof AuthenticatedAdminSubjectsRoute
   '/admin/themes': typeof AuthenticatedAdminThemesRoute
+  '/admin/trash': typeof AuthenticatedAdminTrashRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/test/$resourceId/print': typeof TestResourceIdPrintRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -270,6 +277,7 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/subjects': typeof AuthenticatedAdminSubjectsRoute
   '/admin/themes': typeof AuthenticatedAdminThemesRoute
+  '/admin/trash': typeof AuthenticatedAdminTrashRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/test/$resourceId/print': typeof TestResourceIdPrintRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -305,6 +313,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/subjects': typeof AuthenticatedAdminSubjectsRoute
   '/_authenticated/admin/themes': typeof AuthenticatedAdminThemesRoute
+  '/_authenticated/admin/trash': typeof AuthenticatedAdminTrashRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/test/$resourceId/print': typeof TestResourceIdPrintRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -340,6 +349,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/subjects'
     | '/admin/themes'
+    | '/admin/trash'
     | '/admin/users'
     | '/test/$resourceId/print'
     | '/admin/'
@@ -371,6 +381,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/subjects'
     | '/admin/themes'
+    | '/admin/trash'
     | '/admin/users'
     | '/test/$resourceId/print'
     | '/admin'
@@ -405,6 +416,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/settings'
     | '/_authenticated/admin/subjects'
     | '/_authenticated/admin/themes'
+    | '/_authenticated/admin/trash'
     | '/_authenticated/admin/users'
     | '/test/$resourceId/print'
     | '/_authenticated/admin/'
@@ -629,6 +641,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminThemesRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/trash': {
+      id: '/_authenticated/admin/trash'
+      path: '/trash'
+      fullPath: '/admin/trash'
+      preLoaderRoute: typeof AuthenticatedAdminTrashRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/users': {
       id: '/_authenticated/admin/users'
       path: '/users'
@@ -672,6 +691,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
   AuthenticatedAdminSubjectsRoute: typeof AuthenticatedAdminSubjectsRoute
   AuthenticatedAdminThemesRoute: typeof AuthenticatedAdminThemesRoute
+  AuthenticatedAdminTrashRoute: typeof AuthenticatedAdminTrashRoute
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
@@ -688,6 +708,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
   AuthenticatedAdminSubjectsRoute: AuthenticatedAdminSubjectsRoute,
   AuthenticatedAdminThemesRoute: AuthenticatedAdminThemesRoute,
+  AuthenticatedAdminTrashRoute: AuthenticatedAdminTrashRoute,
   AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
