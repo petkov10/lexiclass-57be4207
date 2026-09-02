@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { classesQuery, subjectsQuery, themesQuery, classSubjectsQuery, resourcesForThemeQuery } from "@/lib/queries";
 import { useResourceUrl } from "@/hooks/useResourceUrl";
 import { supabase } from "@/integrations/supabase/client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
