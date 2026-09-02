@@ -23,12 +23,12 @@ export const Route = createFileRoute("/theme/$themeId")({
 const ICONS: Record<ResourceType, typeof FileText> = {
   presentation: Presentation, document: FileText, link: LinkIcon, video: Video,
   test: FileCheck, task: Pencil, code: Code, image: ImgIcon, note: StickyNote,
-  notebooklm: BookOpen, flashcards: Layers, lesson_plan: BookOpen, code_exercise: Code, other: FileText,
+  notebooklm: BookOpen, flashcards: Layers, lesson_plan: BookOpen, code_exercise: Code, textbook: BookCheck, other: FileText,
 };
 const LABELS: Record<ResourceType, string> = {
   presentation: "Презентация", document: "Документ", link: "Линк", video: "Видео",
   test: "Тест", task: "Задача", code: "Код", image: "Изображение", note: "Бележка",
-  notebooklm: "NotebookLM", flashcards: "Флаш карти", lesson_plan: "Педагогически материал", code_exercise: "Код упражнение", other: "Друго",
+  notebooklm: "NotebookLM", flashcards: "Флаш карти", lesson_plan: "Педагогически материал", code_exercise: "Код упражнение", textbook: "Учебник", other: "Друго",
 };
 
 function ThemePage() {
@@ -207,6 +207,7 @@ function ThemePage() {
 }
 
 const GROUP_ORDER: { types: ResourceType[]; label: string }[] = [
+  { types: ["textbook"], label: "Учебници" },
   { types: ["presentation"], label: "Презентации" },
   { types: ["document"], label: "Документи" },
   { types: ["video"], label: "Видео" },
@@ -300,6 +301,9 @@ function ResourceViewer({ r, fullscreen }: { r: ResourceRow; fullscreen: boolean
   if (r.type === "test") {
     return <TestViewer resourceId={r.id} title={r.title} />;
   }
+  if (r.type === "textbook") {
+    return <TextbookViewer r={r} url={url} loading={loading} />;
+  }
 
   if (r.type === "lesson_plan") {
     const c = (r.content ?? {}) as Record<string, string>;
@@ -327,6 +331,59 @@ function ResourceViewer({ r, fullscreen }: { r: ResourceRow; fullscreen: boolean
     return <FilePreview url={url} fileName={r.file_path ?? r.title} description={r.description} fullscreen={fullscreen} />;
   }
   return <p className="p-4 text-sm text-muted-foreground">Няма съдържание за преглед.</p>;
+}
+
+function TextbookViewer({ r, url, loading }: { r: ResourceRow; url: string | null; loading: boolean }) {
+  const [creds, setCreds] = useState<{ portal_url: string | null; username: string | null; password: string | null; notes: string | null } | null>(null);
+  const [show, setShow] = useState(false);
+  useEffect(() => {
+    let alive = true;
+    import("@/integrations/supabase/client").then(({ supabase }) =>
+      supabase.from("textbook_credentials").select("portal_url, username, password, notes").eq("resource_id", r.id).maybeSingle()
+    ).then(({ data }) => { if (alive && data) setCreds(data as never); }).catch(() => {});
+    return () => { alive = false; };
+  }, [r.id]);
+
+  const portal = creds?.portal_url || r.url || url;
+  return (
+    <div className="space-y-4 text-sm">
+      {r.description && <p className="text-muted-foreground">{r.description}</p>}
+      {portal && (
+        <Button asChild>
+          <a href={portal} target="_blank" rel="noreferrer">Отвори електронния учебник <ExternalLink className="h-4 w-4" /></a>
+        </Button>
+      )}
+      {loading && <p className="text-muted-foreground">Зареждане…</p>}
+      {creds && (creds.username || creds.password || creds.notes) && (
+        <div className="rounded-xl border p-4 space-y-2 bg-muted/30">
+          <div className="flex items-center justify-between gap-2">
+            <span className="font-medium">Данни за вход в портала на издателството</span>
+            <Button size="sm" variant="ghost" onClick={() => setShow((v) => !v)}>{show ? "Скрий" : "Покажи"}</Button>
+          </div>
+          {show ? (
+            <div className="space-y-1 font-mono text-xs">
+              {creds.username && (
+                <div className="flex items-center gap-2">
+                  <span className="text-muted-foreground">Потребител:</span> {creds.username}
+                  <button className="underline" onClick={() => { navigator.clipboard.writeText(creds.username!); toast.success("Копирано"); }}>копирай</button>
+                </div>
+              )}
+              {creds.password && (
+                <div className="flex items-center gap-2">
+                  <span className="text-muted-foreground">Парола:</span> {creds.password}
+                  <button className="underline" onClick={() => { navigator.clipboard.writeText(creds.password!); toast.success("Копирано"); }}>копирай</button>
+                </div>
+              )}
+              {creds.notes && <div className="text-muted-foreground whitespace-pre-wrap font-sans">{creds.notes}</div>}
+            </div>
+          ) : (
+            <p className="text-xs text-muted-foreground">Видимо само за учители след вход.</p>
+          )}
+        </div>
+      )}
+      {!portal && !creds && <p className="text-muted-foreground">Няма зададен линк към учебника.</p>}
+    </div>
+  );
 }
 
 function FilePreview({ url, fileName, description, fullscreen }: { url: string; fileName?: string | null; description?: string | null; fullscreen: boolean }) {

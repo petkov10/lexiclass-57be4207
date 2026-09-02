@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { classesQuery, subjectsQuery, themesQuery, classSubjectsQuery, resourcesForThemeQuery } from "@/lib/queries";
 import { useResourceUrl } from "@/hooks/useResourceUrl";
 import { supabase } from "@/integrations/supabase/client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -35,6 +35,7 @@ const TYPES: { value: ResourceType; label: string }[] = [
   { value: "flashcards", label: "Флаш карти" },
   { value: "lesson_plan", label: "Педагогически материал" },
   { value: "code_exercise", label: "Код упражнение" },
+  { value: "textbook", label: "Учебник (електронен)" },
   { value: "other", label: "Друго" },
 ];
 
@@ -301,10 +302,22 @@ function ResourceForm({ themeId, existing, orderHint, onDone }: { themeId: strin
   const [cards, setCards] = useState<Flashcard[]>(
     ((existing?.content as { flashcards?: Flashcard[] } | null)?.flashcards) ?? []
   );
+  const [tb, setTb] = useState({ portal_url: "", username: "", password: "", notes: "" });
   const [aiTopic, setAiTopic] = useState("");
   const [aiCount, setAiCount] = useState(10);
   const [aiLoading, setAiLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (existing?.type !== "textbook") return;
+    supabase.from("textbook_credentials").select("portal_url, username, password, notes").eq("resource_id", existing.id).maybeSingle()
+      .then(({ data }) => {
+        if (data) setTb({
+          portal_url: data.portal_url ?? "", username: data.username ?? "",
+          password: data.password ?? "", notes: data.notes ?? "",
+        });
+      });
+  }, [existing?.id, existing?.type]);
 
   const save = async () => {
     setSaving(true);
@@ -330,10 +343,21 @@ function ResourceForm({ themeId, existing, orderHint, onDone }: { themeId: strin
             : null,
         order_index: existing?.order_index ?? orderHint,
       };
-      const { error } = existing
-        ? await supabase.from("resources").update(payload).eq("id", existing.id)
-        : await supabase.from("resources").insert(payload);
+      const { data: saved, error } = existing
+        ? await supabase.from("resources").update(payload).eq("id", existing.id).select("id").maybeSingle()
+        : await supabase.from("resources").insert(payload).select("id").maybeSingle();
       if (error) throw error;
+      if (type === "textbook" && saved?.id) {
+        const { error: cErr } = await supabase.from("textbook_credentials").upsert({
+          resource_id: saved.id,
+          portal_url: tb.portal_url.trim() || null,
+          username: tb.username.trim() || null,
+          password: tb.password.trim() || null,
+          notes: tb.notes.trim() || null,
+          updated_at: new Date().toISOString(),
+        });
+        if (cErr) throw cErr;
+      }
       toast.success("Запазено");
       onDone();
     } catch (e: any) {
@@ -427,6 +451,22 @@ function ResourceForm({ themeId, existing, orderHint, onDone }: { themeId: strin
           <div><Label>Условие</Label><Textarea rows={3} value={content.statement || ""} onChange={(e) => setC("statement", e.target.value)} /></div>
           <div><Label>Стартов код</Label><Textarea rows={6} className="font-mono text-xs" value={content.starter_code || ""} onChange={(e) => setC("starter_code", e.target.value)} /></div>
           <div><Label>Решение</Label><Textarea rows={6} className="font-mono text-xs" value={content.solution || ""} onChange={(e) => setC("solution", e.target.value)} /></div>
+        </div>
+      )}
+
+      {type === "textbook" && (
+        <div className="space-y-3 rounded-lg border p-3">
+          <div>
+            <Label>Линк към електронния учебник / портала</Label>
+            <Input value={tb.portal_url} onChange={(e) => setTb((p) => ({ ...p, portal_url: e.target.value }))}
+              placeholder="https://..." />
+          </div>
+          <div className="grid sm:grid-cols-2 gap-3">
+            <div><Label>Потребител</Label><Input value={tb.username} onChange={(e) => setTb((p) => ({ ...p, username: e.target.value }))} /></div>
+            <div><Label>Парола</Label><Input type="password" value={tb.password} onChange={(e) => setTb((p) => ({ ...p, password: e.target.value }))} /></div>
+          </div>
+          <div><Label>Бележки (напр. как се влиза)</Label><Textarea rows={3} value={tb.notes} onChange={(e) => setTb((p) => ({ ...p, notes: e.target.value }))} /></div>
+          <p className="text-xs text-muted-foreground">Данните за вход се виждат само от учители след вход в системата.</p>
         </div>
       )}
 
