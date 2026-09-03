@@ -40,6 +40,7 @@ function ThemePage() {
   const [fullscreen, setFullscreen] = useState(false);
   const [fav, setFav] = useState(false);
   const [projector, setProj] = useState(false);
+  const [lesson, setLesson] = useState(false);
 
   useEffect(() => {
     setFav(isFavorite(themeId));
@@ -122,6 +123,15 @@ function ThemePage() {
               >
                 <MonitorPlay className="h-4 w-4" /> Проектор
               </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                title="Режим „Урок“ — цял екран с таймер за часа"
+                disabled={!resources || resources.length === 0}
+                onClick={() => setLesson(true)}
+              >
+                <Presentation className="h-4 w-4" /> Урок
+              </Button>
 
               <Button
                 variant="outline"
@@ -195,6 +205,13 @@ function ThemePage() {
           )}
         </DialogContent>
       </Dialog>
+      {lesson && (
+        <LessonMode
+          themeName={theme?.name ?? "Урок"}
+          resources={(resources ?? []) as ResourceRow[]}
+          onClose={() => setLesson(false)}
+        />
+      )}
       {theme && (
         <ThemeAIChat
           themeName={theme.name}
@@ -536,6 +553,97 @@ function FlashcardsViewer({ cards, fullscreen }: { cards: Flashcard[]; fullscree
       <div className="flex justify-between gap-2">
         <Button variant="outline" onClick={() => go(-1)} size={fullscreen ? "lg" : "default"}>← Предишна</Button>
         <Button variant="outline" onClick={() => go(1)} size={fullscreen ? "lg" : "default"}>Следваща →</Button>
+      </div>
+    </div>
+  );
+}
+
+/** Режим „Урок“ — цял екран за преподаване: ресурс по ресурс + таймер на часа. */
+function LessonMode({
+  themeName,
+  resources,
+  onClose,
+}: {
+  themeName: string;
+  resources: ResourceRow[];
+  onClose: () => void;
+}) {
+  const [idx, setIdx] = useState(0);
+  const [seconds, setSeconds] = useState(0);
+  const [running, setRunning] = useState(true);
+  const target = 40 * 60; // стандартен учебен час
+
+  useEffect(() => {
+    if (!running) return;
+    const t = setInterval(() => setSeconds((s) => s + 1), 1000);
+    return () => clearInterval(t);
+  }, [running]);
+
+  useEffect(() => {
+    const h = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+      if (e.key === "ArrowRight" || e.key === "PageDown") setIdx((i) => Math.min(i + 1, resources.length - 1));
+      if (e.key === "ArrowLeft" || e.key === "PageUp") setIdx((i) => Math.max(i - 1, 0));
+    };
+    window.addEventListener("keydown", h);
+    return () => window.removeEventListener("keydown", h);
+  }, [resources.length, onClose]);
+
+  const mm = String(Math.floor(seconds / 60)).padStart(2, "0");
+  const ss = String(seconds % 60).padStart(2, "0");
+  const over = seconds > target;
+  const current = resources[idx];
+
+  return (
+    <div className="fixed inset-0 z-[100] bg-background flex flex-col">
+      <div className="flex items-center justify-between gap-3 border-b px-4 py-2">
+        <div className="min-w-0">
+          <div className="text-xs uppercase tracking-wider text-muted-foreground">Режим „Урок“</div>
+          <div className="font-semibold truncate">{themeName}</div>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            onClick={() => setRunning((r) => !r)}
+            className={`font-mono text-xl tabular-nums rounded-md border px-3 py-1 ${over ? "text-destructive border-destructive" : ""}`}
+            title="Пауза / старт на таймера"
+          >
+            {mm}:{ss}
+          </button>
+          <Button size="sm" variant="ghost" onClick={() => { setSeconds(0); setRunning(true); }}>Нулирай</Button>
+          <Button size="sm" variant="outline" onClick={onClose}><Minimize2 className="h-4 w-4" /> Изход</Button>
+        </div>
+      </div>
+
+      <div className="flex-1 overflow-auto p-4 md:p-8">
+        {current ? (
+          <div className="mx-auto max-w-6xl space-y-4">
+            <h2 className="text-2xl md:text-3xl font-semibold">{current.title}</h2>
+            <div className="text-base md:text-lg [&_.prose]:max-w-none">
+              <ResourceViewer r={current} fullscreen />
+            </div>
+          </div>
+        ) : (
+          <p className="text-center text-muted-foreground">Няма ресурси за преподаване.</p>
+        )}
+      </div>
+
+      <div className="border-t px-4 py-2 flex items-center justify-between gap-3">
+        <Button variant="outline" onClick={() => setIdx((i) => Math.max(i - 1, 0))} disabled={idx === 0}>
+          <ChevronLeft className="h-4 w-4" /> Назад
+        </Button>
+        <div className="flex-1 overflow-x-auto flex gap-1 justify-center">
+          {resources.map((r, i) => (
+            <button
+              key={r.id}
+              onClick={() => setIdx(i)}
+              title={r.title}
+              className={`h-2 w-8 rounded-full shrink-0 ${i === idx ? "bg-primary" : "bg-muted"}`}
+            />
+          ))}
+        </div>
+        <Button variant="outline" onClick={() => setIdx((i) => Math.min(i + 1, resources.length - 1))} disabled={idx >= resources.length - 1}>
+          Напред <ChevronRight className="h-4 w-4" />
+        </Button>
       </div>
     </div>
   );

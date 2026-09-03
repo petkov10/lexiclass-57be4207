@@ -23,6 +23,7 @@ import { Route as ApiAiPedagogyRouteImport } from './routes/api/ai-pedagogy'
 import { Route as ApiAiReviewRouteImport } from './routes/api/ai-review'
 import { Route as ApiAiTestRouteImport } from './routes/api/ai-test'
 import { Route as ApiAiThemeMetaRouteImport } from './routes/api/ai-theme-meta'
+import { Route as ApiLinkCheckRouteImport } from './routes/api/link-check'
 import { Route as ClassClassIdRouteImport } from './routes/class.$classId'
 import { Route as ThemeThemeIdRouteImport } from './routes/theme.$themeId'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
@@ -32,6 +33,7 @@ import { Route as AuthenticatedAdminBackupRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAdminClassesRouteImport } from './routes/_authenticated/admin.classes'
 import { Route as AuthenticatedAdminHelpRouteImport } from './routes/_authenticated/admin.help'
 import { Route as AuthenticatedAdminImportRouteImport } from './routes/_authenticated/admin.import'
+import { Route as AuthenticatedAdminLinksRouteImport } from './routes/_authenticated/admin.links'
 import { Route as AuthenticatedAdminResourcesRouteImport } from './routes/_authenticated/admin.resources'
 import { Route as AuthenticatedAdminScheduleRouteImport } from './routes/_authenticated/admin.schedule'
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin.settings'
@@ -112,6 +114,11 @@ const ApiAiThemeMetaRoute = ApiAiThemeMetaRouteImport.update({
   path: '/api/ai-theme-meta',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiLinkCheckRoute = ApiLinkCheckRouteImport.update({
+  id: '/api/link-check',
+  path: '/api/link-check',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ClassClassIdRoute = ClassClassIdRouteImport.update({
   id: '/class/$classId',
   path: '/class/$classId',
@@ -161,6 +168,11 @@ const AuthenticatedAdminImportRoute =
     path: '/import',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminLinksRoute = AuthenticatedAdminLinksRouteImport.update({
+  id: '/links',
+  path: '/links',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
 const AuthenticatedAdminResourcesRoute =
   AuthenticatedAdminResourcesRouteImport.update({
     id: '/resources',
@@ -232,6 +244,7 @@ export interface FileRoutesByFullPath {
   '/api/ai-review': typeof ApiAiReviewRoute
   '/api/ai-test': typeof ApiAiTestRoute
   '/api/ai-theme-meta': typeof ApiAiThemeMetaRoute
+  '/api/link-check': typeof ApiLinkCheckRoute
   '/class/$classId': typeof ClassClassIdRouteWithChildren
   '/theme/$themeId': typeof ThemeThemeIdRoute
   '/admin/activity': typeof AuthenticatedAdminActivityRoute
@@ -240,6 +253,7 @@ export interface FileRoutesByFullPath {
   '/admin/classes': typeof AuthenticatedAdminClassesRoute
   '/admin/help': typeof AuthenticatedAdminHelpRoute
   '/admin/import': typeof AuthenticatedAdminImportRoute
+  '/admin/links': typeof AuthenticatedAdminLinksRoute
   '/admin/resources': typeof AuthenticatedAdminResourcesRoute
   '/admin/schedule': typeof AuthenticatedAdminScheduleRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
@@ -265,6 +279,7 @@ export interface FileRoutesByTo {
   '/api/ai-review': typeof ApiAiReviewRoute
   '/api/ai-test': typeof ApiAiTestRoute
   '/api/ai-theme-meta': typeof ApiAiThemeMetaRoute
+  '/api/link-check': typeof ApiLinkCheckRoute
   '/theme/$themeId': typeof ThemeThemeIdRoute
   '/admin/activity': typeof AuthenticatedAdminActivityRoute
   '/admin/ai': typeof AuthenticatedAdminAiRoute
@@ -272,6 +287,7 @@ export interface FileRoutesByTo {
   '/admin/classes': typeof AuthenticatedAdminClassesRoute
   '/admin/help': typeof AuthenticatedAdminHelpRoute
   '/admin/import': typeof AuthenticatedAdminImportRoute
+  '/admin/links': typeof AuthenticatedAdminLinksRoute
   '/admin/resources': typeof AuthenticatedAdminResourcesRoute
   '/admin/schedule': typeof AuthenticatedAdminScheduleRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
@@ -300,6 +316,7 @@ export interface FileRoutesById {
   '/api/ai-review': typeof ApiAiReviewRoute
   '/api/ai-test': typeof ApiAiTestRoute
   '/api/ai-theme-meta': typeof ApiAiThemeMetaRoute
+  '/api/link-check': typeof ApiLinkCheckRoute
   '/class/$classId': typeof ClassClassIdRouteWithChildren
   '/theme/$themeId': typeof ThemeThemeIdRoute
   '/_authenticated/admin/activity': typeof AuthenticatedAdminActivityRoute
@@ -308,6 +325,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/classes': typeof AuthenticatedAdminClassesRoute
   '/_authenticated/admin/help': typeof AuthenticatedAdminHelpRoute
   '/_authenticated/admin/import': typeof AuthenticatedAdminImportRoute
+  '/_authenticated/admin/links': typeof AuthenticatedAdminLinksRoute
   '/_authenticated/admin/resources': typeof AuthenticatedAdminResourcesRoute
   '/_authenticated/admin/schedule': typeof AuthenticatedAdminScheduleRoute
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
@@ -336,6 +354,7 @@ export interface FileRouteTypes {
     | '/api/ai-review'
     | '/api/ai-test'
     | '/api/ai-theme-meta'
+    | '/api/link-check'
     | '/class/$classId'
     | '/theme/$themeId'
     | '/admin/activity'
@@ -344,6 +363,7 @@ export interface FileRouteTypes {
     | '/admin/classes'
     | '/admin/help'
     | '/admin/import'
+    | '/admin/links'
     | '/admin/resources'
     | '/admin/schedule'
     | '/admin/settings'
@@ -369,6 +389,7 @@ export interface FileRouteTypes {
     | '/api/ai-review'
     | '/api/ai-test'
     | '/api/ai-theme-meta'
+    | '/api/link-check'
     | '/theme/$themeId'
     | '/admin/activity'
     | '/admin/ai'
@@ -376,6 +397,7 @@ export interface FileRouteTypes {
     | '/admin/classes'
     | '/admin/help'
     | '/admin/import'
+    | '/admin/links'
     | '/admin/resources'
     | '/admin/schedule'
     | '/admin/settings'
@@ -403,6 +425,7 @@ export interface FileRouteTypes {
     | '/api/ai-review'
     | '/api/ai-test'
     | '/api/ai-theme-meta'
+    | '/api/link-check'
     | '/class/$classId'
     | '/theme/$themeId'
     | '/_authenticated/admin/activity'
@@ -411,6 +434,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/classes'
     | '/_authenticated/admin/help'
     | '/_authenticated/admin/import'
+    | '/_authenticated/admin/links'
     | '/_authenticated/admin/resources'
     | '/_authenticated/admin/schedule'
     | '/_authenticated/admin/settings'
@@ -438,6 +462,7 @@ export interface RootRouteChildren {
   ApiAiReviewRoute: typeof ApiAiReviewRoute
   ApiAiTestRoute: typeof ApiAiTestRoute
   ApiAiThemeMetaRoute: typeof ApiAiThemeMetaRoute
+  ApiLinkCheckRoute: typeof ApiLinkCheckRoute
   ClassClassIdRoute: typeof ClassClassIdRouteWithChildren
   ThemeThemeIdRoute: typeof ThemeThemeIdRoute
   TestResourceIdPrintRoute: typeof TestResourceIdPrintRoute
@@ -543,6 +568,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAiThemeMetaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/link-check': {
+      id: '/api/link-check'
+      path: '/api/link-check'
+      fullPath: '/api/link-check'
+      preLoaderRoute: typeof ApiLinkCheckRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/class/$classId': {
       id: '/class/$classId'
       path: '/class/$classId'
@@ -604,6 +636,13 @@ declare module '@tanstack/react-router' {
       path: '/import'
       fullPath: '/admin/import'
       preLoaderRoute: typeof AuthenticatedAdminImportRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/links': {
+      id: '/_authenticated/admin/links'
+      path: '/links'
+      fullPath: '/admin/links'
+      preLoaderRoute: typeof AuthenticatedAdminLinksRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/resources': {
@@ -686,6 +725,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminClassesRoute: typeof AuthenticatedAdminClassesRoute
   AuthenticatedAdminHelpRoute: typeof AuthenticatedAdminHelpRoute
   AuthenticatedAdminImportRoute: typeof AuthenticatedAdminImportRoute
+  AuthenticatedAdminLinksRoute: typeof AuthenticatedAdminLinksRoute
   AuthenticatedAdminResourcesRoute: typeof AuthenticatedAdminResourcesRoute
   AuthenticatedAdminScheduleRoute: typeof AuthenticatedAdminScheduleRoute
   AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
@@ -703,6 +743,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminClassesRoute: AuthenticatedAdminClassesRoute,
   AuthenticatedAdminHelpRoute: AuthenticatedAdminHelpRoute,
   AuthenticatedAdminImportRoute: AuthenticatedAdminImportRoute,
+  AuthenticatedAdminLinksRoute: AuthenticatedAdminLinksRoute,
   AuthenticatedAdminResourcesRoute: AuthenticatedAdminResourcesRoute,
   AuthenticatedAdminScheduleRoute: AuthenticatedAdminScheduleRoute,
   AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
@@ -755,6 +796,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAiReviewRoute: ApiAiReviewRoute,
   ApiAiTestRoute: ApiAiTestRoute,
   ApiAiThemeMetaRoute: ApiAiThemeMetaRoute,
+  ApiLinkCheckRoute: ApiLinkCheckRoute,
   ClassClassIdRoute: ClassClassIdRouteWithChildren,
   ThemeThemeIdRoute: ThemeThemeIdRoute,
   TestResourceIdPrintRoute: TestResourceIdPrintRoute,
