@@ -123,6 +123,15 @@ function ThemePage() {
               >
                 <MonitorPlay className="h-4 w-4" /> Проектор
               </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                title="Режим „Урок“ — цял екран с таймер за часа"
+                disabled={!resources || resources.length === 0}
+                onClick={() => setLesson(true)}
+              >
+                <Presentation className="h-4 w-4" /> Урок
+              </Button>
 
               <Button
                 variant="outline"
