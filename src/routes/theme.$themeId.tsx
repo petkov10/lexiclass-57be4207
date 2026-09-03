@@ -205,6 +205,13 @@ function ThemePage() {
           )}
         </DialogContent>
       </Dialog>
+      {lesson && (
+        <LessonMode
+          themeName={theme?.name ?? "Урок"}
+          resources={(resources ?? []) as ResourceRow[]}
+          onClose={() => setLesson(false)}
+        />
+      )}
       {theme && (
         <ThemeAIChat
           themeName={theme.name}
