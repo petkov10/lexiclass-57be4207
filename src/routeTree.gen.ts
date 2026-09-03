@@ -33,6 +33,7 @@ import { Route as AuthenticatedAdminBackupRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAdminClassesRouteImport } from './routes/_authenticated/admin.classes'
 import { Route as AuthenticatedAdminHelpRouteImport } from './routes/_authenticated/admin.help'
 import { Route as AuthenticatedAdminImportRouteImport } from './routes/_authenticated/admin.import'
+import { Route as AuthenticatedAdminLinksRouteImport } from './routes/_authenticated/admin.links'
 import { Route as AuthenticatedAdminResourcesRouteImport } from './routes/_authenticated/admin.resources'
 import { Route as AuthenticatedAdminScheduleRouteImport } from './routes/_authenticated/admin.schedule'
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin.settings'
@@ -167,6 +168,11 @@ const AuthenticatedAdminImportRoute =
     path: '/import',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminLinksRoute = AuthenticatedAdminLinksRouteImport.update({
+  id: '/links',
+  path: '/links',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
 const AuthenticatedAdminResourcesRoute =
   AuthenticatedAdminResourcesRouteImport.update({
     id: '/resources',
@@ -247,6 +253,7 @@ export interface FileRoutesByFullPath {
   '/admin/classes': typeof AuthenticatedAdminClassesRoute
   '/admin/help': typeof AuthenticatedAdminHelpRoute
   '/admin/import': typeof AuthenticatedAdminImportRoute
+  '/admin/links': typeof AuthenticatedAdminLinksRoute
   '/admin/resources': typeof AuthenticatedAdminResourcesRoute
   '/admin/schedule': typeof AuthenticatedAdminScheduleRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
@@ -280,6 +287,7 @@ export interface FileRoutesByTo {
   '/admin/classes': typeof AuthenticatedAdminClassesRoute
   '/admin/help': typeof AuthenticatedAdminHelpRoute
   '/admin/import': typeof AuthenticatedAdminImportRoute
+  '/admin/links': typeof AuthenticatedAdminLinksRoute
   '/admin/resources': typeof AuthenticatedAdminResourcesRoute
   '/admin/schedule': typeof AuthenticatedAdminScheduleRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
@@ -317,6 +325,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/classes': typeof AuthenticatedAdminClassesRoute
   '/_authenticated/admin/help': typeof AuthenticatedAdminHelpRoute
   '/_authenticated/admin/import': typeof AuthenticatedAdminImportRoute
+  '/_authenticated/admin/links': typeof AuthenticatedAdminLinksRoute
   '/_authenticated/admin/resources': typeof AuthenticatedAdminResourcesRoute
   '/_authenticated/admin/schedule': typeof AuthenticatedAdminScheduleRoute
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
@@ -354,6 +363,7 @@ export interface FileRouteTypes {
     | '/admin/classes'
     | '/admin/help'
     | '/admin/import'
+    | '/admin/links'
     | '/admin/resources'
     | '/admin/schedule'
     | '/admin/settings'
@@ -387,6 +397,7 @@ export interface FileRouteTypes {
     | '/admin/classes'
     | '/admin/help'
     | '/admin/import'
+    | '/admin/links'
     | '/admin/resources'
     | '/admin/schedule'
     | '/admin/settings'
@@ -423,6 +434,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/classes'
     | '/_authenticated/admin/help'
     | '/_authenticated/admin/import'
+    | '/_authenticated/admin/links'
     | '/_authenticated/admin/resources'
     | '/_authenticated/admin/schedule'
     | '/_authenticated/admin/settings'
@@ -626,6 +638,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminImportRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/links': {
+      id: '/_authenticated/admin/links'
+      path: '/links'
+      fullPath: '/admin/links'
+      preLoaderRoute: typeof AuthenticatedAdminLinksRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/resources': {
       id: '/_authenticated/admin/resources'
       path: '/resources'
@@ -706,6 +725,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminClassesRoute: typeof AuthenticatedAdminClassesRoute
   AuthenticatedAdminHelpRoute: typeof AuthenticatedAdminHelpRoute
   AuthenticatedAdminImportRoute: typeof AuthenticatedAdminImportRoute
+  AuthenticatedAdminLinksRoute: typeof AuthenticatedAdminLinksRoute
   AuthenticatedAdminResourcesRoute: typeof AuthenticatedAdminResourcesRoute
   AuthenticatedAdminScheduleRoute: typeof AuthenticatedAdminScheduleRoute
   AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
@@ -723,6 +743,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminClassesRoute: AuthenticatedAdminClassesRoute,
   AuthenticatedAdminHelpRoute: AuthenticatedAdminHelpRoute,
   AuthenticatedAdminImportRoute: AuthenticatedAdminImportRoute,
+  AuthenticatedAdminLinksRoute: AuthenticatedAdminLinksRoute,
   AuthenticatedAdminResourcesRoute: AuthenticatedAdminResourcesRoute,
   AuthenticatedAdminScheduleRoute: AuthenticatedAdminScheduleRoute,
   AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
