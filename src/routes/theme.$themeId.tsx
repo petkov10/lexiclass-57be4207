@@ -40,6 +40,7 @@ function ThemePage() {
   const [fullscreen, setFullscreen] = useState(false);
   const [fav, setFav] = useState(false);
   const [projector, setProj] = useState(false);
+  const [lesson, setLesson] = useState(false);
 
   useEffect(() => {
     setFav(isFavorite(themeId));
