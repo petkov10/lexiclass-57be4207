@@ -26,6 +26,7 @@ import {
   ClipboardList,
   LifeBuoy,
   Trash2,
+  Link as LinkIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeModeToggle } from "@/components/ThemeModeToggle";
@@ -51,6 +52,7 @@ const nav: NavItem[] = [
   { to: "/admin/ai", label: "Разработка на урок", icon: BookOpen, tab: "plan" },
   { to: "/admin/ai", label: "Училищни документи", icon: FileSignature, tab: "docs" },
   { to: "/admin/ai", label: "AI тестове", icon: ClipboardList, tab: "test" },
+  { to: "/admin/links", label: "Проверка на връзките", icon: LinkIcon },
   { to: "/admin/help", label: "Помощ", icon: LifeBuoy },
   { to: "/admin/users", label: "Потребители", icon: Users, adminOnly: true },
   { to: "/admin/settings", label: "Настройки", icon: SettingsIcon, adminOnly: true },
