@@ -18,9 +18,14 @@ import { Route as ApiAiCodeExerciseRouteImport } from './routes/api/ai-code-exer
 import { Route as ApiAiCurriculumRouteImport } from './routes/api/ai-curriculum'
 import { Route as ApiAiDocumentRouteImport } from './routes/api/ai-document'
 import { Route as ApiAiFlashcardsRouteImport } from './routes/api/ai-flashcards'
+import { Route as ApiAiGapsRouteImport } from './routes/api/ai-gaps'
 import { Route as ApiAiLessonPlanRouteImport } from './routes/api/ai-lesson-plan'
+import { Route as ApiAiOrderRouteImport } from './routes/api/ai-order'
 import { Route as ApiAiPedagogyRouteImport } from './routes/api/ai-pedagogy'
+import { Route as ApiAiResourceMetaRouteImport } from './routes/api/ai-resource-meta'
 import { Route as ApiAiReviewRouteImport } from './routes/api/ai-review'
+import { Route as ApiAiSummaryRouteImport } from './routes/api/ai-summary'
+import { Route as ApiAiTasksRouteImport } from './routes/api/ai-tasks'
 import { Route as ApiAiTestRouteImport } from './routes/api/ai-test'
 import { Route as ApiAiThemeMetaRouteImport } from './routes/api/ai-theme-meta'
 import { Route as ApiLinkCheckRouteImport } from './routes/api/link-check'
@@ -89,9 +94,19 @@ const ApiAiFlashcardsRoute = ApiAiFlashcardsRouteImport.update({
   path: '/api/ai-flashcards',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAiGapsRoute = ApiAiGapsRouteImport.update({
+  id: '/api/ai-gaps',
+  path: '/api/ai-gaps',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAiLessonPlanRoute = ApiAiLessonPlanRouteImport.update({
   id: '/api/ai-lesson-plan',
   path: '/api/ai-lesson-plan',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAiOrderRoute = ApiAiOrderRouteImport.update({
+  id: '/api/ai-order',
+  path: '/api/ai-order',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAiPedagogyRoute = ApiAiPedagogyRouteImport.update({
@@ -99,9 +114,24 @@ const ApiAiPedagogyRoute = ApiAiPedagogyRouteImport.update({
   path: '/api/ai-pedagogy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAiResourceMetaRoute = ApiAiResourceMetaRouteImport.update({
+  id: '/api/ai-resource-meta',
+  path: '/api/ai-resource-meta',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAiReviewRoute = ApiAiReviewRouteImport.update({
   id: '/api/ai-review',
   path: '/api/ai-review',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAiSummaryRoute = ApiAiSummaryRouteImport.update({
+  id: '/api/ai-summary',
+  path: '/api/ai-summary',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAiTasksRoute = ApiAiTasksRouteImport.update({
+  id: '/api/ai-tasks',
+  path: '/api/ai-tasks',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAiTestRoute = ApiAiTestRouteImport.update({
@@ -239,9 +269,14 @@ export interface FileRoutesByFullPath {
   '/api/ai-curriculum': typeof ApiAiCurriculumRoute
   '/api/ai-document': typeof ApiAiDocumentRoute
   '/api/ai-flashcards': typeof ApiAiFlashcardsRoute
+  '/api/ai-gaps': typeof ApiAiGapsRoute
   '/api/ai-lesson-plan': typeof ApiAiLessonPlanRoute
+  '/api/ai-order': typeof ApiAiOrderRoute
   '/api/ai-pedagogy': typeof ApiAiPedagogyRoute
+  '/api/ai-resource-meta': typeof ApiAiResourceMetaRoute
   '/api/ai-review': typeof ApiAiReviewRoute
+  '/api/ai-summary': typeof ApiAiSummaryRoute
+  '/api/ai-tasks': typeof ApiAiTasksRoute
   '/api/ai-test': typeof ApiAiTestRoute
   '/api/ai-theme-meta': typeof ApiAiThemeMetaRoute
   '/api/link-check': typeof ApiLinkCheckRoute
@@ -274,9 +309,14 @@ export interface FileRoutesByTo {
   '/api/ai-curriculum': typeof ApiAiCurriculumRoute
   '/api/ai-document': typeof ApiAiDocumentRoute
   '/api/ai-flashcards': typeof ApiAiFlashcardsRoute
+  '/api/ai-gaps': typeof ApiAiGapsRoute
   '/api/ai-lesson-plan': typeof ApiAiLessonPlanRoute
+  '/api/ai-order': typeof ApiAiOrderRoute
   '/api/ai-pedagogy': typeof ApiAiPedagogyRoute
+  '/api/ai-resource-meta': typeof ApiAiResourceMetaRoute
   '/api/ai-review': typeof ApiAiReviewRoute
+  '/api/ai-summary': typeof ApiAiSummaryRoute
+  '/api/ai-tasks': typeof ApiAiTasksRoute
   '/api/ai-test': typeof ApiAiTestRoute
   '/api/ai-theme-meta': typeof ApiAiThemeMetaRoute
   '/api/link-check': typeof ApiLinkCheckRoute
@@ -311,9 +351,14 @@ export interface FileRoutesById {
   '/api/ai-curriculum': typeof ApiAiCurriculumRoute
   '/api/ai-document': typeof ApiAiDocumentRoute
   '/api/ai-flashcards': typeof ApiAiFlashcardsRoute
+  '/api/ai-gaps': typeof ApiAiGapsRoute
   '/api/ai-lesson-plan': typeof ApiAiLessonPlanRoute
+  '/api/ai-order': typeof ApiAiOrderRoute
   '/api/ai-pedagogy': typeof ApiAiPedagogyRoute
+  '/api/ai-resource-meta': typeof ApiAiResourceMetaRoute
   '/api/ai-review': typeof ApiAiReviewRoute
+  '/api/ai-summary': typeof ApiAiSummaryRoute
+  '/api/ai-tasks': typeof ApiAiTasksRoute
   '/api/ai-test': typeof ApiAiTestRoute
   '/api/ai-theme-meta': typeof ApiAiThemeMetaRoute
   '/api/link-check': typeof ApiLinkCheckRoute
@@ -349,9 +394,14 @@ export interface FileRouteTypes {
     | '/api/ai-curriculum'
     | '/api/ai-document'
     | '/api/ai-flashcards'
+    | '/api/ai-gaps'
     | '/api/ai-lesson-plan'
+    | '/api/ai-order'
     | '/api/ai-pedagogy'
+    | '/api/ai-resource-meta'
     | '/api/ai-review'
+    | '/api/ai-summary'
+    | '/api/ai-tasks'
     | '/api/ai-test'
     | '/api/ai-theme-meta'
     | '/api/link-check'
@@ -384,9 +434,14 @@ export interface FileRouteTypes {
     | '/api/ai-curriculum'
     | '/api/ai-document'
     | '/api/ai-flashcards'
+    | '/api/ai-gaps'
     | '/api/ai-lesson-plan'
+    | '/api/ai-order'
     | '/api/ai-pedagogy'
+    | '/api/ai-resource-meta'
     | '/api/ai-review'
+    | '/api/ai-summary'
+    | '/api/ai-tasks'
     | '/api/ai-test'
     | '/api/ai-theme-meta'
     | '/api/link-check'
@@ -420,9 +475,14 @@ export interface FileRouteTypes {
     | '/api/ai-curriculum'
     | '/api/ai-document'
     | '/api/ai-flashcards'
+    | '/api/ai-gaps'
     | '/api/ai-lesson-plan'
+    | '/api/ai-order'
     | '/api/ai-pedagogy'
+    | '/api/ai-resource-meta'
     | '/api/ai-review'
+    | '/api/ai-summary'
+    | '/api/ai-tasks'
     | '/api/ai-test'
     | '/api/ai-theme-meta'
     | '/api/link-check'
@@ -457,9 +517,14 @@ export interface RootRouteChildren {
   ApiAiCurriculumRoute: typeof ApiAiCurriculumRoute
   ApiAiDocumentRoute: typeof ApiAiDocumentRoute
   ApiAiFlashcardsRoute: typeof ApiAiFlashcardsRoute
+  ApiAiGapsRoute: typeof ApiAiGapsRoute
   ApiAiLessonPlanRoute: typeof ApiAiLessonPlanRoute
+  ApiAiOrderRoute: typeof ApiAiOrderRoute
   ApiAiPedagogyRoute: typeof ApiAiPedagogyRoute
+  ApiAiResourceMetaRoute: typeof ApiAiResourceMetaRoute
   ApiAiReviewRoute: typeof ApiAiReviewRoute
+  ApiAiSummaryRoute: typeof ApiAiSummaryRoute
+  ApiAiTasksRoute: typeof ApiAiTasksRoute
   ApiAiTestRoute: typeof ApiAiTestRoute
   ApiAiThemeMetaRoute: typeof ApiAiThemeMetaRoute
   ApiLinkCheckRoute: typeof ApiLinkCheckRoute
@@ -533,11 +598,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAiFlashcardsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/ai-gaps': {
+      id: '/api/ai-gaps'
+      path: '/api/ai-gaps'
+      fullPath: '/api/ai-gaps'
+      preLoaderRoute: typeof ApiAiGapsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/ai-lesson-plan': {
       id: '/api/ai-lesson-plan'
       path: '/api/ai-lesson-plan'
       fullPath: '/api/ai-lesson-plan'
       preLoaderRoute: typeof ApiAiLessonPlanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/ai-order': {
+      id: '/api/ai-order'
+      path: '/api/ai-order'
+      fullPath: '/api/ai-order'
+      preLoaderRoute: typeof ApiAiOrderRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/ai-pedagogy': {
@@ -547,11 +626,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAiPedagogyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/ai-resource-meta': {
+      id: '/api/ai-resource-meta'
+      path: '/api/ai-resource-meta'
+      fullPath: '/api/ai-resource-meta'
+      preLoaderRoute: typeof ApiAiResourceMetaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/ai-review': {
       id: '/api/ai-review'
       path: '/api/ai-review'
       fullPath: '/api/ai-review'
       preLoaderRoute: typeof ApiAiReviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/ai-summary': {
+      id: '/api/ai-summary'
+      path: '/api/ai-summary'
+      fullPath: '/api/ai-summary'
+      preLoaderRoute: typeof ApiAiSummaryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/ai-tasks': {
+      id: '/api/ai-tasks'
+      path: '/api/ai-tasks'
+      fullPath: '/api/ai-tasks'
+      preLoaderRoute: typeof ApiAiTasksRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/ai-test': {
@@ -791,9 +891,14 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAiCurriculumRoute: ApiAiCurriculumRoute,
   ApiAiDocumentRoute: ApiAiDocumentRoute,
   ApiAiFlashcardsRoute: ApiAiFlashcardsRoute,
+  ApiAiGapsRoute: ApiAiGapsRoute,
   ApiAiLessonPlanRoute: ApiAiLessonPlanRoute,
+  ApiAiOrderRoute: ApiAiOrderRoute,
   ApiAiPedagogyRoute: ApiAiPedagogyRoute,
+  ApiAiResourceMetaRoute: ApiAiResourceMetaRoute,
   ApiAiReviewRoute: ApiAiReviewRoute,
+  ApiAiSummaryRoute: ApiAiSummaryRoute,
+  ApiAiTasksRoute: ApiAiTasksRoute,
   ApiAiTestRoute: ApiAiTestRoute,
   ApiAiThemeMetaRoute: ApiAiThemeMetaRoute,
   ApiLinkCheckRoute: ApiLinkCheckRoute,
