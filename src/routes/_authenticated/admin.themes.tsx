@@ -320,6 +320,8 @@ function ThemesAdmin() {
           </div>
 
           <Card>
+            <DndContext collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+
 
               <SortableContext items={(themes ?? []).map((t) => t.id)} strategy={verticalListSortingStrategy}>
                 <div className="divide-y">
