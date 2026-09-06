@@ -132,6 +132,12 @@ function ThemePage() {
               >
                 <Presentation className="h-4 w-4" /> Урок
               </Button>
+              {canEdit && (
+                <Button variant="outline" size="sm" title="AI съставя задачи за час по темата" onClick={genTasks}>
+                  <Sparkles className="h-4 w-4" /> AI задачи
+                </Button>
+              )}
+
 
               <Button
                 variant="outline"
