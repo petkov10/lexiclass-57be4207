@@ -15,6 +15,8 @@ import { useApplySettings } from "@/hooks/useAppSettings";
 import { supabase } from "@/integrations/supabase/client";
 import { CommandPalette } from "@/components/CommandPalette";
 import { PinGate } from "@/components/PinGate";
+import { GlobalAIChat } from "@/components/GlobalAIChat";
+
 
 function NotFoundComponent() {
   return (
