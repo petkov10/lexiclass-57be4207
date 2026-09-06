@@ -386,8 +386,30 @@ function ResourceForm({ themeId, existing, orderHint, onDone }: { themeId: strin
       </div>
       <div>
         <Label>Кратко описание</Label>
-        <Input value={description} onChange={(e) => setDescription(e.target.value)} />
+        <div className="flex gap-2">
+          <Input value={description} onChange={(e) => setDescription(e.target.value)} />
+          <Button
+            type="button"
+            variant="outline"
+            className="shrink-0"
+            disabled={metaLoading || !title.trim()}
+            title="AI попълва кратко описание по заглавието и типа"
+            onClick={async () => {
+              setMetaLoading(true);
+              try {
+                const res = await aiFetch("/api/ai-resource-meta", { title, type, current: description });
+                if (!res.ok) throw new Error(await res.text());
+                const j = await res.json();
+                if (j.description) { setDescription(j.description); toast.success("Описанието е попълнено от AI"); }
+                else toast.error("AI не върна описание");
+              } catch (e: any) { toast.error(e.message); } finally { setMetaLoading(false); }
+            }}
+          >
+            <Sparkles /> {metaLoading ? "AI..." : "AI описание"}
+          </Button>
+        </div>
       </div>
+
 
       {(type === "link" || type === "video") && (
         <div>
