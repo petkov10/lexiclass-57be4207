@@ -310,8 +310,17 @@ function ThemesAdmin() {
             </div>
           </Card>
 
+          <div className="flex flex-wrap items-center gap-2">
+            <Button variant="outline" size="sm" onClick={aiOrder} disabled={orderLoading || (themes?.length ?? 0) < 2}>
+              <Sparkles /> {orderLoading ? "AI подрежда..." : "AI подредба на темите"}
+            </Button>
+            <Button variant="outline" size="sm" onClick={aiGaps} disabled={gapsLoading || !themes?.length}>
+              <Sparkles /> {gapsLoading ? "AI проверява..." : "Проверка за пропуски"}
+            </Button>
+          </div>
+
           <Card>
-            <DndContext collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+
               <SortableContext items={(themes ?? []).map((t) => t.id)} strategy={verticalListSortingStrategy}>
                 <div className="divide-y">
                   {(themes ?? []).map((t) => (
