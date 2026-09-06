@@ -11,7 +11,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Markdown } from "@/components/Markdown";
 import { QrCodeButton } from "@/components/QrCodeButton";
 import { ThemeAIChat } from "@/components/ThemeAIChat";
-import { Share2, Star, MonitorPlay } from "lucide-react";
+import { Share2, Star, MonitorPlay, Sparkles } from "lucide-react";
+import { useAuth, useRole } from "@/hooks/useAuth";
+import { aiFetch } from "@/lib/ai-client";
+import { AiResultDialog } from "@/components/AiResultDialog";
 import { isFavorite, toggleFavorite } from "@/lib/favorites";
 import { getProjector, setProjector } from "@/lib/a11y";
 import { toast } from "sonner";
@@ -211,7 +214,7 @@ function ThemePage() {
               {Array.from({ length: 3 }).map((_, i) => <div key={i} className="h-20 rounded-lg bg-muted animate-pulse" />)}
             </div>
           ) : resources && resources.length > 0 ? (
-            <ResourceGroups resources={resources as ResourceRow[]} onOpen={(i) => setOpenIdx(i)} />
+            <ResourceGroups resources={resources as ResourceRow[]} onOpen={(i) => setOpenIdx(i)} onSummarize={canEdit ? summarize : undefined} />
           ) : (
             <p className="text-muted-foreground">Все още няма ресурси за тази тема.</p>
           )}
@@ -262,6 +265,7 @@ function ThemePage() {
           onClose={() => setLesson(false)}
         />
       )}
+      <AiResultDialog open={aiOpen} onOpenChange={setAiOpen} title={aiTitle} loading={aiLoading} value={aiText} onChange={setAiText} />
       {theme && (
         <ThemeAIChat
           themeName={theme.name}
@@ -288,7 +292,7 @@ const GROUP_ORDER: { types: ResourceType[]; label: string }[] = [
   { types: ["other"], label: "Други" },
 ];
 
-function ResourceGroups({ resources, onOpen }: { resources: ResourceRow[]; onOpen: (i: number) => void }) {
+function ResourceGroups({ resources, onOpen, onSummarize }: { resources: ResourceRow[]; onOpen: (i: number) => void; onSummarize?: (r: ResourceRow) => void }) {
   const indexMap = new Map(resources.map((r, i) => [r.id, i]));
   return (
     <div className="space-y-8">
@@ -303,7 +307,7 @@ function ResourceGroups({ resources, onOpen }: { resources: ResourceRow[]; onOpe
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {items.map((r) => (
-                <ResourceCard key={r.id} r={r} onOpen={() => onOpen(indexMap.get(r.id)!)} />
+                <ResourceCard key={r.id} r={r} onOpen={() => onOpen(indexMap.get(r.id)!)} onSummarize={onSummarize} />
               ))}
             </div>
           </section>
@@ -313,7 +317,7 @@ function ResourceGroups({ resources, onOpen }: { resources: ResourceRow[]; onOpe
   );
 }
 
-function ResourceCard({ r, onOpen }: { r: ResourceRow; onOpen: () => void }) {
+function ResourceCard({ r, onOpen, onSummarize }: { r: ResourceRow; onOpen: () => void; onSummarize?: (r: ResourceRow) => void }) {
   const Icon = ICONS[r.type] ?? FileText;
   const isExternal = r.type === "link" || r.type === "video" || r.type === "notebooklm";
   const { url, loading } = useResourceUrl({ url: r.url, file_path: r.file_path });
@@ -325,6 +329,11 @@ function ResourceCard({ r, onOpen }: { r: ResourceRow; onOpen: () => void }) {
         <div className="font-medium truncate">{r.title}</div>
         {r.description && <div className="text-xs text-muted-foreground truncate">{r.description}</div>}
       </div>
+      {onSummarize && (
+        <Button size="sm" variant="ghost" title="AI обобщение на ресурса" onClick={() => onSummarize(r)}>
+          <Sparkles className="h-4 w-4" />
+        </Button>
+      )}
       {isTest ? (
         <Button asChild size="sm" variant="outline"><a href={`/test/${r.id}/print`} target="_blank" rel="noreferrer">Печат</a></Button>
       ) : isExternal && url ? (
