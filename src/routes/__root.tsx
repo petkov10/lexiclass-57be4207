@@ -110,7 +110,9 @@ function AppInner() {
     <>
       <PinGate><Outlet /></PinGate>
       <CommandPalette />
+      <GlobalAIChat />
       <Toaster richColors position="top-right" />
     </>
+
   );
 }
