@@ -306,7 +306,9 @@ function ResourceForm({ themeId, existing, orderHint, onDone }: { themeId: strin
   const [aiTopic, setAiTopic] = useState("");
   const [aiCount, setAiCount] = useState(10);
   const [aiLoading, setAiLoading] = useState(false);
+  const [metaLoading, setMetaLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+
 
   useEffect(() => {
     if (existing?.type !== "textbook") return;
