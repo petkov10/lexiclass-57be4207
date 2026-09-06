@@ -19,6 +19,8 @@ import { CSS } from "@dnd-kit/utilities";
 import { useAuth } from "@/hooks/useAuth";
 import { aiFetch, fileToAiPayload } from "@/lib/ai-client";
 import { Sparkles, Wand2 } from "lucide-react";
+import { AiResultDialog } from "@/components/AiResultDialog";
+
 
 export const Route = createFileRoute("/_authenticated/admin/themes")({
   component: ThemesAdmin,
@@ -243,7 +245,55 @@ function ThemesAdmin() {
   };
 
 
+  // --- AI подредба на темите и проверка за пропуски ---
+  const [orderLoading, setOrderLoading] = useState(false);
+  const [gapsLoading, setGapsLoading] = useState(false);
+  const [gapsOpen, setGapsOpen] = useState(false);
+  const [gapsText, setGapsText] = useState("");
+
+  const aiOrder = async () => {
+    if (!themes || themes.length < 2) return;
+    setOrderLoading(true);
+    try {
+      const res = await aiFetch("/api/ai-order", {
+        className, subject: subjectName,
+        themes: themes.map((t) => ({ id: t.id, name: t.name, description: t.description })),
+      });
+      if (!res.ok) throw new Error(await res.text());
+      const j = await res.json();
+      const order: string[] = j.order ?? [];
+      if (order.length !== themes.length) throw new Error("AI не върна пълна подредба");
+      if (!confirm(`AI предлага нова подредба.\n\n${j.notes || ""}\n\nДа я приложа ли?`)) return;
+      const byId = new Map(themes.map((t) => [t.id, t]));
+      const reordered = order.map((id) => byId.get(id)!).filter(Boolean);
+      qc.setQueryData(["themes", classId, subjectId], reordered);
+      await Promise.all(reordered.map((t, i) => supabase.from("themes").update({ order_index: i + 1 }).eq("id", t.id)));
+      refresh();
+      toast.success("Темите са преподредени");
+    } catch (e: any) { toast.error(e.message); } finally { setOrderLoading(false); }
+  };
+
+  const aiGaps = async () => {
+    if (!themes?.length) return;
+    setGapsLoading(true);
+    setGapsText("");
+    setGapsOpen(true);
+    try {
+      const ids = themes.map((t) => t.id);
+      const { data: rows } = await supabase.from("resources").select("theme_id, type").in("theme_id", ids).is("deleted_at", null);
+      const stats = themes.map((t) => {
+        const own = (rows ?? []).filter((r) => r.theme_id === t.id);
+        return { name: t.name, description: t.description, total: own.length, types: Array.from(new Set(own.map((r) => r.type))) };
+      });
+      const res = await aiFetch("/api/ai-gaps", { className, subject: subjectName, themes: stats });
+      if (!res.ok) throw new Error(await res.text());
+      const j = await res.json();
+      setGapsText(j.message || "");
+    } catch (e: any) { toast.error(e.message); setGapsOpen(false); } finally { setGapsLoading(false); }
+  };
+
   const onDragEnd = async (e: DragEndEvent) => {
+
     const { active, over } = e;
     if (!over || active.id === over.id || !themes) return;
     const oldIdx = themes.findIndex((t) => t.id === active.id);
@@ -310,8 +360,19 @@ function ThemesAdmin() {
             </div>
           </Card>
 
+          <div className="flex flex-wrap items-center gap-2">
+            <Button variant="outline" size="sm" onClick={aiOrder} disabled={orderLoading || (themes?.length ?? 0) < 2}>
+              <Sparkles /> {orderLoading ? "AI подрежда..." : "AI подредба на темите"}
+            </Button>
+            <Button variant="outline" size="sm" onClick={aiGaps} disabled={gapsLoading || !themes?.length}>
+              <Sparkles /> {gapsLoading ? "AI проверява..." : "Проверка за пропуски"}
+            </Button>
+          </div>
+
           <Card>
             <DndContext collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+
+
               <SortableContext items={(themes ?? []).map((t) => t.id)} strategy={verticalListSortingStrategy}>
                 <div className="divide-y">
                   {(themes ?? []).map((t) => (
@@ -338,7 +399,17 @@ function ThemesAdmin() {
         </>
       )}
 
+      <AiResultDialog
+        open={gapsOpen}
+        onOpenChange={setGapsOpen}
+        title="Проверка за пропуски в ресурсите"
+        loading={gapsLoading}
+        value={gapsText}
+        onChange={setGapsText}
+      />
+
       <Dialog open={!!notesFor} onOpenChange={(v) => !v && setNotesFor(null)}>
+
         <DialogContent>
           <DialogHeader><DialogTitle className="flex items-center gap-2"><StickyNote className="h-4 w-4" /> Лични бележки: {notesFor?.name}</DialogTitle></DialogHeader>
           <p className="text-xs text-muted-foreground">Тези бележки са видими само за учители в админ панела. Не се показват публично.</p>
