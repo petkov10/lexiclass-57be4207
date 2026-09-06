@@ -41,6 +41,50 @@ function ThemePage() {
   const [fav, setFav] = useState(false);
   const [projector, setProj] = useState(false);
   const [lesson, setLesson] = useState(false);
+  const { user } = useAuth();
+  const { canEdit } = useRole(user?.id);
+  const [aiOpen, setAiOpen] = useState(false);
+  const [aiTitle, setAiTitle] = useState("");
+  const [aiText, setAiText] = useState("");
+  const [aiLoading, setAiLoading] = useState(false);
+
+  const runAi = async (title: string, path: string, body: unknown) => {
+    setAiTitle(title);
+    setAiText("");
+    setAiOpen(true);
+    setAiLoading(true);
+    try {
+      const res = await aiFetch(path, body);
+      if (!res.ok) throw new Error((await res.text()) || "Грешка при AI заявката");
+      const j = await res.json();
+      setAiText(j.message || "");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Неуспешна заявка");
+      setAiOpen(false);
+    } finally { setAiLoading(false); }
+  };
+
+  const genTasks = () =>
+    runAi(`Задачи по темата: ${theme?.name ?? ""}`, "/api/ai-tasks", {
+      theme: theme?.name,
+      description: theme?.description,
+      className: (theme as any)?.class?.name,
+      subject: (theme as any)?.subject?.name,
+      resources: (resources ?? []).map((r) => `${r.title} (${LABELS[r.type as ResourceType] ?? r.type})`),
+      count: 5,
+    });
+
+  const summarize = (r: ResourceRow) =>
+    runAi(`Обобщение: ${r.title}`, "/api/ai-summary", {
+      title: r.title,
+      type: LABELS[r.type] ?? r.type,
+      description: r.description,
+      url: r.url,
+      theme: theme?.name,
+      className: (theme as any)?.class?.name,
+      text: typeof (r.content as any)?.statement === "string" ? (r.content as any).statement : null,
+    });
+
 
   useEffect(() => {
     setFav(isFavorite(themeId));
