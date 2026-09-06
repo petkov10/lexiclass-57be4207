@@ -19,6 +19,8 @@ import { CSS } from "@dnd-kit/utilities";
 import { useAuth } from "@/hooks/useAuth";
 import { aiFetch, fileToAiPayload } from "@/lib/ai-client";
 import { Sparkles, Wand2 } from "lucide-react";
+import { AiResultDialog } from "@/components/AiResultDialog";
+
 
 export const Route = createFileRoute("/_authenticated/admin/themes")({
   component: ThemesAdmin,
