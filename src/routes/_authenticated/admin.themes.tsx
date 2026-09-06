@@ -397,7 +397,17 @@ function ThemesAdmin() {
         </>
       )}
 
+      <AiResultDialog
+        open={gapsOpen}
+        onOpenChange={setGapsOpen}
+        title="Проверка за пропуски в ресурсите"
+        loading={gapsLoading}
+        value={gapsText}
+        onChange={setGapsText}
+      />
+
       <Dialog open={!!notesFor} onOpenChange={(v) => !v && setNotesFor(null)}>
+
         <DialogContent>
           <DialogHeader><DialogTitle className="flex items-center gap-2"><StickyNote className="h-4 w-4" /> Лични бележки: {notesFor?.name}</DialogTitle></DialogHeader>
           <p className="text-xs text-muted-foreground">Тези бележки са видими само за учители в админ панела. Не се показват публично.</p>
