@@ -494,7 +494,7 @@ function ThemesAdmin() {
   );
 }
 
-function SortableThemeRow({ t, isEditing, editValues, setEditValues, onStartEdit, onCancelEdit, onSave, onRemove, onOpenNotes, onDuplicate, onHomework, hasNotes }: any) {
+function SortableThemeRow({ t, isEditing, editValues, setEditValues, onStartEdit, onCancelEdit, onSave, onRemove, onOpenNotes, onDuplicate, hasNotes }: any) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: t.id });
   const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.5 : 1 };
   return (
