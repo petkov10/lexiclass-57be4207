@@ -1,11 +1,14 @@
 services:
   lexiclass:
     build: .
+    image: lexiclass:latest
     container_name: lexiclass_app
     restart: unless-stopped
     ports:
       - "3000:3000"
     environment:
       - NODE_ENV=production
+      - PORT=3000
+      - HOST=0.0.0.0
     env_file:
       - .env
