@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { classesQuery, subjectsQuery, themesQuery, classSubjectsQuery, homeworkForThemeQuery } from "@/lib/queries";
+import { classesQuery, subjectsQuery, themesQuery, classSubjectsQuery } from "@/lib/queries";
 import { supabase } from "@/integrations/supabase/client";
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
@@ -61,7 +61,6 @@ function ThemesAdmin() {
   const [editValues, setEditValues] = useState({ name: "", description: "", week: "", color: "", tags: "" });
   const [notesFor, setNotesFor] = useState<{ id: string; name: string; notes: string } | null>(null);
   const [duplicateFor, setDuplicateFor] = useState<{ id: string; name: string } | null>(null);
-  const [homeworkFor, setHomeworkFor] = useState<{ id: string; name: string } | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const refresh = () => {
@@ -388,7 +387,6 @@ function ThemesAdmin() {
                       onOpenNotes={() => openNotes(t.id, t.name)}
                       hasNotes={notedThemeIds?.has(t.id) ?? false}
                       onDuplicate={() => setDuplicateFor({ id: t.id, name: t.name })}
-                      onHomework={() => setHomeworkFor({ id: t.id, name: t.name })}
                     />
                   ))}
                   {(!themes || themes.length === 0) && <div className="p-6 text-sm text-muted-foreground text-center">Все още няма теми.</div>}
@@ -425,12 +423,6 @@ function ThemesAdmin() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={!!homeworkFor} onOpenChange={(v) => !v && setHomeworkFor(null)}>
-        <DialogContent>
-          <DialogHeader><DialogTitle className="flex items-center gap-2"><BookCheck className="h-4 w-4" /> Домашни към: {homeworkFor?.name}</DialogTitle></DialogHeader>
-          {homeworkFor && <HomeworkManager themeId={homeworkFor.id} userId={user?.id} />}
-        </DialogContent>
-      </Dialog>
 
       <Dialog open={aiOpen} onOpenChange={setAiOpen}>
         <DialogContent className="max-w-2xl">
@@ -502,7 +494,7 @@ function ThemesAdmin() {
   );
 }
 
-function SortableThemeRow({ t, isEditing, editValues, setEditValues, onStartEdit, onCancelEdit, onSave, onRemove, onOpenNotes, onDuplicate, onHomework, hasNotes }: any) {
+function SortableThemeRow({ t, isEditing, editValues, setEditValues, onStartEdit, onCancelEdit, onSave, onRemove, onOpenNotes, onDuplicate, hasNotes }: any) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: t.id });
   const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.5 : 1 };
   return (
@@ -543,7 +535,6 @@ function SortableThemeRow({ t, isEditing, editValues, setEditValues, onStartEdit
             )}
           </div>
           {hasNotes && <span title="Има лични бележки" className="text-amber-500"><StickyNote className="h-3.5 w-3.5" /></span>}
-          <Button size="sm" variant="ghost" onClick={onHomework} title="Домашни"><BookCheck className="h-4 w-4" /></Button>
           <Button size="sm" variant="ghost" onClick={onOpenNotes} title="Лични бележки"><StickyNote className="h-4 w-4" /></Button>
           <Button size="sm" variant="ghost" onClick={onDuplicate} title="Копирай в друг клас"><Copy className="h-4 w-4" /></Button>
           <Button size="sm" variant="ghost" onClick={onStartEdit}>Редактирай</Button>
@@ -615,47 +606,3 @@ function DuplicateForm({ themeId, onDone }: { themeId: string; onDone: () => voi
   );
 }
 
-function HomeworkManager({ themeId, userId }: { themeId: string; userId?: string }) {
-  const qc = useQueryClient();
-  const { data: items } = useQuery(homeworkForThemeQuery(themeId));
-  const [title, setTitle] = useState("");
-  const [desc, setDesc] = useState("");
-  const [deadline, setDeadline] = useState("");
-  const refresh = () => qc.invalidateQueries({ queryKey: ["homework", themeId] });
-  const add = async () => {
-    if (!title.trim()) return;
-    const { error } = await supabase.from("homework").insert({
-      theme_id: themeId, title: title.trim(), description: desc || null,
-      deadline: deadline || null, created_by: userId,
-    });
-    if (error) return toast.error(error.message);
-    setTitle(""); setDesc(""); setDeadline(""); refresh();
-  };
-  return (
-    <div className="space-y-3">
-      <div className="space-y-2 border-b pb-3">
-        <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Заглавие" />
-        <Textarea rows={3} value={desc} onChange={(e) => setDesc(e.target.value)} placeholder="Описание / задание" />
-        <div className="flex gap-2">
-          <Input type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} className="flex-1" />
-          <Button onClick={add} disabled={!title.trim()}><Plus /> Добави</Button>
-        </div>
-      </div>
-      <div className="space-y-2 max-h-[40vh] overflow-auto">
-        {(items ?? []).map((h) => (
-          <div key={h.id} className="flex items-start gap-2 rounded border p-2">
-            <div className="flex-1 min-w-0">
-              <div className="font-medium text-sm">{h.title}</div>
-              {h.description && <div className="text-xs text-muted-foreground line-clamp-2">{h.description}</div>}
-              {h.deadline && <div className="text-xs text-primary mt-1">До: {new Date(h.deadline).toLocaleDateString("bg-BG")}</div>}
-            </div>
-            <Button size="sm" variant="ghost" onClick={async () => { await supabase.from("homework").delete().eq("id", h.id); refresh(); }}>
-              <Trash2 className="text-destructive h-4 w-4" />
-            </Button>
-          </div>
-        ))}
-        {(items?.length ?? 0) === 0 && <p className="text-xs text-muted-foreground text-center py-4">Няма домашни.</p>}
-      </div>
-    </div>
-  );
-}

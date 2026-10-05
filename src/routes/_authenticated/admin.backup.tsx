@@ -341,7 +341,7 @@ function BackupPage() {
       <Card className="p-6 space-y-3">
         <h2 className="font-semibold flex items-center gap-2"><FileArchive className="h-4 w-4 text-primary" /> 1. Направете архив</h2>
         <p className="text-sm text-muted-foreground">
-          <b>Пълен архив</b> = всички данни (класове, предмети, теми, ресурси, домашни, разписание, тестове, настройки)
+          <b>Пълен архив</b> = всички данни (класове, предмети, теми, ресурси, разписание, тестове, настройки)
           <b> + всички качени файлове</b> в един .zip. Същият файл се използва и за преместване на сайта.
         </p>
         <div className="flex flex-wrap gap-2">

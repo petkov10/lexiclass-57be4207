@@ -380,7 +380,7 @@ function DangerZone() {
     <Card className="p-6 space-y-5 border-destructive/40">
       <div>
         <h2 className="font-semibold text-destructive">Опасна зона</h2>
-        <p className="text-xs text-muted-foreground mt-1">Каскадно изтриване — премахва избрания елемент заедно с всички теми, ресурси, домашни и програма.</p>
+        <p className="text-xs text-muted-foreground mt-1">Каскадно изтриване — премахва избрания елемент заедно с всички теми, ресурси и програма.</p>
       </div>
 
       <div className="space-y-3">
@@ -414,7 +414,7 @@ function DangerZone() {
             <SelectContent>{themes?.map((t) => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}</SelectContent>
           </Select>
           <Button variant="destructive" disabled={!themeId || busy}
-            onClick={() => run(`Изтриване на тема със всички ресурси и домашни.`,
+            onClick={() => run(`Изтриване на тема със всички ресурси.`,
               async () => { const { error } = await supabase.rpc("admin_delete_theme", { _id: themeId }); return { error }; })}>
             Изтрий тема
           </Button>
@@ -423,7 +423,7 @@ function DangerZone() {
 
       <div className="pt-4 border-t border-destructive/30 space-y-2">
         <Label className="text-destructive">Нулиране на цялото съдържание</Label>
-        <p className="text-xs text-muted-foreground">Изтрива ВСИЧКИ класове, предмети, теми, ресурси, тестови резултати, домашни и програма. Потребителите и настройките остават.</p>
+        <p className="text-xs text-muted-foreground">Изтрива ВСИЧКИ класове, предмети, теми, ресурси, тестови резултати и програма. Потребителите и настройките остават.</p>
         <p className="text-xs text-muted-foreground">Напиши <code className="bg-muted px-1 rounded">ИЗТРИЙ ВСИЧКО</code> за потвърждение:</p>
         <div className="flex gap-2">
           <Input value={resetConfirm} onChange={(e) => setResetConfirm(e.target.value)} placeholder="ИЗТРИЙ ВСИЧКО" />
