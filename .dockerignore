@@ -1,0 +1,8 @@
+node_modules
+.output
+dist
+.git
+.lovable
+.tanstack
+tsconfig.tsbuildinfo
+*.log
