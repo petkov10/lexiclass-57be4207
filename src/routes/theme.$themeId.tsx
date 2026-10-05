@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { resourcesForThemeQuery, themeByIdQuery, homeworkForThemeQuery } from "@/lib/queries";
+import { resourcesForThemeQuery, themeByIdQuery } from "@/lib/queries";
 import { useResourceUrl } from "@/hooks/useResourceUrl";
 import { PublicShell } from "@/components/layout/PublicShell";
 import { ChevronRight, FileText, Link as LinkIcon, Video, FileCheck, Code, Image as ImgIcon, StickyNote, Presentation, Pencil, ExternalLink, BookOpen, Layers, RotateCw, Maximize2, Minimize2, ClipboardList, ChevronLeft, BookCheck, Download } from "lucide-react";
@@ -38,7 +38,6 @@ function ThemePage() {
   const { themeId } = Route.useParams();
   const { data: theme } = useQuery(themeByIdQuery(themeId));
   const { data: resources, isLoading } = useQuery(resourcesForThemeQuery(themeId));
-  const { data: homework } = useQuery(homeworkForThemeQuery(themeId));
   const [openIdx, setOpenIdx] = useState<number | null>(null);
   const [fullscreen, setFullscreen] = useState(false);
   const [fav, setFav] = useState(false);
@@ -220,20 +219,6 @@ function ThemePage() {
           )}
         </div>
 
-        {(homework?.length ?? 0) > 0 && (
-          <div className="mt-10">
-            <h2 className="text-lg font-semibold flex items-center gap-2 mb-3"><BookCheck className="h-5 w-5 text-primary" /> Домашна работа</h2>
-            <div className="space-y-2">
-              {homework!.map((h) => (
-                <div key={h.id} className="rounded-lg border bg-card p-4">
-                  <div className="font-medium">{h.title}</div>
-                  {h.description && <div className="text-sm text-muted-foreground mt-1 whitespace-pre-wrap">{h.description}</div>}
-                  {h.deadline && <div className="text-xs text-primary mt-2">Срок: {new Date(h.deadline).toLocaleDateString("bg-BG")}</div>}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
 
       <Dialog open={openIdx !== null} onOpenChange={(v) => { if (!v) { setOpenIdx(null); setFullscreen(false); } }}>
