@@ -24,3 +24,13 @@ cd <repository-name>
 npm i
 npm run dev
 ```
+
+## Пускане с Docker (на друг компютър)
+
+1. Инсталирайте Docker Desktop.
+2. Копирайте папката на проекта (заедно с файла `.env`).
+3. В папката изпълнете: `docker compose up -d --build`
+4. Отворете http://localhost:3000
+
+Спиране: `docker compose down`. Обновяване: `docker compose up -d --build`.
+Данните и файловете остават в облачната база — Docker пуска само сайта.
