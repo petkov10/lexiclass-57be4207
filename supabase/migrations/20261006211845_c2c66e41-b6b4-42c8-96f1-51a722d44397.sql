@@ -1,0 +1,10 @@
+REVOKE EXECUTE ON FUNCTION public.can_edit(uuid) FROM anon, public;
+GRANT EXECUTE ON FUNCTION public.can_edit(uuid) TO authenticated;
+ALTER POLICY "Public read classes" ON public.classes TO authenticated;
+ALTER POLICY "Public read subjects" ON public.subjects TO authenticated;
+ALTER POLICY "Public read themes" ON public.themes TO authenticated;
+ALTER POLICY "Public read resources" ON public.resources TO authenticated;
+CREATE POLICY "Visitors read classes" ON public.classes FOR SELECT TO anon USING (deleted_at IS NULL);
+CREATE POLICY "Visitors read subjects" ON public.subjects FOR SELECT TO anon USING (deleted_at IS NULL);
+CREATE POLICY "Visitors read themes" ON public.themes FOR SELECT TO anon USING (deleted_at IS NULL);
+CREATE POLICY "Visitors read resources" ON public.resources FOR SELECT TO anon USING (is_hidden = false AND deleted_at IS NULL);
